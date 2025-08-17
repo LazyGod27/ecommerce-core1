@@ -3,14 +3,43 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\StripeWebhookController;
+use App\Http\Controllers\Api\CartController;
+use App\Http\Controllers\Api\CheckoutController;
+use App\Http\Controllers\Api\AuthController;
 
 Route::get('/products', [ProductController::class, 'index']);
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/checkout', 'Api\CheckoutController@store');
-});
-Route::post('/register', 'Api\AuthController@register');
-Route::post('/login', 'Api\AuthController@login');
-Route::middleware('auth:sanctum')->post('/logout', 'Api\AuthController@logout');
+Route::get('/products/search', [ProductController::class, 'productSearch']);
 
-Route::post('/payment/intent', 'Api\PaymentController@createPaymentIntent');
-Route::post('/payment/webhook', 'Api\PaymentController@handleWebhook');
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/cart', [CartController::class, 'index']);
+    Route::post('/cart/add/{product}', [CartController::class, 'add']);
+    Route::put('/cart/update/{rowId}', [CartController::class, 'update']);
+    Route::delete('/cart/remove/{rowId}', [CartController::class, 'remove']);
+    Route::delete('/cart/clear', [CartController::class, 'clear']);
+    
+    Route::post('/checkout', [CheckoutController::class, 'store']);
+});
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+
+Route::post('/payment/intent', [PaymentController::class, 'createPaymentIntent']);
+Route::post('/payment/webhook', [PaymentController::class, 'handleWebhook']);
+
+Route::post('/payments/gcash/initiate', [PaymentController::class, 'initiateGcash']);
+Route::post('/payments/gcash/webhook', [PaymentController::class, 'gcashWebhook']);
+
+Route::post('/search/voice', 'Api\SearchController@voiceSearch');
+
+Route::post('/payments/process', [PaymentController::class, 'process']);
+Route::post('/payments/refund', [PaymentController::class, 'refund']);
+
+Route::post('/stripe/webhook', [StripeWebhookController::class, 'handleWebhook']);
+
+Route::middleware('throttle:60,1')->group(function () {
+    Route::post('/payments/gcash/webhook', [PaymentController::class, 'gcashWebhook']);
+});
+

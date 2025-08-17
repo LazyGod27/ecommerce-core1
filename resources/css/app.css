@@ -1,11 +1,89 @@
-@import 'tailwindcss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* Custom styles */
+.message-box {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    animation: fadeInOut 3s forwards;
+}
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -20px); }
+    10% { opacity: 1; transform: translate(-50%, 0); }
+    90% { opacity: 1; transform: translate(-50%, 0); }
+    100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+/* Additional custom components */
+.top-notification-bar {
+    @apply bg-very-light-blue text-dark-blue text-center py-2 text-sm font-bold;
+}
+
+.header {
+    @apply bg-dark-slate-blue text-white flex items-center justify-between px-4 py-2 text-sm sticky top-0 z-50;
+}
+
+.search-bar {
+    @apply flex-grow flex h-10 rounded overflow-hidden mx-2 sm:mx-4 mt-2 sm:mt-0 focus-within:ring-2 focus-within:ring-bright-sky-blue;
+}
+
+.search-dropdown {
+    @apply bg-light-grayish-blue text-dark-slate-blue px-3 flex items-center gap-1 border-r border-gray-300 cursor-pointer text-xs;
+}
+
+.search-button {
+    @apply bg-bright-sky-blue text-dark-blue px-4 cursor-pointer text-lg hover:bg-dark-blue hover:text-white transition-colors duration-200;
+}
+
+.sub-nav {
+    @apply bg-dark-blue text-white py-2 px-4 text-sm flex items-center z-40;
+}
+
+/* Product listing styles */
+.product-listing-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6;
+}
+
+.product-listing-item {
+    @apply bg-white border border-gray-200 rounded-lg p-4 flex flex-col relative shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.product-title {
+    @apply text-dark-blue text-base font-medium mb-2 line-clamp-2;
+}
+
+.current-price {
+    @apply text-dark-blue text-xl font-bold;
+}
+
+/* Footer styles */
+.footer {
+    @apply bg-dark-slate-blue text-white mt-12 pt-6;
+}
+
+.footer-links {
+    @apply flex flex-col sm:flex-row justify-around py-8 px-6 border-b border-muted-blue-green;
+}
+
+.footer-col {
+    @apply flex-1 min-w-[180px] my-5 sm:my-0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .header {
+        @apply flex-wrap px-3 py-2;
+    }
+    
+    .search-bar {
+        @apply order-3 w-full mt-3 mx-0;
+    }
+    
+    .product-listing-grid {
+        @apply grid-cols-1;
+    }
 }

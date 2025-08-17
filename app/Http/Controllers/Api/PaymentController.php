@@ -10,6 +10,17 @@ use App\Mail\OrderConfirmation;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
 use Stripe\Exception\ApiErrorException;
+use App\Events\OrderPaid;
+use App\Mail\PaymentFailed;
+use App\Models\Payment;
+use App\Models\User;
+use App\Http\Requests\PaymentRequest;
+use App\Http\Requests\RefundRequest;
+use App\Http\Requests\PaymentIntentRequest;
+use App\Http\Requests\ProcessPaymentRequest;
+use App\Http\Requests\WebhookRequest;
+use App\Http\Requests\CreatePaymentIntentRequest;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -54,7 +65,7 @@ class PaymentController extends Controller
     {
         $request->validate([
             'order_id' => 'required|exists:orders,id',
-            'payment_method' => 'required|in:card,paypal',
+            'payment_method' => 'required|in:card,paypal,gcash',
             'payment_method_id' => 'required_if:payment_method,card'
         ]);
 
@@ -65,9 +76,16 @@ class PaymentController extends Controller
             return response()->json(['error' => 'Order already paid'], 400);
         }
 
-        return $request->payment_method === 'card' 
-            ? $this->processCardPayment($order, $request)
-            : $this->processPaypalPayment($order, $request);
+        switch ($request->payment_method) {
+            case 'card':
+                return $this->processCardPayment($order, $request);
+            case 'paypal':
+                return $this->processPaypalPayment($order, $request);
+            case 'gcash':
+                return $this->initiateGcash($order, $request);
+            default:
+                return response()->json(['error' => 'Invalid payment method'], 400);
+        }
     }
     
     /**
@@ -137,6 +155,55 @@ class PaymentController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Initiate GCash payment
+     */
+    public function initiateGcash(Order $order, Request $request)
+    {
+        try {
+            $gcashService = app(GcashService::class);
+            $redirectUrl = $gcashService->createPayment(
+                $order, 
+                $request->callback_url ?? config('app.url') . '/order-complete/' . $order->id
+            );
+            
+            return response()->json([
+                'success' => true,
+                'redirect_url' => $redirectUrl
+            ]);
+            
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Handle GCash webhook events
+     */
+    public function gcashWebhook(Request $request)
+    {
+        $payload = $request->all();
+        Log::info('GCash Webhook:', $payload);
+
+        // Verify the webhook signature here (implementation depends on GCash's security requirements)
+        
+        $order = Order::find($payload['metadata']['order_id'] ?? null);
+        if (!$order) {
+            return response()->json(['error' => 'Order not found'], 404);
+        }
+
+        if ($payload['status'] === 'success') {
+            $this->markOrderAsPaid($order, [
+                'payment_id' => $payload['paymentId'] ?? $payload['transaction_id'] ?? uniqid('GCASH-'),
+                'payment_method' => 'gcash'
+            ]);
+        }
+
+        return response()->json(['status' => 'success']);
+    }
     
     /**
      * Handle Stripe webhook events
@@ -175,10 +242,13 @@ class PaymentController extends Controller
      */
     protected function markOrderAsPaid(Order $order, $paymentData)
     {
+        $paymentMethod = $paymentData instanceof PaymentIntent ? 'card' : ($paymentData['payment_method'] ?? 'unknown');
+        $paymentId = $paymentData instanceof PaymentIntent ? $paymentData->id : ($paymentData['payment_id'] ?? uniqid(strtoupper($paymentMethod) . '-'));
+
         $order->update([
             'payment_status' => 'paid',
-            'payment_method' => $paymentData instanceof PaymentIntent ? 'card' : $paymentData['payment_method'],
-            'payment_id' => $paymentData instanceof PaymentIntent ? $paymentData->id : $paymentData['payment_id'],
+            'payment_method' => $paymentMethod,
+            'payment_id' => $paymentId,
             'paid_at' => now()
         ]);
         

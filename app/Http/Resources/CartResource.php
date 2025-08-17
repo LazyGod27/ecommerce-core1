@@ -17,11 +17,9 @@ class CartResource extends JsonResource
         return [
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'items' => CartItemResource::collection($this->items),
-            'total' => $this->items->sum(function ($item) {
-                return $item->quantity * $item->product->price;
-            }),
-            'items_count' => $this->items->sum('quantity'),
+            'total' => $this->total,
+            'item_count' => $this->items->count(),
+            'items' => CartItemResource::collection($this->whenLoaded('items')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

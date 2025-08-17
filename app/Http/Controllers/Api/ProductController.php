@@ -2,82 +2,75 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Product;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Http;
+use App\Models\Product;
+use App\Http\Controllers\Controller;
 
 class ProductController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        // Validate request parameters
-        $validator = Validator::make($request->all(), [
-            'search' => 'sometimes|string|max:255',
-            'category' => 'sometimes|string|max:255',
-            'min_price' => 'sometimes|numeric|min:0',
-            'max_price' => 'sometimes|numeric|min:0|gt:min_price',
-            'sort' => 'sometimes|string|in:name,price,created_at,updated_at',
-            'direction' => 'sometimes|string|in:asc,desc',
-            'per_page' => 'sometimes|integer|min:1|max:100',
-        ]);
+        $products = Product::with(['reviews'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+            
+        return response()->json($products);
+    }
 
-        if ($validator->fails()) {
-            return response()->json([
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        $query = Product::query();
+    public function productSearch(Request $request)
+    {
+        // Traditional search
+        $query = Product::with(['reviews']);
         
-        // Eager load relationships if needed
-        $query->with(['category', 'reviews']); // Example relationships
-        
-        // Search by name or description
-        if ($request->has('search')) {
-            $searchTerm = $request->search;
-            $query->where(function($q) use ($searchTerm) {
-                $q->where('name', 'like', '%'.$searchTerm.'%')
-                  ->orWhere('description', 'like', '%'.$searchTerm.'%');
-            });
+        if ($request->has('q')) {
+            // Text search
+            $query->where('name', 'like', '%'.$request->q.'%')
+                  ->orWhere('description', 'like', '%'.$request->q.'%');
         }
         
-        // Filter by category
-        if ($request->has('category')) {
-            $query->whereHas('category', function($q) use ($request) {
-                $q->where('slug', $request->category);
-            });
+        // Voice search processing
+        if ($request->has('voice_query')) {
+            $voiceText = $this->processVoiceQuery($request->voice_query);
+            $query->where('name', 'like', '%'.$voiceText.'%');
         }
         
-        // Price range filter
-        if ($request->has('min_price')) {
-            $query->where('price', '>=', $request->min_price);
-        }
-        if ($request->has('max_price')) {
-            $query->where('price', '<=', $request->max_price);
+        // Image search
+        if ($request->hasFile('image_search')) {
+            $imageResults = $this->processImageSearch($request->file('image_search'));
+            $query->whereIn('id', $imageResults);
         }
         
-        // In stock filter
-        if ($request->boolean('in_stock')) {
-            $query->where('in_stock', true);
-        }
-        
-        // Sorting with fallback to multiple columns
-        $sort = $request->input('sort', 'created_at');
-        $direction = $request->input('direction', 'desc');
-        
-        // More sophisticated sorting logic
-        if ($sort === 'popularity') {
-            $query->withCount('orders')->orderBy('orders_count', $direction);
-        } else {
-            $query->orderBy($sort, $direction);
-        }
-        
-        // Pagination with configurable items per page
-        $perPage = $request->input('per_page', 10);
-        
-        return response()->json([
-            'data' => $query->paginate($perPage)
+        // Add filters, pagination, etc.
+        return $query->paginate(15);
+    }
+    
+    private function processVoiceQuery($audio)
+    {
+        // Integrate with speech-to-text API
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer '.config('services.speech.key'),
+        ])->post('https://api.speech-service.com/v1/recognize', [
+            'audio' => base64_encode(file_get_contents($audio)),
         ]);
+        
+        return $response->json()['text'];
+    }
+    
+    private function processImageSearch($image)
+    {
+        // Integrate with computer vision API
+        $response = Http::withHeaders([
+            'Authorization' => 'Bearer '.config('services.vision.key'),
+        ])->post('https://api.vision-service.com/v1/analyze', [
+            'image' => base64_encode(file_get_contents($image)),
+            'features' => ['objects', 'tags']
+        ]);
+        
+        // Extract relevant product tags
+        $tags = $response->json()['tags'];
+        return Product::whereHas('tags', function($q) use ($tags) {
+            $q->whereIn('name', $tags);
+        })->pluck('id');
     }
 }
