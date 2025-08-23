@@ -7,11 +7,11 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\CustomerServiceController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ProductController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('/products/search', function () {
-    return view('products.search');
-});
+Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
+Route::get('/products/category/{category}', [ProductController::class, 'category'])->name('products.category');
 
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
@@ -26,6 +26,16 @@ Route::get('/customer-service', [CustomerServiceController::class, 'index'])->na
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
+
+// Account route
+Route::get('/account', function () {
+    return view('account');
+})->name('account');
+
+// Checkout routes
+Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
 
 // Payment routes
 Route::post('/payment/gcash', [PaymentController::class, 'initiateGcash'])->name('payment.gcash');

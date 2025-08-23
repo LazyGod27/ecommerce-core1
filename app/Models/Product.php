@@ -11,8 +11,11 @@ class Product extends Model
 {
     protected $fillable = [
         'name',
+        'description',
         'price',
         'stock',
+        'category',
+        'image',
         'review_summary',
         'review_summary_updated_at',
         'average_rating',
@@ -102,6 +105,11 @@ class Product extends Model
     public function scopeInStock($query)
     {
         return $query->where('stock', '>', 0);
+    }
+
+    public function scopeByCategory($query, $category)
+    {
+        return $query->where('category', $category);
     }
 
     protected static function booted()

@@ -9,6 +9,8 @@ class HomeController extends Controller
 {
     public function index()
     {
+        // For the new frontend, we'll provide some sample data
+        // In a real application, you'd fetch this from your database
         $featuredProducts = Product::with(['reviews'])
             ->orderBy('average_rating', 'desc')
             ->take(8)

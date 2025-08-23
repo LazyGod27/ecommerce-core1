@@ -12,14 +12,11 @@ class CartController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        $cart = Cart::with(['items.product'])->where('user_id', $user->id)->first();
+        // For the new frontend, we'll use session-based cart
+        $cart = session('cart', []);
+        $subtotal = collect($cart)->sum('price');
         
-        if (!$cart) {
-            $cart = Cart::create(['user_id' => $user->id]);
-        }
-        
-        return view('cart', compact('cart'));
+        return view('cart', compact('cart', 'subtotal'));
     }
 
     public function add(Request $request, Product $product)
@@ -28,33 +25,33 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1|max:' . $product->stock
         ]);
 
-        $user = Auth::user();
-        $cart = Cart::firstOrCreate(['user_id' => $user->id]);
-
-        // Check if product already in cart
-        $existingItem = $cart->items()->where('product_id', $product->id)->first();
-
-        if ($existingItem) {
-            $existingItem->update([
-                'quantity' => $existingItem->quantity + $request->quantity
-            ]);
-        } else {
-            $cart->items()->create([
-                'product_id' => $product->id,
-                'quantity' => $request->quantity,
-                'price' => $product->price
-            ]);
-        }
-
+        $cart = session('cart', []);
+        
+        // Generate a unique row ID
+        $rowId = uniqid();
+        
+        $cart[$rowId] = [
+            'rowId' => $rowId,
+            'id' => $product->id,
+            'name' => $product->name,
+            'price' => $product->price * $request->quantity,
+            'quantity' => $request->quantity,
+            'image' => $product->image ?? 'default.jpg'
+        ];
+        
+        session(['cart' => $cart]);
+        
         return redirect()->route('cart')->with('success', 'Product added to cart!');
     }
 
     public function remove($rowId)
     {
-        $user = Auth::user();
-        $cart = Cart::where('user_id', $user->id)->firstOrFail();
+        $cart = session('cart', []);
         
-        $cart->items()->where('id', $rowId)->delete();
+        if (isset($cart[$rowId])) {
+            unset($cart[$rowId]);
+            session(['cart' => $cart]);
+        }
         
         return redirect()->route('cart')->with('success', 'Item removed from cart!');
     }
@@ -65,12 +62,39 @@ class CartController extends Controller
             'quantity' => 'required|integer|min:1'
         ]);
 
-        $user = Auth::user();
-        $cart = Cart::where('user_id', $user->id)->firstOrFail();
+        $cart = session('cart', []);
         
-        $item = $cart->items()->where('id', $rowId)->firstOrFail();
-        $item->update(['quantity' => $request->quantity]);
+        if (isset($cart[$rowId])) {
+            $product = Product::find($cart[$rowId]['id']);
+            $cart[$rowId]['quantity'] = $request->quantity;
+            $cart[$rowId]['price'] = $product->price * $request->quantity;
+            session(['cart' => $cart]);
+        }
         
         return redirect()->route('cart')->with('success', 'Cart updated!');
+    }
+
+    public function processCheckout(Request $request)
+    {
+        $request->validate([
+            'payment_method' => 'required|string'
+        ]);
+
+        $cart = session('cart', []);
+        
+        if (empty($cart)) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty!');
+        }
+
+        // Here you would typically:
+        // 1. Create an order in the database
+        // 2. Process payment based on the selected method
+        // 3. Clear the cart
+        // 4. Redirect to success page or tracking page
+
+        // For now, we'll just clear the cart and redirect
+        session()->forget('cart');
+        
+        return redirect()->route('tracking')->with('success', 'Order placed successfully!');
     }
 }
