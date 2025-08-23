@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\StripeWebhookController;
 use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CheckoutController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\SearchController;
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/search', [ProductController::class, 'productSearch']);
@@ -32,7 +33,7 @@ Route::post('/payment/webhook', [PaymentController::class, 'handleWebhook']);
 Route::post('/payments/gcash/initiate', [PaymentController::class, 'initiateGcash']);
 Route::post('/payments/gcash/webhook', [PaymentController::class, 'gcashWebhook']);
 
-Route::post('/search/voice', 'Api\SearchController@voiceSearch');
+Route::post('/search/voice', [SearchController::class, 'voiceSearch']);
 
 Route::post('/payments/process', [PaymentController::class, 'process']);
 Route::post('/payments/refund', [PaymentController::class, 'refund']);

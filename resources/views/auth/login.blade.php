@@ -4,137 +4,348 @@
 
 @section('styles')
 <style>
-    :root {
-        --color-bright-cyan: #4bc5ec;
-        --color-light-cyan: #94dcf4;
-        --color-dark-blue: #2c3c8c;
-        --color-dusty-blue-gray: #5c8c9c;
-        --color-light-gray-blue: #bdccdc;
-        --color-dark-blue-gray: #353c61;
+    .auth-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 20px;
     }
-    .bg-bright-cyan { background-color: var(--color-bright-cyan); }
-    .bg-light-cyan { background-color: var(--color-light-cyan); }
-    .bg-dark-blue { background-color: var(--color-dark-blue); }
-    .bg-dusty-blue-gray { background-color: var(--color-dusty-blue-gray); }
-    .bg-light-gray-blue { background-color: var(--color-light-gray-blue); }
-    .bg-dark-blue-gray { background-color: var(--color-dark-blue-gray); }
-    
-    .text-bright-cyan { color: var(--color-bright-cyan); }
-    .text-light-cyan { color: var(--color-light-cyan); }
-    .text-dark-blue { color: var(--color-dark-blue); }
-    .text-dusty-blue-gray { color: var(--color-dusty-blue-gray); }
-    .text-light-gray-blue { color: var(--color-light-gray-blue); }
-    .text-dark-blue-gray { color: var(--color-dark-blue-gray); }
-    
-    .border-dusty-blue-gray { border-color: var(--color-dusty-blue-gray); }
-    
-    .hover\:bg-dark-blue:hover { background-color: var(--color-dark-blue); }
-    .focus\:ring-bright-cyan:focus { --tw-ring-color: var(--color-bright-cyan); }
-    
-    .dark .bg-dark-blue-gray { background-color: var(--color-dark-blue-gray); }
-    .dark .bg-dusty-blue-gray { background-color: var(--color-dusty-blue-gray); }
-    .dark .text-light-cyan { color: var(--color-light-cyan); }
-    .dark .text-light-gray-blue { color: var(--color-light-gray-blue); }
-    .dark .border-light-gray-blue { border-color: var(--color-light-gray-blue); }
-    .dark .bg-light-cyan { background-color: var(--color-light-cyan); }
-    .dark .text-dark-blue { color: var(--color-dark-blue); }
+
+    .auth-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        width: 100%;
+        max-width: 900px;
+        display: flex;
+        min-height: 600px;
+    }
+
+    .auth-image {
+        flex: 1;
+        background: linear-gradient(135deg, #4bc5ec 0%, #2c3c8c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        padding: 40px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .auth-image::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="white" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    }
+
+    .auth-image-content {
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-image h2 {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .auth-image p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+
+    .auth-forms {
+        flex: 1;
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .form-container {
+        display: none;
+    }
+
+    .form-container.active {
+        display: block;
+    }
+
+    .form-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #555;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #4bc5ec;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(75, 197, 236, 0.1);
+    }
+
+    .form-button {
+        width: 100%;
+        padding: 14px;
+        background: linear-gradient(135deg, #4bc5ec 0%, #2c3c8c 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .form-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(75, 197, 236, 0.3);
+    }
+
+    .social-buttons {
+        margin-top: 20px;
+    }
+
+    .social-button {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #e1e5e9;
+        border-radius: 10px;
+        background: white;
+        color: #333;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        text-decoration: none;
+    }
+
+    .social-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        text-decoration: none;
+    }
+
+    .social-button.google {
+        border-color: #db4437;
+        color: #db4437;
+    }
+
+    .social-button.google:hover {
+        background: #db4437;
+        color: white;
+    }
+
+    .social-button.facebook {
+        border-color: #4267B2;
+        color: #4267B2;
+    }
+
+    .social-button.facebook:hover {
+        background: #4267B2;
+        color: white;
+    }
+
+    .form-toggle {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .toggle-link {
+        color: #4bc5ec;
+        text-decoration: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .toggle-link:hover {
+        text-decoration: underline;
+    }
+
+    .error-message {
+        background: #fee;
+        color: #c33;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #fcc;
+    }
+
+    .success-message {
+        background: #efe;
+        color: #363;
+        padding: 10px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #cfc;
+    }
+
+    @media (max-width: 768px) {
+        .auth-card {
+            flex-direction: column;
+            max-width: 400px;
+        }
+
+        .auth-image {
+            padding: 30px 20px;
+        }
+
+        .auth-image h2 {
+            font-size: 2rem;
+        }
+
+        .auth-forms {
+            padding: 30px 20px;
+        }
+    }
 </style>
 @endsection
 
 @section('content')
-<div class="bg-light-gray-blue dark:bg-dark-blue-gray flex items-center justify-center min-h-screen p-4 transition-colors duration-500">
-    <div class="bg-white dark:bg-dusty-blue-gray rounded-2xl shadow-2xl p-8 max-w-sm w-full mx-auto transition-all duration-500 ease-in-out">
-        
-        <div id="login-form">
-            <h2 class="text-3xl font-bold text-center text-dark-blue dark:text-light-cyan mb-6">Sign In</h2>
-            
-            <div class="space-y-4 mb-6">
-                <button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white text-dark-blue font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-100 transition-colors duration-300">
-                    <i class="fab fa-google text-lg"></i>
-                    Sign In with Gmail
-                </button>
-                <button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3b5998] text-white font-semibold rounded-lg shadow-md hover:bg-[#2d4373] transition-colors duration-300">
-                    <i class="fab fa-facebook-f text-lg"></i>
-                    Sign In with Facebook
-                </button>
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-image">
+            <div class="auth-image-content">
+                <h2>Welcome to iMarket</h2>
+                <p>Your one-stop shop for everything you need</p>
             </div>
-            
-            <div class="relative flex items-center justify-center my-6">
-                <div class="flex-grow border-t border-dusty-blue-gray dark:border-light-gray-blue"></div>
-                <span class="flex-shrink mx-4 text-dusty-blue-gray dark:text-light-gray-blue text-sm">or</span>
-                <div class="flex-grow border-t border-dusty-blue-gray dark:border-light-gray-blue"></div>
-            </div>
-
-            <form method="POST" action="{{ route('login') }}" class="space-y-6">
-                @csrf
-                <div>
-                    <label for="login-email" class="block text-sm font-medium text-dark-blue dark:text-light-gray-blue">Email</label>
-                    <input type="email" id="login-email" name="email" class="mt-1 block w-full px-4 py-2 border border-dusty-blue-gray rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-bright-cyan dark:bg-dark-blue-gray dark:text-light-gray-blue dark:border-light-gray-blue" required>
-                </div>
-                <div>
-                    <label for="login-password" class="block text-sm font-medium text-dark-blue dark:text-light-gray-blue">Password</label>
-                    <input type="password" id="login-password" name="password" class="mt-1 block w-full px-4 py-2 border border-dusty-blue-gray rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-bright-cyan dark:bg-dark-blue-gray dark:text-light-gray-blue dark:border-light-gray-blue" required>
-                </div>
-                <button type="submit" class="w-full py-3 px-4 bg-bright-cyan text-white font-semibold rounded-lg shadow-lg hover:bg-dark-blue focus:outline-none focus:ring-2 focus:ring-bright-cyan focus:ring-offset-2 dark:focus:ring-offset-dark-blue-gray transition-colors duration-300">
-                    Sign In
-                </button>
-            </form>
-            <p class="mt-6 text-center text-sm text-dark-blue dark:text-light-gray-blue">
-                Don't have an account? 
-                <a href="#" id="show-signup" class="text-dark-blue dark:text-light-cyan font-medium hover:text-bright-cyan transition-colors duration-300">
-                    Sign up
-                </a>
-            </p>
         </div>
+        
+        <div class="auth-forms">
+            @if ($errors->any())
+                <div class="error-message">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
-        <div id="signup-form" class="hidden">
-            <h2 class="text-3xl font-bold text-center text-dark-blue dark:text-light-cyan mb-6">Sign Up</h2>
+            @if (session('success'))
+                <div class="success-message">
+                    {{ session('success') }}
+                </div>
+            @endif
 
-            <div class="space-y-4 mb-6">
-                <button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-white text-dark-blue font-semibold rounded-lg shadow-md border border-gray-300 hover:bg-gray-100 transition-colors duration-300">
-                    <i class="fab fa-google text-lg"></i>
-                    Sign Up with Gmail
-                </button>
-                <button class="w-full flex items-center justify-center gap-2 py-3 px-4 bg-[#3b5998] text-white font-semibold rounded-lg shadow-md hover:bg-[#2d4373] transition-colors duration-300">
-                    <i class="fab fa-facebook-f text-lg"></i>
-                    Sign Up with Facebook
-                </button>
+            <!-- Login Form -->
+            <div id="login-form" class="form-container active">
+                <h2 class="form-title">Sign In</h2>
+                
+                <form method="POST" action="{{ route('login') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label for="login-email" class="form-label">Email Address</label>
+                        <input type="email" id="login-email" name="email" class="form-input" value="{{ old('email') }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="login-password" class="form-label">Password</label>
+                        <input type="password" id="login-password" name="password" class="form-input" required>
+                    </div>
+                    
+                    <button type="submit" class="form-button">Sign In</button>
+                </form>
+
+                <div class="social-buttons">
+                    <a href="{{ route('auth.google') }}" class="social-button google">
+                        <i class="fab fa-google"></i>
+                        Continue with Google
+                    </a>
+                    <a href="{{ route('auth.facebook') }}" class="social-button facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        Continue with Facebook
+                    </a>
+                </div>
+
+                <div class="form-toggle">
+                    <span>Don't have an account? </span>
+                    <a class="toggle-link" onclick="showRegister()">Sign Up</a>
+                </div>
             </div>
 
-            <div class="relative flex items-center justify-center my-6">
-                <div class="flex-grow border-t border-dusty-blue-gray dark:border-light-gray-blue"></div>
-                <span class="flex-shrink mx-4 text-dusty-blue-gray dark:text-light-gray-blue text-sm">or</span>
-                <div class="flex-grow border-t border-dusty-blue-gray dark:border-light-gray-blue"></div>
-            </div>
+            <!-- Register Form -->
+            <div id="register-form" class="form-container">
+                <h2 class="form-title">Create Account</h2>
+                
+                <form method="POST" action="{{ route('register') }}">
+                    @csrf
+                    <div class="form-group">
+                        <label for="register-name" class="form-label">Full Name</label>
+                        <input type="text" id="register-name" name="name" class="form-input" value="{{ old('name') }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-email" class="form-label">Email Address</label>
+                        <input type="email" id="register-email" name="email" class="form-input" value="{{ old('email') }}" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password" class="form-label">Password</label>
+                        <input type="password" id="register-password" name="password" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="register-password-confirm" class="form-label">Confirm Password</label>
+                        <input type="password" id="register-password-confirm" name="password_confirmation" class="form-input" required>
+                    </div>
+                    
+                    <button type="submit" class="form-button">Create Account</button>
+                </form>
 
-            <form method="POST" action="{{ route('register') }}" class="space-y-6">
-                @csrf
-                <div>
-                    <label for="signup-name" class="block text-sm font-medium text-dark-blue dark:text-light-gray-blue">Full Name</label>
-                    <input type="text" id="signup-name" name="name" class="mt-1 block w-full px-4 py-2 border border-dusty-blue-gray rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-bright-cyan dark:bg-dark-blue-gray dark:text-light-gray-blue dark:border-light-gray-blue" required>
+                <div class="social-buttons">
+                    <a href="{{ route('auth.google') }}" class="social-button google">
+                        <i class="fab fa-google"></i>
+                        Sign up with Google
+                    </a>
+                    <a href="{{ route('auth.facebook') }}" class="social-button facebook">
+                        <i class="fab fa-facebook-f"></i>
+                        Sign up with Facebook
+                    </a>
                 </div>
-                <div>
-                    <label for="signup-email" class="block text-sm font-medium text-dark-blue dark:text-light-gray-blue">Email</label>
-                    <input type="email" id="signup-email" name="email" class="mt-1 block w-full px-4 py-2 border border-dusty-blue-gray rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-bright-cyan dark:bg-dark-blue-gray dark:text-light-gray-blue dark:border-light-gray-blue" required>
+
+                <div class="form-toggle">
+                    <span>Already have an account? </span>
+                    <a class="toggle-link" onclick="showLogin()">Sign In</a>
                 </div>
-                <div>
-                    <label for="signup-password" class="block text-sm font-medium text-dark-blue dark:text-light-gray-blue">Password</label>
-                    <input type="password" id="signup-password" name="password" class="mt-1 block w-full px-4 py-2 border border-dusty-blue-gray rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-bright-cyan dark:bg-dark-blue-gray dark:text-light-gray-blue dark:border-light-gray-blue" required>
-                </div>
-                <div>
-                    <label for="confirm-password" class="block text-sm font-medium text-dark-blue dark:text-light-gray-blue">Confirm Password</label>
-                    <input type="password" id="confirm-password" name="password_confirmation" class="mt-1 block w-full px-4 py-2 border border-dusty-blue-gray rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-bright-cyan dark:bg-dark-blue-gray dark:text-light-gray-blue dark:border-light-gray-blue" required>
-                </div>
-                <button type="submit" class="w-full py-3 px-4 bg-bright-cyan text-white font-semibold rounded-lg shadow-lg hover:bg-dark-blue focus:outline-none focus:ring-2 focus:ring-bright-cyan focus:ring-offset-2 dark:focus:ring-offset-dark-blue-gray transition-colors duration-300">
-                    Sign Up
-                </button>
-            </form>
-            <p class="mt-6 text-center text-sm text-dark-blue dark:text-light-gray-blue">
-                Already have an account? 
-                <a href="#" id="show-login" class="text-dark-blue dark:text-light-cyan font-medium hover:text-bright-cyan transition-colors duration-300">
-                    Sign in
-                </a>
-            </p>
+            </div>
         </div>
     </div>
 </div>
@@ -142,29 +353,19 @@
 
 @section('scripts')
 <script>
-    const loginForm = document.getElementById('login-form');
-    const signupForm = document.getElementById('signup-form');
-    const showSignupLink = document.getElementById('show-signup');
-    const showLoginLink = document.getElementById('show-login');
-
-    function showSignup() {
-        loginForm.classList.add('hidden');
-        signupForm.classList.remove('hidden');
-    }
-
     function showLogin() {
-        signupForm.classList.add('hidden');
-        loginForm.classList.remove('hidden');
+        document.getElementById('login-form').classList.add('active');
+        document.getElementById('register-form').classList.remove('active');
     }
 
-    showSignupLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showSignup();
-    });
+    function showRegister() {
+        document.getElementById('login-form').classList.remove('active');
+        document.getElementById('register-form').classList.add('active');
+    }
 
-    showLoginLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        showLogin();
-    });
+    // Auto-switch to register form if there are validation errors for registration
+    @if($errors->has('name') || $errors->has('password_confirmation'))
+        showRegister();
+    @endif
 </script>
 @endsection

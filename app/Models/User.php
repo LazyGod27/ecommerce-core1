@@ -23,6 +23,23 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'google_id',
+        'facebook_id',
+        'phone',
+        'birth_date',
+        'gender',
+        'address_line1',
+        'address_line2',
+        'city',
+        'state',
+        'postal_code',
+        'country',
+        'bio',
+        'avatar',
+        'email_notifications',
+        'sms_notifications',
+        'preferred_language',
+        'timezone',
     ];
 
     /**
@@ -45,6 +62,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'birth_date' => 'date',
+            'email_notifications' => 'boolean',
+            'sms_notifications' => 'boolean',
         ];
     }
 
@@ -61,5 +81,42 @@ class User extends Authenticatable
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Get the user's full address
+     */
+    public function getFullAddressAttribute(): string
+    {
+        $parts = array_filter([
+            $this->address_line1,
+            $this->address_line2,
+            $this->city,
+            $this->state,
+            $this->postal_code,
+            $this->country
+        ]);
+
+        return implode(', ', $parts);
+    }
+
+    /**
+     * Get the user's age
+     */
+    public function getAgeAttribute(): ?int
+    {
+        if (!$this->birth_date) {
+            return null;
+        }
+
+        return $this->birth_date->age;
+    }
+
+    /**
+     * Check if user has complete profile
+     */
+    public function getHasCompleteProfileAttribute(): bool
+    {
+        return !empty($this->phone) && !empty($this->address_line1) && !empty($this->city);
     }
 }
