@@ -122,6 +122,9 @@
     .status-transit { background: #e8f5e8; color: #388e3c; }
     .status-delivered { background: #e8f5e8; color: #2e7d32; }
     .status-cancelled { background: #ffebee; color: #d32f2f; }
+    .status-pending { background: #fff3e0; color: #f57c00; }
+    .status-processing { background: #e3f2fd; color: #1976d2; }
+    .status-completed { background: #e8f5e8; color: #2e7d32; }
 
     .recent-orders {
         background: white;
@@ -181,7 +184,40 @@
             Recent Orders
         </h3>
         <div id="recent-orders-list">
-            <!-- Recent orders will be populated here -->
+            @if($orders && count($orders) > 0)
+                @foreach($orders as $order)
+                <div class="order-item">
+                    <div class="flex justify-between items-center">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-4">
+                                <div>
+                                    <h4 class="font-semibold text-gray-800">Order #{{ $order->order_number }}</h4>
+                                    <p class="text-sm text-gray-600">{{ $order->created_at->format('M d, Y h:i A') }}</p>
+                                    <p class="text-sm text-gray-600">{{ $order->items->count() }} item(s) - ₱{{ number_format($order->total, 2) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="status-badge status-{{ strtolower($order->status) }}">
+                                {{ ucfirst($order->status) }}
+                            </span>
+                            <a href="{{ route('tracking.show', $order->id) }}" 
+                               class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm">
+                                Track Order
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            @else
+                <div class="text-center py-8">
+                    <i class="fas fa-shopping-bag text-4xl text-gray-400 mb-4"></i>
+                    <p class="text-gray-600">No orders found. Start shopping to see your orders here!</p>
+                    <a href="{{ route('home') }}" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
+                        Start Shopping
+                    </a>
+                </div>
+            @endif
         </div>
     </div>
     @endauth

@@ -7,15 +7,20 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TrackingController;
+use App\Http\Controllers\OrderController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/category/{category}', [ProductController::class, 'category'])->name('products.category');
 
+// Cart routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
+Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
 // Authentication routes
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -30,8 +35,10 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 Route::get('/auth/facebook', [AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
 Route::get('/auth/facebook/callback', [AuthController::class, 'handleFacebookCallback']);
 
-// Checkout routes
-Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
+// Checkout routes (protected by auth middleware)
+Route::middleware('auth')->group(function () {
+    Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
+});
 
 // Profile routes (protected by auth middleware)
 Route::middleware('auth')->group(function () {
@@ -55,21 +62,48 @@ Route::get('/account', function () {
 })->name('account');
 
 // Payment routes
-Route::get('/payment/gcash', [PaymentController::class, 'gcash'])->name('payment.gcash');
-Route::post('/payment/gcash/process', [PaymentController::class, 'processGcash'])->name('payment.gcash.process');
-Route::get('/payment/success', [PaymentController::class, 'success'])->name('payment.success');
-Route::get('/payment/failed', [PaymentController::class, 'failed'])->name('payment.failed');
+Route::middleware('auth')->group(function () {
+    Route::get('/payment/process/{orderId}', [PaymentController::class, 'process'])->name('payment.process');
+    Route::post('/payment/gcash', [PaymentController::class, 'gcash'])->name('payment.gcash');
+    Route::post('/payment/paymaya', [PaymentController::class, 'paymaya'])->name('payment.paymaya');
+    Route::post('/payment/stripe', [PaymentController::class, 'stripe'])->name('payment.stripe');
+    Route::get('/payment/success/{orderId}', [PaymentController::class, 'success'])->name('payment.success');
+    Route::get('/payment/failed/{orderId}', [PaymentController::class, 'failed'])->name('payment.failed');
+    Route::post('/payment/refund/{orderId}', [PaymentController::class, 'refund'])->name('payment.refund');
+});
 
-// Tracking route
-Route::get('/tracking', function () {
-    return view('tracking');
-})->name('tracking');
+// Payment callbacks (public routes for webhooks)
+Route::get('/payment/callback/{method}/{orderId}', [PaymentController::class, 'callback'])->name('payment.callback');
+Route::post('/payment/webhook/{method}', [PaymentController::class, 'webhook'])->name('payment.webhook');
+
+// Tracking routes (protected by auth middleware)
+Route::middleware('auth')->group(function () {
+    Route::get('/tracking', [TrackingController::class, 'index'])->name('tracking');
+    Route::get('/tracking/{orderId}', [TrackingController::class, 'show'])->name('tracking.show');
+    Route::post('/tracking/search', [TrackingController::class, 'track'])->name('tracking.search');
+    Route::post('/tracking/order', [TrackingController::class, 'trackByOrderNumber'])->name('tracking.order');
+    Route::get('/tracking/updates/{trackingId}', [TrackingController::class, 'getTrackingUpdates'])->name('tracking.updates');
+    Route::get('/tracking/delivery/{trackingId}', [TrackingController::class, 'getEstimatedDelivery'])->name('tracking.delivery');
+    Route::get('/tracking/history', [TrackingController::class, 'getOrderHistory'])->name('tracking.history');
+    Route::get('/tracking/invoice/{orderId}', [TrackingController::class, 'downloadInvoice'])->name('tracking.invoice');
+});
+
+// Order management routes (protected by auth middleware)
+Route::middleware('auth')->group(function () {
+    Route::get('/order/confirmation/{orderId}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+    Route::post('/order/cancel/{orderId}', [OrderController::class, 'cancel'])->name('order.cancel');
+    Route::put('/order/edit/{orderId}', [OrderController::class, 'edit'])->name('order.edit');
+});
+
+// Admin tracking management (protected)
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::post('/tracking/update/{trackingId}', [TrackingController::class, 'updateTrackingStatus'])->name('tracking.update');
+});
 
 // Customer service route
 Route::get('/customer-service', function () {
     return view('customer-service');
 })->name('customer-service');
 
-// Stripe webhook
-Route::post('stripe/webhook', [\App\Http\Controllers\Api\PaymentController::class, 'handleWebhook'])
-     ->name('stripe.webhook');
+// API routes for AJAX requests
+Route::get('/api/payment-methods', [PaymentController::class, 'getPaymentMethods'])->name('api.payment.methods');

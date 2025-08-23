@@ -37,6 +37,20 @@ return [
         'webhook_secret' => env('STRIPE_WEBHOOK_SECRET'),
     ],
 
+    'gcash' => [
+        'api_key' => env('GCASH_API_KEY'),
+        'secret_key' => env('GCASH_SECRET_KEY'),
+        'base_url' => env('GCASH_BASE_URL', 'https://api.gcash.com'),
+        'merchant_id' => env('GCASH_MERCHANT_ID'),
+    ],
+
+    'paymaya' => [
+        'public_key' => env('PAYMAYA_PUBLIC_KEY'),
+        'secret_key' => env('PAYMAYA_SECRET_KEY'),
+        'base_url' => env('PAYMAYA_BASE_URL', 'https://api.paymaya.com'),
+        'merchant_id' => env('PAYMAYA_MERCHANT_ID'),
+    ],
+
     'google' => [
         'client_id' => env('GOOGLE_CLIENT_ID'),
         'client_secret' => env('GOOGLE_CLIENT_SECRET'),
@@ -47,27 +61,6 @@ return [
         'client_id' => env('FACEBOOK_CLIENT_ID'),
         'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
-    ],
-
-    'gcash' => [
-        'api_key' => env('GCASH_API_KEY'),
-        'api_endpoint' => env('GCASH_API_ENDPOINT', 'https://api.gcash.com/v1'),
-        'environment' => env('GCASH_ENVIRONMENT', 'sandbox'),
-    ],
-
-    'openai' => [
-        'api_key' => env('OPENAI_API_KEY'),
-        'endpoint' => env('OPENAI_ENDPOINT', 'https://api.openai.com/v1/chat/completions'),
-    ],
-
-    'speech' => [
-        'key' => env('SPEECH_API_KEY'),
-        'endpoint' => env('SPEECH_API_ENDPOINT'),
-    ],
-
-    'vision' => [
-        'key' => env('VISION_API_KEY'),
-        'endpoint' => env('VISION_API_ENDPOINT'),
     ],
 
 ];

@@ -82,13 +82,12 @@
                                 <h3 class="font-semibold text-gray-800">{{ $item['name'] }}</h3>
                                 <p class="text-gray-600">₱{{ number_format($item['price'], 2) }}</p>
                             </div>
-                            <form action="{{ route('cart.remove', $item['rowId']) }}" method="POST" class="ml-4">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:text-red-700">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </form>
+                                                         <form action="{{ route('cart.remove', $item['rowId']) }}" method="POST" class="ml-4">
+                                 @csrf
+                                 <button type="submit" class="text-red-500 hover:text-red-700">
+                                     <i class="fas fa-trash"></i>
+                                 </button>
+                             </form>
                         </div>
                         @endforeach
                     @else
@@ -108,6 +107,28 @@
                 </div>
             </div>
 
+            <!-- Shipping Information -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-semibold mb-4 text-gray-800">Shipping Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Shipping Address *</label>
+                        <textarea name="shipping_address" rows="3" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-light" required placeholder="Enter your complete shipping address"></textarea>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Number *</label>
+                            <input type="tel" name="contact_number" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-light" required placeholder="Enter your contact number">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
+                            <input type="email" name="email" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-light" required placeholder="Enter your email address">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment Method Selection -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-8">
                 <h2 class="text-xl font-semibold mb-4 text-gray-800">Choose a Payment Method</h2>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -150,13 +171,17 @@
                         <span id="discount-amount">-₱0.00</span>
                     </div>
                     <div class="flex justify-between text-gray-700">
+                        <span>Tax (12% VAT):</span>
+                        <span id="tax-amount">₱{{ number_format($tax ?? 0, 2) }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-700">
                         <span>Shipping:</span>
-                        <span id="shipping-cost">₱50.00</span>
+                        <span id="shipping-cost">₱{{ number_format($shippingCost ?? 50, 2) }}</span>
                     </div>
                     <hr class="my-2 border-gray-200">
                     <div class="flex justify-between font-bold text-lg text-gray-800">
                         <span>Total:</span>
-                        <span id="total">₱{{ number_format(($subtotal ?? 0) + 50, 2) }}</span>
+                        <span id="total">₱{{ number_format($total ?? (($subtotal ?? 0) + ($tax ?? 0) + ($shippingCost ?? 50)), 2) }}</span>
                     </div>
                 </div>
                 <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
