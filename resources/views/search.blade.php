@@ -1,12 +1,13 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Product Search</title>
-    @vite(['resources/js/app.js'])
-</head>
-<body>
-    <div id="app">
-        <product-search></product-search>
-    </div>
-</body>
-</html>
+@extends('layouts.frontend')
+
+@section('title', 'Search Products - iMarket')
+
+@section('content')
+<div id="app">
+    <product-search></product-search>
+</div>
+@endsection
+
+@push('scripts')
+@vite(['resources/js/app.js'])
+@endpush

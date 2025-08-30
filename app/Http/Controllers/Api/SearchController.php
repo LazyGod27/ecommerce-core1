@@ -39,25 +39,33 @@ class SearchController extends Controller
 
     private function transcribeAudio($audioFile)
     {
-        // This is a placeholder implementation
-        // In production, you would integrate with a speech-to-text service like:
-        // - Google Cloud Speech-to-Text
-        // - Amazon Transcribe
-        // - Azure Speech Services
-        // - OpenAI Whisper API
+        try {
+            // Check if OpenAI API key is configured
+            $openaiKey = config('services.openai.key');
+            if (!$openaiKey) {
+                throw new \Exception('OpenAI API key not configured');
+            }
 
-        // For demo purposes, return a sample text
-        return 'sample product search';
-        
-        // Real implementation would look like:
-        /*
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . config('services.speech.key'),
-        ])->attach(
-            'audio', file_get_contents($audioFile), 'audio.wav'
-        )->post(config('services.speech.endpoint'));
+            // Send audio to OpenAI Whisper API
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $openaiKey,
+            ])->attach(
+                'file', file_get_contents($audioFile), 'audio.wav'
+            )->post('https://api.openai.com/v1/audio/transcriptions', [
+                'model' => 'whisper-1',
+                'response_format' => 'json'
+            ]);
 
-        return $response->json()['transcript'] ?? '';
-        */
+            if ($response->successful()) {
+                $result = $response->json();
+                return $result['text'] ?? '';
+            } else {
+                throw new \Exception('OpenAI API request failed: ' . $response->body());
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Voice transcription failed: ' . $e->getMessage());
+            throw new \Exception('Voice transcription failed: ' . $e->getMessage());
+        }
     }
 }

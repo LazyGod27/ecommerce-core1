@@ -1,46 +1,20 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Product Search</title>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-</head>
-<body>
-    <h1>Product Search</h1>
-    
-    <div>
-        <input type="text" id="search" placeholder="Search products...">
-        <button onclick="searchProducts()">Search</button>
+@extends('layouts.frontend')
+
+@section('title', 'Products - iMarket')
+
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="text-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">All Products</h1>
+        <p class="text-gray-600">Browse our complete product catalog</p>
     </div>
     
-    <div id="results"></div>
-    
-    <script>
-        function searchProducts() {
-            const searchTerm = document.getElementById('search').value;
-            
-            axios.get('/api/products', {
-                params: {
-                    search: searchTerm
-                }
-            })
-            .then(response => {
-                const products = response.data.data;
-                let html = '<ul>';
-                
-                products.forEach(product => {
-                    html += `<li>${product.name} - $${product.price}</li>`;
-                });
-                
-                html += '</ul>';
-                document.getElementById('results').innerHTML = html;
-            })
-            .catch(error => {
-                console.error(error);
-            });
-        }
-        
-        // Initial load
-        searchProducts();
-    </script>
-</body>
-</html>
+    <div id="app">
+        <product-search></product-search>
+    </div>
+</div>
+@endsection
+
+@push('scripts')
+@vite(['resources/js/app.js'])
+@endpush

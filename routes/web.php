@@ -11,8 +11,22 @@ use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\OrderController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/products', function () {
+    return view('products');
+})->name('products');
 Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/category/{category}', [ProductController::class, 'category'])->name('products.category');
+Route::get('/voice-search', function () {
+    return view('voice-search');
+})->name('voice-search');
+
+Route::get('/test-voice', function () {
+    return view('test-voice');
+})->name('test-voice');
+
+Route::get('/demo', function () {
+    return view('demo');
+})->name('demo');
 
 // Cart routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart');

@@ -63,4 +63,13 @@ return [
         'redirect' => env('FACEBOOK_REDIRECT_URI'),
     ],
 
+    'openai' => [
+        'key' => env('OPENAI_API_KEY'),
+        'organization' => env('OPENAI_ORGANIZATION_ID'),
+    ],
+
+    'huggingface' => [
+        'key' => env('HUGGINGFACE_API_KEY'),
+    ],
+
 ];

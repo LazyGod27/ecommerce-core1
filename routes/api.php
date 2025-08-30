@@ -34,6 +34,7 @@ Route::post('/payments/gcash/initiate', [PaymentController::class, 'initiateGcas
 Route::post('/payments/gcash/webhook', [PaymentController::class, 'gcashWebhook']);
 
 Route::post('/search/voice', [SearchController::class, 'voiceSearch']);
+Route::post('/search/image', [App\Http\Controllers\Api\ImageSearchController::class, 'searchByImage']);
 
 Route::post('/payments/process', [PaymentController::class, 'process']);
 Route::post('/payments/refund', [PaymentController::class, 'refund']);
