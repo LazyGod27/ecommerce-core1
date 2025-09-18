@@ -10,7 +10,9 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\OrderController;
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/', function () {
+    return view('ssa.index');
+})->name('home');
 Route::get('/products', function () {
     return view('products');
 })->name('products');
@@ -27,6 +29,10 @@ Route::get('/test-voice', function () {
 Route::get('/demo', function () {
     return view('demo');
 })->name('demo');
+
+Route::get('/debug', function () {
+    return view('debug');
+})->name('debug');
 
 // Cart routes
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
@@ -49,7 +55,8 @@ Route::get('/auth/google/callback', [AuthController::class, 'handleGoogleCallbac
 Route::get('/auth/facebook', [AuthController::class, 'redirectToFacebook'])->name('auth.facebook');
 Route::get('/auth/facebook/callback', [AuthController::class, 'handleFacebookCallback']);
 
-// Checkout routes (protected by auth middleware)
+// Checkout routes
+Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 Route::middleware('auth')->group(function () {
     Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
 });

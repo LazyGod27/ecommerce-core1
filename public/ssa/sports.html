@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>User</title>
+    <style>
+  .image-scan-fab {
+        position: fixed;
+        bottom: 20px;
+        left: 20px; 
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        transition: transform 0.3s ease;
+    }
+    .image-scan-fab:hover {
+        transform: scale(1.1);
+    }
+     .voice-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px; /* Aligned to the left */
+        width: 180px;
+        height: 50px;
+        border-radius: 50px;
+        background-color: #007bff;
+        color: #000000;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+    .voice-toggle-btn:hover {
+        transform: scale(1.05);
+    }
+    .voice-chat-container {
+        position: fixed;
+        bottom: -100%;
+        right: 20px; 
+        width: 350px;
+        height: 450px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 1001;
+        transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .voice-chat-container.open {
+        bottom: 90px;
+    }
+    .voice-chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: var(--primary-color);
+        color: #00008a;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .voice-chat-close-btn {
+        background: none;
+        border: none;
+        color: #ffffff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+    .voice-chat-body {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #4f549c;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .voice-message {
+        padding: 10px 15px;
+        border-radius: 15px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    .voice-bot-message {
+        background-color: #e0e0e0;
+        align-self: flex-start;
+    }
+    .voice-user-message {
+        background-color: var(--primary-color);
+        color: #fff;
+        align-self: flex-end;
+    }
+    .voice-chat-input-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        border-top: 1px solid #000000;
+    }
+    #voice-mic-btn {
+        background-color: rgb(125, 125, 241);
+        color: #000000;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #voice-mic-btn.listening {
+        background-color: #dc3545;
+        animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    </style>
+</head>
+<body>
+
+<div class="login-modal" id="loginModal">
+    <div class="login-content">
+        <span class="close-btn" id="closeLogin">&times;</span>
+        <h2>Login</h2>
+        <form>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required>
+            <label for="password">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="Enter password" required>
+                <i class="ri-eye-line" id="togglePassword"></i>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <p class="signup-text">
+            Don't have an account yet? 
+            <a href="#" id="openSignup">Sign up here</a>
+        </p>
+    </div>
+</div>
+
+<div class="signup-modal" id="signupModal">
+    <div class="signup-content">
+        <span class="close-btn" id="closeSignup">&times;</span>
+        <h2>Sign Up</h2>
+        <form>
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter email" required>
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="Enter phone number" required>
+            <label for="newPassword">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="newPassword" placeholder="Enter password" required>
+                <i class="ri-eye-line toggleSignupPassword"></i>
+            </div>
+            <button type="submit" class="login-btn">Create Account</button>
+        </form>
+        <div class="divider">
+            <span>OR</span>
+        </div>
+        <div class="social-login">
+            <button type="button" class="google-btn">
+                <img src="google.png" alt="Google Logo">
+                Sign up with Google
+            </button>
+            <button type="button" class="facebook-btn">
+                <i class="ri-facebook-fill"></i> Sign up with Facebook
+            </button>
+        </div>
+        <p class="signup-text">
+            Already have an account? 
+            <a href="#" id="openLoginFromSignup">Login here</a>
+        </p>
+    </div>
+</div>
+
+<header>
+    <div class="logo">
+        <img src="logo.png" alt="IMARKET PH Logo">
+    </div>
+    <ul class="navbar" id="navbar">
+        <li><a href="index.html" class="active"><i class="ri-home-line"></i> Home</a></li>
+        <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
+        <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
+        <li class="dropdown">
+            <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
+            <ul class="dropdown-menu">
+                <li><a href="#"><i class="ri-fire-line"></i> Best Selling</a></li>
+                <li><a href="#"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+                <li><a href="electronics.html"><i class="ri-computer-line"></i> Electronics</a></li>
+                <li><a href="#"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+                <li><a href="#"><i class="ri-home-4-line"></i> Home & Living</a></li>
+                <li><a href="#"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+                <li><a href="#"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+                <li><a href="#"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+                <li><a href="#"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="search-bar">
+        <input type="text" placeholder="Search for products, brands and more..." />
+        <button class="search-btn"><i class="ri-search-line"></i></button>
+    </div>
+    <div class="icons">
+        <a href="cart.html"><i class="ri-shopping-cart-line"></i></a>
+        <a href="user.html"><i class="ri-user-line"></i></a>
+        <div class="bx bx-menu" id="menu-icon"></div>
+    </div>
+</header>
+<div class="overlay" id="overlay"></div>
+
+<section class="hero">
+    <div class="hero-slides">
+        <img class="slide active" src="https://csrbox.org/news/1585300241sports.jpg" alt="Slide 1">
+        <img class="slide" src="https://cdn.chinadialogue.net/content/uploads/2020/05/20093220/TW4HCY_Gonga_Snow_Mountain_Ring_Line_hikes.jpg" alt="Slide 2">
+        <img class="slide" src="http://www.madeiracamping.com/wp-content/uploads/2014/11/FreeGreatPicture.com-19323-high-definition-outdoor-sports.jpg" alt="Slide 3">
+        <img class="slide" src="http://besthomegym.net/wp-content/uploads/gym-equipment-660x330.jpg" alt="Slide 4">
+        <img class="slide" src="https://www.activeoutdoors.info/wp-content/uploads/2020/04/woman-4752400_1920.jpg" alt="Slide 5">
+    </div>
+    <div class="hero-content">
+        <h1>SPORTS</h1>
+    </div>
+    <div class="hero-dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+        <span class="dot" data-index="4"></span>
+    </div>
+</section>
+
+<div class="overlay" id="overlay"></div>
+
+<section class="feature">
+    <div class="feature-content">
+        <div class="product-card"
+            data-name="Durable Waterproof Hiking Boots"
+            data-sizes="36,37,38,39,40,41,42,43,44,45"
+            data-colors="Brown,Black,Green,Gray"
+            data-price="4800"
+            data-orig-price="6000"
+            data-img-brown="https://cdn.shopify.com/s/files/1/0312/2921/products/1_eb6ef6cc-dd53-4348-a019-fa625878165a.jpg?v=1571265412    "
+            data-img-black="https://elliottsboots.sirv.com/Images/KEENOutdoor/KE1022512.jpg"
+            data-img-green="https://www.bootbarn.com/dw/image/v2/BCCF_PRD/on/demandware.static/-/Sites-master-product-catalog-shp/default/dwc61b7e8a/images/625/2000337625_300_P1.JPG?sw=980&sh=980&sm=fit"
+            data-img-gray="https://cdn.idealo.com/folder/Product/200523/6/200523639/s1_produktbild_max_4/keen-targhee-iii-wp-women-bleacher-duck-green.jpg">
+            <div class="product-img">
+                <img src="https://www.tripsavvy.com/thmb/_AoGMpzCqj-2t4BGOZf2o-3gfDY=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Keen_Targhee_III_04-17c091d491ec4c299688c05740376cac.jpg" alt="Durable Waterproof Hiking Boots">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>KEEN Targhee III</h6>
+                <h3>₱4,800 <del>₱6,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Training Shorts with Pockets"
+            data-sizes="S,M,L,XL,XXL"
+            data-colors="Black,Gray"
+            data-price="300"
+            data-orig-price="350"
+            data-img-black="https://i.pinimg.com/originals/36/4f/1b/364f1b92496d49adf3b7b5ba95bd2586.jpg"
+            data-img-gray="https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/5decce1c6dae25868c879abaec31624f.jpg?imageView2/2/w/800/q/70/format/webp">
+            <div class="product-img">
+                <img src="https://i5.walmartimages.com/asr/b2fdf73a-4594-4902-9b0d-1a5114d923a4.9e96017fc8990f2a03dfe6d196e5c19d.jpeg?odnWidth=1000&odnHeight=1000&odnBg=ffffff" alt="Training Shorts with Pockets">
+                <span class="discount">-14%</span>
+            </div>
+            <div class="product-info">
+                <h6>Training Shorts with Pockets</h6>
+                <h3>₱300 <del>₱350</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 7,800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Hydration Pack for Cycling"
+            data-sizes="Default"
+            data-colors="Black,Blue,Red"
+            data-price="1200"
+            data-orig-price="1600"
+            data-img-black="https://www.starbike.com/images/2022/uswe-mtb-hydro-backpack-12l-4-hires.jpg"
+            data-img-blue="https://p.vitalmtb.com/styles/full_size_1600/s3/photos/products/41156/photos/2058236/mtb-hydro-3-black-blue-uswe-hydr.png?VersionId=dLxKAJGKTlbDyWW6LNRmm6OcNjPARm2h&itok=Bm_VX_4d"
+            data-img-red="https://m.media-amazon.com/images/I/9160jxgQRPL.jpg">
+            <div class="product-img">
+                <img src="https://www.starbike.com/images/2022/uswe-mtb-hydro-backpack-12l-4-hires.jpg" alt="Hydration Pack for Cycling">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>HYDRO MTB</h6>
+                <h3>₱1,200 <del>₱1,600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 5,300 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card"
+            data-name="Fleece Pullover Jacket"
+            data-sizes="S,M,L,XL"
+            data-colors="Brown"
+            data-price="1500"
+            data-orig-price="2000"
+            data-img-brown="https://cdn.shopify.com/s/files/1/0114/4022/6366/products/fleece-coyote-1_1600x.jpg?v=1582183985">
+            <div class="product-img">
+                <img src="https://cdn.shopify.com/s/files/1/0114/4022/6366/products/fleece-coyote-1_1600x.jpg?v=1582183985" alt="Fleece Pullover Jacket">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Fleece Pullover Jacket</h6>
+                <h3>₱1,500 <del>₱2,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,400 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Rainproof Shell Jacket"
+            data-sizes="S,M,L,XL"
+            data-colors="Black,Red,Orange"
+            data-price="2500"
+            data-orig-price="3500"
+            data-img-black="https://www.cimalp.co.uk/21075-new_fiche_produit/technical-ultrashell-jacket.jpg"
+            data-img-navy="https://www.cimalp.co.uk/12516-new_fiche_produit/reinforced-ultrashell-jacket.jpg"
+            data-img-Green="https://static.cimalp.fr/33723-large_default/superlight-windproof-jacket.jpg">
+            <div class="product-img">
+                <img src="https://static.cimalp.fr/30028-large_default/ultra-light-windproof-jacket.jpg" alt="Rainproof Shell Jacket">
+                <span class="discount">-28%</span>
+            </div>
+            <div class="product-info">
+                <h6>CIMALP Rainproof Jacket</h6>
+                <h3>₱2,500 <del>₱3,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,900 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Long-Sleeve Compression Top"
+            data-sizes="S,M,L,XL"
+            data-colors="Black,WHite"
+            data-price="450"
+            data-orig-price="600"
+            data-img-white="https://cdn11.bigcommerce.com/s-8a17r5u7/images/stencil/2048x2048/products/1159/16645/ma1964a-whtwht__98599.1546602402.jpg?c=2"
+            data-img-black="https://content.competitivecyclist.com/images/items/large/TXU/TXU0126/BLA_D2.jpg">
+            <div class="product-img">
+                <img src="https://content.competitivecyclist.com/images/items/large/TXU/TXU0126/BLA_D2.jpg" alt="Long-Sleeve Compression Top">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>2XU Longsleeve Compression</h6>
+                <h3>₱450 <del>₱600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 6,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Moisture-Wicking Running Cap"
+            data-sizes="OS"
+            data-colors="Black,Yellow,White,Pink"
+            data-price="650"
+            data-orig-price="800"
+            data-img-black="https://www.lsi.co.uk/storage/products/clothing-2023-v2/BB188/bb188-blk-back.jpg"
+            data-img-yellow="http://cdn.shopify.com/s/files/1/0887/7992/products/hi_viz_3_1024x1024.jpg?v=1448408117"
+            data-img-white="https://i.pinimg.com/originals/de/4e/2d/de4e2d73b48e1d916e6d3d071f62edf2.jpg"
+            data-img-pink="http://cdn.shopify.com/s/files/1/0887/7992/products/pink_2_large.jpg?v=1448402476">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/originals/de/4e/2d/de4e2d73b48e1d916e6d3d071f62edf2.jpg" alt="Moisture-Wicking Running Cap">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Moisture-Wicking Running Cap</h6>
+                <h3>₱650 <del>₱800</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="High-Visibility Cycling Jersey"
+            data-sizes="S,M,L,XL,2XL"
+            data-colors="Yellow,Navy,Blue,Black,White"
+            data-price="1300"
+            data-orig-price="1600"
+            data-img-yellow="https://m.media-amazon.com/images/I/61XcZR3rkqL._AC_SX679_.jpg"
+            data-img-navy="https://m.media-amazon.com/images/I/61bfqI0XD8L._AC_SX522_.jpg"
+            data-img-blue="https://m.media-amazon.com/images/I/610OAl5JDEL._AC_SX522_.jpg"
+            data-img-black="https://m.media-amazon.com/images/I/71EzA98mMBL._AC_SX522_.jpg"
+            data-img-white="https://m.media-amazon.com/images/I/61RHIGzl8uL._AC_SX522_.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/61XcZR3rkqL._AC_SX522_.jpg" alt="High-Visibility Cycling Jersey">
+                <span class="discount">-18%</span>
+            </div>
+            <div class="product-info">
+                <h6>ARSUXEO Men's Short Sleeves Cycling Jersey Bicycle Biking Bike Shirt 636</h6>
+                <h3>₱1,300 <del>₱1,600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Quick-Dry Sport Shirt"
+            data-sizes="S,M,L,XL,2XL,3XL"
+            data-colors="Black,White,Green,Blue,Gray"
+            data-price="550"
+            data-orig-price="700"
+            data-img-black="https://m.media-amazon.com/images/I/71o44WGW4rL._AC_SY550_.jpg"
+            data-img-white="https://m.media-amazon.com/images/I/71mqNYkPTEL._AC_SY550_.jpg"
+            data-img-green="https://m.media-amazon.com/images/I/81K+RJbkXQL._AC_SY550_.jpg"
+            data-img-blue="https://m.media-amazon.com/images/I/81ySR2bry0L._AC_SY550_.jpg"
+            data-img-gray="https://m.media-amazon.com/images/I/81b7KZScFAL._AC_SY550_.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/71o44WGW4rL._AC_SY550_.jpg" alt="Quick-Dry Sport Shirt">
+                <span class="discount">-21%</span>
+            </div>
+            <div class="product-info">
+                <h6>TACVASEN Men's Lightweight Athletic T-Shirts Quick Dry Workout Gym Tops Short Sleeve Running Tee Shirt Performance Activewear</h6>
+                <h3>₱550 <del>₱700</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 7,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card"
+            data-name="Heavy-Duty Climbing Rope"
+            data-sizes="Default"
+            data-colors="Red"
+            data-price="2800"
+            data-orig-price="4000"
+            data-img-red="https://m.media-amazon.com/images/I/81NCbSVPUkL._AC_SX679_.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/81NCbSVPUkL._AC_SX679_.jpg" alt="Heavy-Duty Climbing Rope">
+                <span class="discount">-30%</span>
+            </div>
+            <div class="product-info">
+                <h6>150Ft 1/2 Inch Heavy Duty Climbing Rope - for Tree Swing, Pulling, Outdoor & Gym Use (Red)</h6>
+                <h3>₱2,800 <del>₱4,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,500 sold</p>
+            </div>
+        </div>
+    <div class="product-card" 
+       data-name="High-Performance Running Shoes" 
+       data-sizes="39,40,41,42,43,44,45" 
+       data-colors="Navy-Blue,Black,White" 
+       data-price="3500" 
+       data-orig-price="4200" 
+       data-img-White="https://m.media-amazon.com/images/I/71UmBKxMJqL._AC_SY535_.jpg" 
+       data-img-Navy-Blue="https://m.media-amazon.com/images/I/712Kt28IRUL._AC_SY535_.jpg" 
+       data-img-Black="https://m.media-amazon.com/images/I/81BctOe-TCL._AC_SY535_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/81BctOe-TCL._AC_SY535_.jpg" alt="High-Performance Running Shoes"> 
+      <span class="discount">-17%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>Men’s PG7 Running Shoes Cushioning Comfortable Breathable Athletic Workout Gym Cross Trainer Sports Sneakers</h6> 
+      <h3>₱3,500 <del>₱4,200</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 8,200 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Trail Running Backpack" 
+       data-sizes="S,M,L" 
+       data-colors="White,Black,Green,White" 
+       data-price="1800" 
+       data-orig-price="2000" 
+       data-img-White="https://m.media-amazon.com/images/I/81-vTl43CoL._AC_SX569_.jpg"
+       data-img-Black="https://m.media-amazon.com/images/I/91lLB7-eo6L._AC_SX569_.jpg"
+       data-img-green="https://m.media-amazon.com/images/I/71Ut28BQ-eL._AC_SX569_.jpg" 
+       data-img-white="https://m.media-amazon.com/images/I/81zgaXyGt-L._AC_SX569_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/91lLB7-eo6L.__AC_SX300_SY300_QL70_FMwebp_.jpg" alt="Trail Running Backpack"> 
+      <span class="discount">-10%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>MVRK Water Resistant Chest Pack - Running Vest for Workouts, Running Phone Holder Extra Storage, Lightweight Running Pack</h6> 
+      <h3>₱1,800 <del>₱2,000</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 5,100 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="All-Weather Windbreaker" 
+       data-sizes="S,M,L,XL" 
+       data-colors="Green,Gray,Blue,Black" 
+       data-price="2100" 
+       data-orig-price="2500" 
+       data-img-green="https://m.media-amazon.com/images/I/81jBFrdbrEL._AC_SY550_.jpg"
+       data-img-gray="https://m.media-amazon.com/images/I/81lMtViGxYL._AC_SY550_.jpg" 
+       data-img-blue="https://m.media-amazon.com/images/I/81t2H20E7KL._AC_SY550_.jpg" 
+       data-img-black="https://m.media-amazon.com/images/I/814N257zllL._AC_SY550_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/81jBFrdbrEL._AC_SY550_.jpg" alt="All-Weather Windbreaker"> 
+      <span class="discount">-16%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>Mens Rain Jacket Raincoat Windbreaker Running Waterproof Lightweight Packable with Hood Travel Hiking Cycling</h6> 
+      <h3>₱2,100 <del>₱2,500</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 4,500 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Quick-Dry Hiking Pants" 
+       data-sizes="28,30,32,34,36" 
+       data-colors="Black,Brown,Gray" 
+       data-price="1200" 
+       data-orig-price="1500"
+       data-img-Black="https://m.media-amazon.com/images/I/61I6oDKBNzL._AC_SY550_.jpg" 
+       data-img-brown="https://m.media-amazon.com/images/I/613T9xKPkhL._AC_SY550_.jpg" 
+       data-img-gray="https://m.media-amazon.com/images/I/61TMlDSEuyL._AC_SY550_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/61I6oDKBNzL._AC_SY550_.jpg" alt="Quick-Dry Hiking Pants"> 
+      <span class="discount">-20%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>CQR Men's Convertible Cargo Tactical Pants, Water Resistant Outdoor Hiking Pants, Zip Off Lightweight Stretch Work Pants</h6> 
+      <h3>₱1,200 <del>₱1,500</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 3,800 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Fitness Tracker Watch" 
+       data-sizes="Default" 
+       data-colors="Pink,BLue,Black,White" 
+       data-price="4500" 
+       data-orig-price="5000" 
+       data-img-pink="https://m.media-amazon.com/images/I/61+0q9lXalL._AC_SX425_.jpg"
+       data-img-blue="https://m.media-amazon.com/images/I/615d3GQ1OJL._AC_SX425_.jpg"
+       data-img-black="https://m.media-amazon.com/images/I/41uMUYIK6tL._AC_SX425_.jpg" 
+       data-img-white="https://m.media-amazon.com/images/I/51u1vaTdTvL._AC_SX425_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/41uMUYIK6tL._AC_SX425_.jpg" alt="Fitness Tracker Watch"> 
+      <span class="discount">-10%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>Fitness Tracker with Heart Rate/Blood Oxygen/Sleep Monitor, 20+ Sports Modes Smart Watches for Women/Men, Activity & Step Tracker Smart Watch for Android/iOS Phone</h6> 
+      <h3>₱4,500 <del>₱5,000</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 6,900 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Insulated Water Bottle" 
+       data-sizes="Default" 
+       data-colors="Black,Orange,Green" 
+       data-price="750" 
+       data-orig-price="950" 
+       data-img-black="https://m.media-amazon.com/images/I/718RbhzhVbL._AC_SX569_.jpg" 
+       data-img-orange="https://m.media-amazon.com/images/I/51B1KLpmlfL._AC_SX569_.jpg" 
+       data-img-green="https://m.media-amazon.com/images/I/51KBfz9CrKL._AC_SX569_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/61sS-XIvEXL.__AC_SX300_SY300_QL70_FMwebp_.jpg" alt="Insulated Water Bottle"> 
+      <span class="discount">-21%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>Owala FreeSip Insulated Stainless Steel Water Bottle with Straw for Sports, Travel, and School BPA-Free Sports Water Bottle, 24 oz, Citrus Crush</h6> 
+      <h3>₱750 <del>₱950</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 9,500 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Lightweight Camping Tent" 
+       data-sizes="2-Person,4-Person" 
+       data-colors="Blue,Pink,Red,Yellow,Orange" 
+       data-price="3800" 
+       data-orig-price="5000"
+       data-img-Blue="https://m.media-amazon.com/images/I/81DaQhY+yRL._AC_SX569_.jpg"
+       data-img-pink="https://m.media-amazon.com/images/I/81GYG5c0DML._AC_SX569_.jpg"
+       data-img-red="https://m.media-amazon.com/images/I/81HKefqkHRL._AC_SX569_.jpg"
+       data-img-yellow="https://m.media-amazon.com/images/I/81gUSGUOehL._AC_SX569_.jpg"
+       data-img-orange="https://m.media-amazon.com/images/I/81Ce6HzyJTL._AC_SX569_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/81DaQhY+yRL._AC_SX569_.jpg" alt="Lightweight Camping Tent"> 
+      <span class="discount">-24%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>2-Person Dome Tent – Easy Set Up Shelter with Rain Fly and Carrying Bag for Camping</h6> 
+      <h3>₱3,800 <del>₱5,000</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 2,500 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Multi-tool Knife" 
+       data-sizes="90LBS" 
+       data-colors="Default" 
+       data-price="1050" 
+       data-orig-price="1200" 
+       data-img-90LB="https://m.media-amazon.com/images/I/71BE37ZZfLL._AC_SX569_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/71BE37ZZfLL._AC_SX569_.jpg" alt="Multi-tool Knife"> 
+      <span class="discount">-12%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>FEIERDUN Adjustable Dumbbells, 90lbs Free Weight Set with Connector, 5 in1 Dumbbells Set Used as Barbell, Kettlebells, Push up Stand, Weight Plate, Fitness Exercises for Home Gym Suitable Men/Women</h6> 
+      <h3>₱1,050 <del>₱1,200</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 4,100 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="UV Protection Sunglasses" 
+       data-sizes="Default" 
+       data-colors="Default" 
+       data-price="1500" 
+       data-orig-price="1800" 
+       data-img-Default="https://m.media-amazon.com/images/I/71jbvJKvSgL.__AC_SX300_SY300_QL70_FMwebp_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/71jbvJKvSgL.__AC_SX300_SY300_QL70_FMwebp_.jpg" alt="UV Protection Sunglasses"> 
+      <span class="discount">-17%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>Push Up Board,Home Gym,Portable Exercise Equipment,Pilates Bar and 20 Fitness Accessories with Resistance Bands and Ab Roller Wheel,Full Body Workout at Home</h6> 
+      <h3>₱1,500 <del>₱1,800</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 5,600 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Outdoor LED Headlamp" 
+       data-sizes="Default" 
+       data-colors="Black" 
+       data-price="850" 
+       data-orig-price="1000" 
+       data-img-black="https://m.media-amazon.com/images/I/71DxWxvCwlL._AC_SX679_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/71DxWxvCwlL._AC_SX679_.jpg" alt="Outdoor LED Headlamp"> 
+      <span class="discount">-15%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>LHKNL Headlamp Flashlight, Lumen Ultra-Light Bright LED Rechargeable Headlight with White Red Light, 2-Pack Waterproof Motion Sensor Head Lamp,8 Modes for Outdoor Camping Running Hiking Fishing</h6> 
+      <h3>₱850 <del>₱1,000</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 7,300 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Portable Bluetooth Speaker" 
+       data-sizes="Default" 
+       data-colors="Brown,Blue,Red,Gray" 
+       data-price="1900" 
+       data-orig-price="2200" 
+       data-img-red="https://m.media-amazon.com/images/I/81XytsfIkoL._AC_SX425_.jpg"
+       data-img-gray="https://m.media-amazon.com/images/I/81kKAIFHjKL._AC_SX425_.jpg" 
+       data-img-blue="https://m.media-amazon.com/images/I/81brnK6495L._AC_SX425_.jpg" 
+       data-img-brown="https://m.media-amazon.com/images/I/71kq0nZ9kHL._AC_SX425_.jpg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/81AqvIT6DmL.__AC_SX300_SY300_QL70_FMwebp_.jpg" alt="Portable Bluetooth Speaker"> 
+      <span class="discount">-14%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>WILSON NBA DRV Series Basketball</h6> 
+      <h3>₱1,900 <del>₱2,200</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 4,900 sold</p> 
+    </div> 
+  </div> 
+
+  <div class="product-card" 
+       data-name="Yoga Mat with Carrying Strap" 
+       data-sizes="Default" 
+       data-colors="red" 
+       data-price="900" 
+       data-orig-price="1100" 
+       data-img-red="https://m.media-amazon.com/images/I/61btRqmjd-L._AC_SX569_.jpgg"> 
+    <div class="product-img"> 
+      <img src="https://m.media-amazon.com/images/I/61btRqmjd-L._AC_SX569_.jpg" alt="Yoga Mat"> 
+      <span class="discount">-18%</span> 
+    </div> 
+    <div class="product-info"> 
+      <h6>Aimking Basketball Hoop Outdoor 3.3-10FT 5s-Rapid-Adjustable, 40/44 inch Shatterproof Backboard & Enlarged Base, Portable Basketball Hoop</h6> 
+      <h3>₱900 <del>₱1,100</del></h3> 
+      <p class="buyers"><i class="fas fa-user-check"></i> 3,400 sold</p> 
+    </div> 
+  </div>
+  </div>
+</section>
+
+<div class="product-modal" id="productModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <img src="" alt="" class="modal-img" id="modalImg">
+        <div class="modal-details">
+            <h2 id="modalName">Product Name</h2>
+            <p class="modal-price"><span id="modalPrice">₱1,234</span> <del id="modalOrigPrice">₱5,678</del></p>
+            
+            <div class="modal-option-group" id="sizesGroup">
+                <h4>Sizes:</h4>
+                <div class="option-list" id="modalSizes">
+                    </div>
+            </div>
+            
+            <div class="modal-option-group" id="colorsGroup">
+                <h4>Colors:</h4>
+                <div class="option-list" id="modalColors">
+                    </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="add-to-cart-btn" id="addToCartBtn"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                <button class="checkout-btn" id="checkoutBtn"><i class="fas fa-credit-card"></i> Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="voice-chat-container" id="voice-chat-container">
+    <div class="voice-chat-header">
+        <span class="voice-chat-title">Voice Command AI</span>
+        <button class="voice-chat-close-btn" id="voice-close-chat-btn">&times;</button>
+    </div>
+    <div class="voice-chat-body" id="voice-chat-body">
+        <div class="voice-message voice-bot-message">Hello! Tap the microphone to start talking.</div>
+    </div>
+    <div class="voice-chat-input-area">
+        <button id="voice-mic-btn"><i class="ri-mic-fill"></i></button>
+    </div>
+</div>
+
+<button class="voice-toggle-btn" id="voice-toggle-btn">
+    Voice Command AI
+</button>
+  <footer class="footer">
+      <div class="footer-container">
+          <div class="footer-section">
+              <h5>Customer Care</h5>
+              <ul>
+                  <li><a href="customer.html">Customer Serice</a></li>
+                  <li><a href="#">How to Buy</a></li>
+                  <li><a href="#">Shipping & Delivery</a></li>
+                  <li><a href="#">Return & Refund</a></li>
+                  <li><a href="#">Contact Us</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h5>About ImarketPH</h5>
+              <ul>
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Careers</a></li>
+                  <li><a href="#">Terms & Conditions</a></li>
+                  <li><a href="#">Privacy Policy</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h5>Payment Methods</h5>
+              <div class="footer-logos">
+                  <img src="visa.png" alt="Visa">
+                  <img src="mastercard.png" alt="Mastercard">
+                  <img src="gcash.png" alt="GCash">
+                  <img src="maya.png" alt="Paymaya">
+              </div>
+          </div>
+          <div class="footer-section">
+              <h5>Delivery Services</h5>
+              <div class="footer-logos">
+                  <img src="jnt.png" alt="J&T Express">
+                  <img src="ninjavan.jpg" alt="Ninja Van">
+                  <img src="lbc.png" alt="LBC Express">
+                  <img src="flash.png" alt="Flash Express">
+              </div>
+          </div>
+          <div class="footer-section">
+              <h5>Follow Us</h5>
+              <div class="footer-socials">
+                  <a href="#"><img src="facebook.png" alt="Facebook"></a>
+                  <a href="#"><img src="instagram.jpg" alt="Instagram"></a>
+                  <a href="#"><img src="twitter.png" alt="Twitter"></a>
+                  <a href="#"><img src="youtube.png" alt="YouTube"></a>
+              </div>
+          </div>
+      </div>
+      <div class="footer-bottom">
+          <p>© 2025 All Rights Reserved by ImarketPH</p>
+      </div>
+  </footer> 
+        <button class="image-scan-fab" onclick="window.open('https://images.google.com/', '_blank')" title="Image Scan">
+        <i class="ri-camera-line"></i>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const productCards = document.querySelectorAll('.product-card');
+        const productModal = document.getElementById('productModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalName = document.getElementById('modalName');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalOrigPrice = document.getElementById('modalOrigPrice');
+        const modalSizes = document.getElementById('modalSizes');
+        const modalColors = document.getElementById('modalColors');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+
+        let selectedSize = '';
+        let selectedColor = '';
+        let currentProductData = {};
+
+
+        const openModal = (productData) => {
+            currentProductData = productData;
+            
+            modalImg.src = productData.imgSrc;
+            modalImg.alt = productData.name;
+            
+            modalName.textContent = productData.name;
+            modalPrice.textContent = `₱${productData.price.toLocaleString()}`;
+            modalOrigPrice.textContent = `₱${productData.origPrice.toLocaleString()}`;
+            
+            modalSizes.innerHTML = '';
+            modalColors.innerHTML = '';
+
+            productData.sizes.split(',').forEach(size => {
+                const sizeOption = document.createElement('span');
+                sizeOption.classList.add('option');
+                sizeOption.textContent = size.trim();
+                modalSizes.appendChild(sizeOption);
+            });
+
+            productData.colors.split(',').forEach(color => {
+                const colorOption = document.createElement('span');
+                colorOption.classList.add('option');
+                colorOption.textContent = color.trim();
+                colorOption.setAttribute('data-color', color.trim().toLowerCase().replace(/ /g, ''));
+                modalColors.appendChild(colorOption);
+            });
+
+            productModal.style.display = 'flex';
+        
+            selectedSize = '';
+            selectedColor = '';
+        };
+
+       const closeModal = () => {
+            productModal.style.display = 'none';
+        };
+
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const productData = {
+                    name: card.getAttribute('data-name'),
+                    sizes: card.getAttribute('data-sizes'),
+                    colors: card.getAttribute('data-colors'),
+                    price: parseFloat(card.getAttribute('data-price')),
+                    origPrice: parseFloat(card.getAttribute('data-orig-price')),
+                    imgSrc: card.querySelector('.product-img img').src,
+                    colorImages: {}
+                };
+
+                const dataAttributes = card.attributes;
+                for (let i = 0; i < dataAttributes.length; i++) {
+                    const attr = dataAttributes[i];
+                    if (attr.name.startsWith('data-img-')) {
+                        const colorName = attr.name.replace('data-img-', '');
+                        productData.colorImages[colorName] = attr.value;
+                    }
+                }
+                
+                openModal(productData);
+            });
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target === productModal) {
+                closeModal();
+            }
+        });
+
+        const handleOptionSelection = (containerId, optionType) => {
+            const container = document.getElementById(containerId);
+            container.addEventListener('click', (e) => {
+                if (e.target.classList.contains('option')) {
+                    container.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    e.target.classList.add('selected');
+
+                    if (optionType === 'size') {
+                        selectedSize = e.target.textContent;
+                    } else if (optionType === 'color') {
+                        selectedColor = e.target.textContent;
+                        colorChangeHandler(e.target.getAttribute('data-color'));
+                    }
+                }
+            });
+        };
+
+        handleOptionSelection('modalSizes', 'size');
+        handleOptionSelection('modalColors', 'color');
+        
+        const colorChangeHandler = (color) => {
+            const newImageSrc = currentProductData.colorImages[color];
+            if (newImageSrc) {
+                modalImg.src = newImageSrc;
+            } else {
+                console.warn(`Image not found for color: ${color}`);
+            }
+        };
+        
+        addToCartBtn.addEventListener('click', () => {
+            const productName = modalName.textContent;
+            if (selectedSize && selectedColor) {
+                alert(`Added ${productName} (Size: ${selectedSize}, Color: ${selectedColor}) to cart!`);
+                closeModal();
+            } else {
+                alert('Please select a size and color.');
+            }
+        });
+
+        checkoutBtn.addEventListener('click', () => {
+            const productName = modalName.textContent;
+            if (selectedSize && selectedColor) {
+                alert(`Proceeding to checkout for ${productName} (Size: ${selectedSize}, Color: ${selectedColor}).`);
+                closeModal();
+            } else {
+                alert('Please select a size and color before checking out.');
+            }
+        });
+    });
+</script>
+  <script src="https://unpkg.com/scrollreveal"></script>
+  <script src="script.js"></script>
+</body>
+</html>

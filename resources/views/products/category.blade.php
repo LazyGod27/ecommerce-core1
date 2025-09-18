@@ -189,8 +189,27 @@
         quantityInput.name = 'quantity';
         quantityInput.value = '1';
         
+        // Add product data for demo products
+        const productNameInput = document.createElement('input');
+        productNameInput.type = 'hidden';
+        productNameInput.name = 'product_name';
+        productNameInput.value = product.name;
+        
+        const productPriceInput = document.createElement('input');
+        productPriceInput.type = 'hidden';
+        productPriceInput.name = 'product_price';
+        productPriceInput.value = product.price;
+        
+        const productImageInput = document.createElement('input');
+        productImageInput.type = 'hidden';
+        productImageInput.name = 'product_image';
+        productImageInput.value = product.image;
+        
         form.appendChild(csrfToken);
         form.appendChild(quantityInput);
+        form.appendChild(productNameInput);
+        form.appendChild(productPriceInput);
+        form.appendChild(productImageInput);
         document.body.appendChild(form);
         form.submit();
     };

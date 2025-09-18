@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>User</title>
+    <style>
+        
+        .dropdown-menu {
+            display: none;
+        }
+        .dropdown-menu.show {
+            display: block;
+        }
+        .modal {
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="logo.png" alt="IMARKET PH Logo">
+        </div>
+        <ul class="navbar" id="navbar">
+            <li><a href="index.html" class="active"><i class="ri-home-line"></i> Home</a></li>
+            <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
+            <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
+            <li class="dropdown">
+                <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="#"><i class="ri-fire-line"></i> Best Selling</a></li>
+                    <li><a href="#"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+                    <li><a href="#"><i class="ri-computer-line"></i> Electronics</a></li>
+                    <li><a href="#"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+                    <li><a href="#"><i class="ri-home-4-line"></i> Home & Living</a></li>
+                    <li><a href="#"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+                    <li><a href="#"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+                    <li><a href="#"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+                    <li><a href="#"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="search-bar">
+            <input type="text" placeholder="Search for products, brands and more..." />
+            <button class="search-btn"><i class="ri-search-line"></i></button>
+        </div>
+        <div class="icons">
+            <a href="cart.html"><i class="ri-shopping-cart-line"></i></a>
+            <a href="user.html"><i class="ri-user-line"></i></a>
+            <div class="bx bx-menu" id="menu-icon"></div>
+        </div>
+    </header>
+
+    <div class="modal login-modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeLogin">&times;</span>
+            <h2>Login</h2>
+            <form>
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username" required>
+                <label for="password">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="password" placeholder="Enter password" required>
+                    <i class="ri-eye-line" id="togglePassword"></i>
+                </div>
+                <button type="submit" class="login-btn">Login</button>
+            </form>
+            <p class="signup-text">
+                Don't have an account yet? 
+                <a href="#" id="openSignup">Sign up here</a>
+            </p>
+        </div>
+    </div>
+    
+    <div class="modal signup-modal" id="signupModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeSignup">&times;</span>
+            <h2>Sign Up</h2>
+            <form>
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email" required>
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" placeholder="Enter phone number" required>
+                <label for="newPassword">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" id="newPassword" placeholder="Enter password" required>
+                    <i class="ri-eye-line toggleSignupPassword"></i>
+                </div>
+                <button type="submit" class="login-btn">Create Account</button>
+            </form>
+            <div class="divider">
+                <span>OR</span>
+            </div>
+            <div class="social-login">
+                <button type="button" class="google-btn">
+                    <img src="https://placehold.co/20x20/1A237E/FFFFFF?text=G" alt="Google Logo">
+                    Sign up with Google
+                </button>
+                <button type="button" class="facebook-btn">
+                    <i class="ri-facebook-fill"></i> Sign up with Facebook
+                </button>
+            </div>
+            <p class="signup-text">
+                Already have an account? 
+                <a href="#" id="openLoginFromSignup">Login here</a>
+            </p>
+        </div>
+    </div>
+    
+    <main class="main-container">
+        <section class="product-grid-section">
+            <h2>Popular Products</h2>
+            <div class="product-grid" id="product-list">
+            </div>
+        </section>
+        <section class="cart-section">
+            <h2>Shopping Cart</h2>
+            <ul class="cart-items" id="cart-items-list">
+            </ul>
+            <div class="checkout-details">
+                <h3>Voucher</h3>
+                <div class="voucher-input">
+                    <input type="text" placeholder="Enter voucher code">
+                </div>
+                <h3>Payment Method</h3>
+                <div class="payment-methods">
+                    <label><input type="radio" name="payment" value="gcash" checked><img src="https://getcash.ph/wp-content/uploads/2021/01/Transparent-1280-x-720.png" alt="GCash Logo"> GCash</label>
+                    <label><input type="radio" name="payment" value="paymaya"><img src="https://logodix.com/logo/2206757.jpg" alt="PayMaya Logo"> PayMaya</label>
+                    <label><input type="radio" name="payment" value="card"><img src="https://tse3.mm.bing.net/th/id/OIP.Mj26XgLJojJVKLy6iqHjWAHaEK?pid=Api&P=0&h=180" alt="Card Logo"> Credit/Debit Card</label>
+                    <label><input type="radio" name="payment" value="cod"><img src="https://img.freepik.com/premium-vector/cod-icon-shipping-cash-delivery-symbol-vector-logo-template_883533-219.jpg" alt="COD Logo"> Cash on Delivery (COD)</label>
+                </div>
+            </div>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Selected Items (<span id="total-items">0</span>)</span>
+                    <span class="summary-total" id="cart-total">₱0.00</span>
+                </div>
+            </div>
+            <button class="checkout-button" id="checkout-button" disabled>Checkout</button>
+        </section>
+    </main>
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h5>Customer Care</h5>
+                <ul>
+                    <li><a href="customer.html">Customer Serice</a></li>
+                    <li><a href="#">How to Buy</a></li>
+                    <li><a href="#">Shipping & Delivery</a></li>
+                    <li><a href="#">Return & Refund</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h5>About ImarketPH</h5>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h5>Payment Methods</h5>
+                <div class="footer-logos">
+                    <img src="visa.png" alt="Visa">
+                    <img src="mastercard.png" alt="Mastercard">
+                    <img src="gcash.png" alt="GCash">
+                    <img src="maya.png" alt="Paymaya">
+                </div>
+            </div>
+            <div class="footer-section">
+                <h5>Delivery Services</h5>
+                <div class="footer-logos">
+                    <img src="jnt.png" alt="J&T Express">
+                    <img src="ninjavan.jpg" alt="Ninja Van">
+                    <img src="lbc.png" alt="LBC Express">
+                    <img src="flash.png" alt="Flash Express">
+                </div>
+            </div>
+            <div class="footer-section">
+                <h5>Follow Us</h5>
+                <div class="footer-socials">
+                    <a href="#"><img src="facebook.png" alt="Facebook"></a>
+                    <a href="#"><img src="instagram.jpg" alt="Instagram"></a>
+                    <a href="#"><img src="twitter.png" alt="Twitter"></a>
+                    <a href="#"><img src="youtube.png" alt="YouTube"></a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2025 All Rights Reserved by ImarketPH</p>
+        </div>
+    </footer>
+    <script>
+        const products = [];
+        let cart = [];
+        function renderProducts() {
+            const productList = document.getElementById('product-list');
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p class="price">₱${product.price.toFixed(2)}</p>
+                    <button class="add-to-cart-button" onclick="addToCart(${product.id})">Add to Cart</button>
+                `;
+                productList.appendChild(productCard);
+            });
+        }
+        function updateCart() {
+            const cartList = document.getElementById('cart-items-list');
+            const cartTotal = document.getElementById('cart-total');
+            const totalItemsSpan = document.getElementById('total-items');
+            const checkoutButton = document.getElementById('checkout-button');
+            cartList.innerHTML = '';
+            let totalPrice = 0;
+            let totalItems = 0;
+            cart.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'cart-item';
+                li.innerHTML = `
+                    <div class="cart-item-header">
+                        <input type="checkbox" class="item-checkbox" checked onchange="updateCart()">
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="item-details">
+                            <span class="cart-item-name">${item.name}</span>
+                            <span class="cart-item-price">₱${item.price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="quantity-and-notes">
+                        <div class="quantity-controls">
+                            <button onclick="changeQuantity(${item.id}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="changeQuantity(${item.id}, 1)">+</button>
+                        </div>
+                        <textarea class="item-notes" placeholder="Add a note (e.g., 'no box')"></textarea>
+                    </div>
+                `;
+                cartList.appendChild(li);
+                if (li.querySelector('.item-checkbox').checked) {
+                    totalPrice += item.price * item.quantity;
+                    totalItems += item.quantity;
+                }
+            });
+            cartTotal.textContent = `₱${totalPrice.toFixed(2)}`;
+            totalItemsSpan.textContent = totalItems;
+            checkoutButton.disabled = totalItems === 0;
+        }
+        function addToCart(productId) {
+            const productToAdd = products.find(p => p.id === productId);
+            if (!productToAdd) return;
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...productToAdd, quantity: 1 });
+            }
+            updateCart();
+        }
+        function changeQuantity(itemId, change) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== itemId);
+                }
+            }
+            updateCart();
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCart();
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropdown = document.querySelector(".dropdown > a");
+            const dropdownMenu = document.querySelector(".dropdown-menu");
+            if (dropdown && dropdownMenu) {
+                dropdown.addEventListener("click", function(e) {
+                    e.preventDefault();
+                    dropdownMenu.classList.toggle("show");
+                });
+                document.addEventListener("click", function(e) {
+                    if (!dropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.remove("show");
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

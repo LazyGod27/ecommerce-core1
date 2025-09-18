@@ -1,319 +1,564 @@
 @extends('layouts.frontend')
 
-@section('title', 'iMarket - Checkout')
+@section('title', 'iMarket - Shopping Cart')
 
 @section('styles')
 <style>
-    :root {
-        --blue-dark: #2c3c8c;
-        --blue-darker: #353c61;
-        --blue-light: #4bc5ec;
-        --gray-blue: #5c6c9c;
-        --light-gray-blue: #bdcodc;
-        --gray-light: #94dcf4;
+    .main-container {
+        padding-top: 100px;
+        min-height: 100vh;
+        background: var(--bg-color);
     }
-    .bg-blue-dark { background-color: var(--blue-dark); }
-    .bg-blue-darker { background-color: var(--blue-darker); }
-    .bg-blue-light { background-color: var(--blue-light); }
-    .text-blue-dark { color: var(--blue-dark); }
-    .text-blue-light { color: var(--blue-light); }
-    .text-gray-blue { color: var(--gray-blue); }
-    .border-gray-blue { border-color: var(--gray-blue); }
-    .hover\:bg-gray-blue:hover { background-color: var(--gray-blue); }
-    .header-bg { background-color: #353c61; }
-    .header-bottom-bg { background-color: #2c3c8c; }
-    .home-button { background-color: #2c3c8c; }
-    .search-button { background-color: #4bc5ec; }
-    #message-box {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 1000;
+    
+    .product-grid-section {
+        padding: 20px;
+        background: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
-    #message-backdrop {
-        position: fixed;
-        top: 0;
-        left: 0;
+    
+    .cart-section {
+        padding: 20px;
+        background: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .cart-items {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .cart-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        background: #f9fafb;
+    }
+    
+    .cart-item-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .item-checkbox {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--main-color);
+    }
+    
+    .cart-item img {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+    
+    .item-details {
+        flex: 1;
+    }
+    
+    .cart-item-name {
+        font-weight: 600;
+        color: var(--text-color);
+        display: block;
+        margin-bottom: 5px;
+    }
+    
+    .cart-item-price {
+        color: var(--main-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .quantity-and-notes {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    .item-actions {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .remove-btn {
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 8px 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .remove-btn:hover {
+        background: #dc2626;
+        transform: translateY(-1px);
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        border-radius: 8px;
+        padding: 5px;
+        border: 1px solid #d1d5db;
+    }
+    
+    .quantity-controls button {
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: var(--main-color);
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .quantity-controls button:hover {
+        background: #1e40af;
+    }
+    
+    .quantity-controls span {
+        min-width: 30px;
+        text-align: center;
+        font-weight: 600;
+    }
+    
+    .item-notes {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        resize: vertical;
+        min-height: 40px;
+        font-family: inherit;
+    }
+    
+    .checkout-details {
+        margin: 20px 0;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 8px;
+    }
+    
+    .checkout-details h3 {
+        margin-bottom: 15px;
+        color: var(--text-color);
+        font-weight: 600;
+    }
+    
+    .voucher-input input {
         width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 14px;
     }
-
-    .card {
-        transition: transform 0.2s, box-shadow 0.2s;
+    
+    .payment-methods {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
     }
-    .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    
+    .payment-methods label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        cursor: pointer;
+        background: white;
+        transition: all 0.3s ease;
     }
-    .card.selected {
-        border: 3px solid #10b981; 
-        box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
-        background-color: #ecfdf5; 
+    
+    .payment-methods label:hover {
+        border-color: var(--main-color);
+        background: #f0f9ff;
     }
-    @media (min-width: 1024px) {
-        .lg\:landscape-flex {
-            display: flex;
-            flex-direction: row;
-            align-items: flex-start;
-        }
-        .lg\:landscape-flex-1 {
-            flex: 1;
-        }
+    
+    .payment-methods input[type="radio"] {
+        accent-color: var(--main-color);
+    }
+    
+    .payment-methods img {
+        width: 30px;
+        height: 20px;
+        object-fit: contain;
+    }
+    
+    .cart-summary {
+        background: #f8fafc;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+    
+    .summary-total {
+        color: var(--main-color);
+        font-size: 1.3rem;
+    }
+    
+    .checkout-button {
+        width: 100%;
+        padding: 15px;
+        background: var(--main-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .checkout-button:hover:not(:disabled) {
+        background: #1e40af;
+        transform: translateY(-2px);
+    }
+    
+    .checkout-button:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+    }
+    
+    .empty-cart {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .empty-cart i {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+    }
+    
+    .empty-cart h2 {
+        color: var(--text-color);
+        margin-bottom: 10px;
+    }
+    
+    .empty-cart p {
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+    
+    .continue-shopping-btn {
+        display: inline-block;
+        padding: 12px 24px;
+        background: var(--main-color);
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .continue-shopping-btn:hover {
+        background: #1e40af;
+        transform: translateY(-2px);
+    }
+    
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-4px);
+    }
+    
+    .product-card img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+    }
+    
+    .product-card h3 {
+        padding: 15px;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .product-card .price {
+        padding: 0 15px 15px;
+        color: var(--main-color);
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    
+    .add-to-cart-button {
+        width: 100%;
+        padding: 10px;
+        background: var(--main-color);
+        color: white;
+        border: none;
+        border-radius: 0 0 12px 12px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.3s ease;
+    }
+    
+    .add-to-cart-button:hover {
+        background: #1e40af;
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">Checkout</h1>
-    <div class="lg:flex lg:space-x-8">
-        <div class="flex-1">
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Your Cart</h2>
-                <div id="cart-items" class="space-y-4">
-                    @if(session('cart') && count(session('cart')) > 0)
-                        @foreach(session('cart') as $item)
-                        <div class="flex items-center space-x-4 border-b pb-4">
-                            <img src="{{ asset('storage/' . $item['image']) }}" alt="{{ $item['name'] }}" class="w-16 h-16 rounded-md object-cover">
-                            <div class="flex-1">
-                                <h3 class="font-semibold text-gray-800">{{ $item['name'] }}</h3>
-                                <p class="text-gray-600">₱{{ number_format($item['price'], 2) }}</p>
+<div class="main-container">
+    <section class="product-grid-section">
+        <h2>Popular Products</h2>
+        <div class="product-grid" id="product-list">
+            <!-- Popular products will be loaded here -->
+        </div>
+    </section>
+    
+    <section class="cart-section">
+        <h2>Shopping Cart</h2>
+        
+        @if(session('success'))
+            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                {{ session('error') }}
+            </div>
+        @endif
+
+        @if(session('cart') && count(session('cart')) > 0)
+            <ul class="cart-items" id="cart-items-list">
+                @foreach(session('cart') as $item)
+                    <li class="cart-item" data-row-id="{{ $item['rowId'] }}">
+                        <div class="cart-item-header">
+                            <input type="checkbox" class="item-checkbox" checked onchange="updateCart()">
+                            <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset('storage/' . $item['image']) }}" 
+                                 alt="{{ $item['name'] }}">
+                            <div class="item-details">
+                                <span class="cart-item-name">{{ $item['name'] }}</span>
+                                <span class="cart-item-price">₱{{ number_format($item['price'], 2) }}</span>
                             </div>
-                                                         <form action="{{ route('cart.remove', $item['rowId']) }}" method="POST" class="ml-4">
-                                 @csrf
-                                 <button type="submit" class="text-red-500 hover:text-red-700">
-                                     <i class="fas fa-trash"></i>
-                                 </button>
-                             </form>
                         </div>
-                        @endforeach
-                    @else
-                        <p class="text-center text-gray-500">Your cart is empty.</p>
-                    @endif
+                        <div class="quantity-and-notes">
+                            <div class="quantity-controls">
+                                <button onclick="changeQuantity('{{ $item['rowId'] }}', -1)">-</button>
+                                <span>{{ $item['quantity'] }}</span>
+                                <button onclick="changeQuantity('{{ $item['rowId'] }}', 1)">+</button>
+                            </div>
+                            <div class="item-actions">
+                                <button onclick="removeItem('{{ $item['rowId'] }}')" class="remove-btn" title="Remove item">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </div>
+                            <textarea class="item-notes" placeholder="Add a note (e.g., 'no box')"></textarea>
+                        </div>
+                    </li>
+                @endforeach
+            </ul>
+            
+            <div class="checkout-details">
+                <h3>Voucher</h3>
+                <div class="voucher-input">
+                    <input type="text" placeholder="Enter voucher code">
+                </div>
+                
+                <h3>Payment Method</h3>
+                <div class="payment-methods">
+                    <label>
+                        <input type="radio" name="payment" value="gcash" checked>
+                        <img src="{{ asset('ssa/gcash.png') }}" alt="GCash Logo"> 
+                        GCash
+                    </label>
+                    <label>
+                        <input type="radio" name="payment" value="paymaya">
+                        <img src="{{ asset('ssa/maya.png') }}" alt="PayMaya Logo"> 
+                        PayMaya
+                    </label>
+                    <label>
+                        <input type="radio" name="payment" value="card">
+                        <img src="{{ asset('ssa/visa.png') }}" alt="Card Logo"> 
+                        Credit/Debit Card
+                    </label>
+                    <label>
+                        <input type="radio" name="payment" value="cod">
+                        <i class="ri-money-dollar-circle-line"></i> 
+                        Cash on Delivery (COD)
+                    </label>
                 </div>
             </div>
             
-
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8 lg:landscape-flex-1">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Voucher Code</h2>
-                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                    <input type="text" id="voucher-input" placeholder="Enter voucher code" class="flex-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-light">
-                    <button id="apply-voucher-btn" class="bg-blue-dark hover:bg-blue-darker text-white font-bold py-3 px-6 rounded-md transition-colors duration-200">
-                        Apply Voucher
-                    </button>
+            <div class="cart-summary">
+                <div class="summary-row">
+                    <span class="summary-label">Selected Items (<span id="total-items">{{ count(session('cart')) }}</span>)</span>
+                    <span class="summary-total" id="cart-total">₱{{ number_format($subtotal ?? 0, 2) }}</span>
                 </div>
             </div>
-
-            <!-- Shipping Information -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Shipping Information</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Shipping Address *</label>
-                        <textarea name="shipping_address" rows="3" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-light" required placeholder="Enter your complete shipping address"></textarea>
-                    </div>
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Contact Number *</label>
-                            <input type="tel" name="contact_number" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-light" required placeholder="Enter your contact number">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                            <input type="email" name="email" class="w-full border border-gray-300 rounded-md p-3 focus:outline-none focus:ring-2 focus:ring-blue-light" required placeholder="Enter your email address">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Payment Method Selection -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Choose a Payment Method</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-
-                    <div id="gcash" class="card p-6 border-2 border-gray-200 rounded-xl cursor-pointer flex flex-col items-center text-center hover:bg-gray-50" data-method="GCash">
-                        <img src="https://logodix.com/logo/2206207.png" class="w-12 h-12 text-green-600 mb-2" alt="GCash logo">
-                        <h3 class="text-xl font-semibold text-gray-800">GCash</h3>
-                        <p class="text-sm text-gray-500">E-wallet</p>
-                    </div>
-                    <div id="paymaya" class="card p-6 border-2 border-gray-200 rounded-xl cursor-pointer flex flex-col items-center text-center hover:bg-gray-50" data-method="PayMaya">
-                        <img src="https://business.inquirer.net/wp-content/blogs.dir/5/files/2020/11/PayMaya-Logo_Vertical.png" class="w-12 h-12 text-pink-600 mb-2" alt="PayMaya logo">
-                        <h3 class="text-xl font-semibold text-gray-800">PayMaya</h3>
-                        <p class="text-sm text-gray-500">E-wallet</p>
-                    </div>
-                    <div id="card" class="card p-6 border-2 border-gray-200 rounded-xl cursor-pointer flex flex-col items-center text-center hover:bg-gray-50" data-method="Card">
-                        <img src="https://up.yimg.com/ib/th/id/OIP.Tm8I5fC59eVVStXCIObmMQHaE1?pid=Api&rs=1&c=1&qlt=95&w=106&h=69" class="w-12 h-12 text-purple-600 mb-2" alt="Credit/Debit card icon">
-                        <h3 class="text-xl font-semibold text-gray-800">Card</h3>
-                        <p class="text-sm text-gray-500">Credit/Debit Card</p>
-                    </div>
-                    <div id="cod" class="card p-6 border-2 border-gray-200 rounded-xl cursor-pointer flex flex-col items-center text-center hover:bg-gray-50" data-method="Cash on Delivery">
-                        <img src="https://static.vecteezy.com/system/resources/previews/006/566/274/non_2x/cash-on-delivery-icon-design-illustration-in-flat-design-free-vector.jpg" class="w-12 h-12 text-green-600 mb-2" alt="Cash on Delivery icon">
-                        <h3 class="text-xl font-semibold text-gray-800">COD</h3>
-                        <p class="text-sm text-gray-500">Cash on Delivery</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="lg:w-1/3 mt-8 lg:mt-0">
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h2 class="text-xl font-semibold mb-4 text-gray-800">Order Summary</h2>
-                <div class="space-y-2">
-                    <div class="flex justify-between text-gray-700">
-                        <span>Subtotal:</span>
-                        <span id="subtotal">₱{{ number_format($subtotal ?? 0, 2) }}</span>
-                    </div>
-
-                    <div class="flex justify-between text-red-600 font-semibold" id="discount-row">
-                        <span>Discount:</span>
-                        <span id="discount-amount">-₱0.00</span>
-                    </div>
-                    <div class="flex justify-between text-gray-700">
-                        <span>Tax (12% VAT):</span>
-                        <span id="tax-amount">₱{{ number_format($tax ?? 0, 2) }}</span>
-                    </div>
-                    <div class="flex justify-between text-gray-700">
-                        <span>Shipping:</span>
-                        <span id="shipping-cost">₱{{ number_format($shippingCost ?? 50, 2) }}</span>
-                    </div>
-                    <hr class="my-2 border-gray-200">
-                    <div class="flex justify-between font-bold text-lg text-gray-800">
-                        <span>Total:</span>
-                        <span id="total">₱{{ number_format($total ?? (($subtotal ?? 0) + ($tax ?? 0) + ($shippingCost ?? 50)), 2) }}</span>
-                    </div>
-                </div>
-                <form action="{{ route('checkout.process') }}" method="POST" id="checkout-form">
+            
+            @auth
+                <form method="POST" action="{{ route('checkout.process') }}">
                     @csrf
-                    <input type="hidden" name="payment_method" id="payment_method">
-                    <button type="submit" id="place-order-btn" class="mt-6 w-full bg-blue-dark hover:bg-blue-darker text-white font-bold py-3 px-4 rounded-md transition-colors duration-200" disabled>
-                        Place Order
+                    <button type="submit" class="checkout-button" id="checkout-button">
+                        Checkout
                     </button>
                 </form>
+            @else
+                <a href="{{ route('login') }}" class="checkout-button" style="text-decoration: none; display: block; text-align: center;">
+                    Login to Checkout
+                </a>
+            @endauth
+        @else
+            <div class="empty-cart">
+                <i class="ri-shopping-cart-line"></i>
+                <h2>Your cart is empty</h2>
+                <p>Add some items to get started!</p>
+                <a href="{{ route('products') }}" class="continue-shopping-btn">Continue Shopping</a>
             </div>
-        </div>
-    </div>
-</div>
-
-<div id="message-backdrop" class="hidden"></div>
-<div id="message-box" class="hidden bg-white p-8 rounded-lg shadow-lg max-w-sm text-center">
-    <p id="message-text" class="text-lg font-semibold text-gray-800 mb-4"></p>
-    <button id="close-message-btn" class="bg-blue-dark hover:bg-blue-darker text-white font-bold py-2 px-4 rounded-md">OK</button>
+        @endif
+    </section>
 </div>
 @endsection
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const subtotalElement = document.getElementById('subtotal');
-        const shippingCostElement = document.getElementById('shipping-cost');
-        const discountAmountElement = document.getElementById('discount-amount');
-        const totalElement = document.getElementById('total');
-        const placeOrderBtn = document.getElementById('place-order-btn');
-        const messageBox = document.getElementById('message-box');
-        const messageBackdrop = document.getElementById('message-backdrop');
-        const messageText = document.getElementById('message-text');
-        const closeMessageBtn = document.getElementById('close-message-btn');
-        const voucherInput = document.getElementById('voucher-input');
-        const applyVoucherBtn = document.getElementById('apply-voucher-btn');
-        const paymentCards = document.querySelectorAll('.card');
-        const paymentMethodInput = document.getElementById('payment_method');
-
-        let selectedMethod = null;
-        let appliedDiscount = 0;
-        let isVoucherApplied = false;
-
-        const vouchers = {
-            'IMARKET10': { type: 'percent', value: 0.10, minPurchase: 100 },
-            'FREESHIP': { type: 'shipping', value: 50.00, minPurchase: 500 },
-            'SAVE50': { type: 'fixed', value: 50.00, minPurchase: 250 }
-        };
-
-        const shippingCost = 50.00;
-        const subtotal = {{ $subtotal ?? 0 }};
-
-        function showMessage(text, callback) {
-            messageText.textContent = text;
-            messageBox.classList.remove('hidden');
-            messageBackdrop.classList.remove('hidden');
-            closeMessageBtn.onclick = () => {
-                messageBox.classList.add('hidden');
-                messageBackdrop.classList.add('hidden');
-                if (callback) callback();
-            };
-        }
-
-        function updateOrderSummary(subtotal, discount) {
-            let currentShippingCost = shippingCost;
-            if (isVoucherApplied && voucherInput.value.toUpperCase() === 'FREESHIP') {
-                currentShippingCost = 0;
-            }
-
-            const total = subtotal - discount + currentShippingCost;
-            subtotalElement.textContent = `₱${subtotal.toFixed(2)}`;
-            discountAmountElement.textContent = `-₱${discount.toFixed(2)}`;
-            shippingCostElement.textContent = `₱${currentShippingCost.toFixed(2)}`;
-            totalElement.textContent = `₱${total.toFixed(2)}`;
-        }
-
-        applyVoucherBtn.addEventListener('click', () => {
-            if (subtotal === 0) {
-                showMessage('Your cart is empty. Cannot apply a voucher.');
-                return;
-            }
-            if (isVoucherApplied) {
-                showMessage('A voucher has already been applied.');
-                return;
-            }
-
-            const voucherCode = voucherInput.value.toUpperCase();
-            const voucher = vouchers[voucherCode];
-
-            if (!voucher) {
-                showMessage('Invalid voucher code. Please try again.');
-                voucherInput.value = '';
-                return;
-            }
-
-            if (subtotal < voucher.minPurchase) {
-                showMessage(`This voucher requires a minimum purchase of ₱${voucher.minPurchase.toFixed(2)}.`);
-                return;
-            }
-
-            let discount = 0;
-            if (voucher.type === 'percent') {
-                discount = subtotal * voucher.value;
-            } else if (voucher.type === 'fixed') {
-                discount = voucher.value;
-            } else if (voucher.type === 'shipping') {
-                discount = 0;
-            }
-            
-            appliedDiscount = discount;
-            isVoucherApplied = true;
-            updateOrderSummary(subtotal, appliedDiscount);
-            showMessage(`Voucher "${voucherCode}" applied successfully!`);
-        });
-
-        paymentCards.forEach(card => {
-            card.addEventListener('click', () => {
-                paymentCards.forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-
-                selectedMethod = card.dataset.method;
-                paymentMethodInput.value = selectedMethod;
-                placeOrderBtn.disabled = false;
-            });
+    function updateCart() {
+        // Update cart totals based on checked items
+        const checkedItems = document.querySelectorAll('.item-checkbox:checked');
+        const totalItems = Array.from(checkedItems).reduce((sum, checkbox) => {
+            const quantitySpan = checkbox.closest('.cart-item').querySelector('.quantity-controls span');
+            return sum + parseInt(quantitySpan.textContent);
+        }, 0);
+        
+        document.getElementById('total-items').textContent = totalItems;
+        
+        // Calculate total price
+        let totalPrice = 0;
+        checkedItems.forEach(checkbox => {
+            const cartItem = checkbox.closest('.cart-item');
+            const priceText = cartItem.querySelector('.cart-item-price').textContent;
+            const price = parseFloat(priceText.replace('₱', '').replace(',', ''));
+            const quantity = parseInt(cartItem.querySelector('.quantity-controls span').textContent);
+            totalPrice += price * quantity;
         });
         
-        document.getElementById('checkout-form').addEventListener('submit', function(e) {
-            if (!selectedMethod) {
-                e.preventDefault();
-                showMessage('Please select a payment method.');
-                return;
-            }
-        });
+        document.getElementById('cart-total').textContent = `₱${totalPrice.toFixed(2)}`;
+        
+        // Enable/disable checkout button
+        const checkoutButton = document.getElementById('checkout-button');
+        if (checkoutButton) {
+            checkoutButton.disabled = totalItems === 0;
+        }
+    }
+    
+    function changeQuantity(rowId, change) {
+        const quantitySpan = event.target.parentElement.querySelector('span');
+        let quantity = parseInt(quantitySpan.textContent);
+        quantity += change;
+        
+        if (quantity <= 0) {
+            // Remove item from cart
+            removeItem(rowId);
+        } else {
+            // Update quantity via form submission
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/update/${rowId}`;
+            
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.appendChild(csrfToken);
+            
+            // Add quantity
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = 'quantity';
+            quantityInput.value = quantity;
+            form.appendChild(quantityInput);
+            
+            // Add to DOM and submit
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    function removeItem(rowId) {
+        if (confirm('Are you sure you want to remove this item from your cart?')) {
+            // Create a form to submit the delete request
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/remove/${rowId}`;
+            
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.appendChild(csrfToken);
+            
+            // Add to DOM and submit
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    
+    // Load popular products
+    function loadPopularProducts() {
+        const productList = document.getElementById('product-list');
+        // This would typically fetch from an API
+        // For now, we'll show a placeholder
+        productList.innerHTML = '<p class="text-center text-gray-500">Popular products will be loaded here</p>';
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        loadPopularProducts();
+        updateCart();
     });
 </script>
 @endsection

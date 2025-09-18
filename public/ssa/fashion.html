@@ -1,0 +1,1090 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>User</title>
+    <style>
+  .image-scan-fab {
+        position: fixed;
+        bottom: 20px;
+        left: 20px; 
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        transition: transform 0.3s ease;
+    }
+    .image-scan-fab:hover {
+        transform: scale(1.1);
+    }
+     .voice-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px; /* Aligned to the left */
+        width: 180px;
+        height: 50px;
+        border-radius: 50px;
+        background-color: #007bff;
+        color: #000000;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+    .voice-toggle-btn:hover {
+        transform: scale(1.05);
+    }
+    .voice-chat-container {
+        position: fixed;
+        bottom: -100%;
+        right: 20px; 
+        width: 350px;
+        height: 450px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 1001;
+        transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .voice-chat-container.open {
+        bottom: 90px;
+    }
+    .voice-chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: var(--primary-color);
+        color: #00008a;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .voice-chat-close-btn {
+        background: none;
+        border: none;
+        color: #ffffff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+    .voice-chat-body {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #4f549c;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .voice-message {
+        padding: 10px 15px;
+        border-radius: 15px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    .voice-bot-message {
+        background-color: #e0e0e0;
+        align-self: flex-start;
+    }
+    .voice-user-message {
+        background-color: var(--primary-color);
+        color: #fff;
+        align-self: flex-end;
+    }
+    .voice-chat-input-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        border-top: 1px solid #000000;
+    }
+    #voice-mic-btn {
+        background-color: rgb(125, 125, 241);
+        color: #000000;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #voice-mic-btn.listening {
+        background-color: #dc3545;
+        animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    </style>
+</head>
+<body>
+
+<div class="login-modal" id="loginModal">
+    <div class="login-content">
+        <span class="close-btn" id="closeLogin">&times;</span>
+        <h2>Login</h2>
+        <form>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required>
+            <label for="password">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="Enter password" required>
+                <i class="ri-eye-line" id="togglePassword"></i>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <p class="signup-text">
+            Don't have an account yet? 
+            <a href="#" id="openSignup">Sign up here</a>
+        </p>
+    </div>
+</div>
+
+<div class="signup-modal" id="signupModal">
+    <div class="signup-content">
+        <span class="close-btn" id="closeSignup">&times;</span>
+        <h2>Sign Up</h2>
+        <form>
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter email" required>
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="Enter phone number" required>
+            <label for="newPassword">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="newPassword" placeholder="Enter password" required>
+                <i class="ri-eye-line toggleSignupPassword"></i>
+            </div>
+            <button type="submit" class="login-btn">Create Account</button>
+        </form>
+        <div class="divider">
+            <span>OR</span>
+        </div>
+        <div class="social-login">
+            <button type="button" class="google-btn">
+                <img src="google.png" alt="Google Logo">
+                Sign up with Google
+            </button>
+            <button type="button" class="facebook-btn">
+                <i class="ri-facebook-fill"></i> Sign up with Facebook
+            </button>
+        </div>
+        <p class="signup-text">
+            Already have an account? 
+            <a href="#" id="openLoginFromSignup">Login here</a>
+        </p>
+    </div>
+</div>
+
+<header>
+    <div class="logo">
+        <img src="logo.png" alt="IMARKET PH Logo">
+    </div>
+    <ul class="navbar" id="navbar">
+        <li><a href="index.html" class="active"><i class="ri-home-line"></i> Home</a></li>
+        <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
+        <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
+        <li class="dropdown">
+            <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
+            <ul class="dropdown-menu">
+                <li><a href="#"><i class="ri-fire-line"></i> Best Selling</a></li>
+                <li><a href="#"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+                <li><a href="electronics.html"><i class="ri-computer-line"></i> Electronics</a></li>
+                <li><a href="#"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+                <li><a href="#"><i class="ri-home-4-line"></i> Home & Living</a></li>
+                <li><a href="#"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+                <li><a href="#"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+                <li><a href="#"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+                <li><a href="#"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="search-bar">
+        <input type="text" placeholder="Search for products, brands and more..." />
+        <button class="search-btn"><i class="ri-search-line"></i></button>
+    </div>
+    <div class="icons">
+        <a href="cart.html"><i class="ri-shopping-cart-line"></i></a>
+        <a href="user.html"><i class="ri-user-line"></i></a>
+        <div class="bx bx-menu" id="menu-icon"></div>
+    </div>
+</header>
+<div class="overlay" id="overlay"></div>
+
+<section class="hero">
+    <div class="hero-slides">
+        <img class="slide active" src="https://i.pinimg.com/736x/a2/4a/b5/a24ab53b4bf89b079978fad2e813e6d8.jpg" alt="Slide 1">
+        <img class="slide" src="https://i.pinimg.com/1200x/95/62/40/9562401b17aa8803c45564fa87a7523a.jpg" alt="Slide 2">
+        <img class="slide" src="https://i.pinimg.com/1200x/3f/29/e2/3f29e2a0f203313db21fa45734f73b29.jpg" alt="Slide 3">
+        <img class="slide" src="https://i.pinimg.com/736x/fd/a6/8c/fda68c5189f7cd37f044e201a77acc1e.jpg" alt="Slide 4">
+        <img class="slide" src="https://i.pinimg.com/736x/5c/b4/98/5cb49830b398136f9c2aa341f847958d.jpg" alt="Slide 5">
+    </div>
+    <div class="hero-content">
+        <h1> WEAR</h1>
+    </div>
+    <div class="hero-dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+        <span class="dot" data-index="4"></span>
+    </div>
+</section>
+
+<section class="feature">
+    <div class="feature-content">
+        <div class="product-card" 
+            data-name="Vintage Low-Top Sneakers" 
+            data-sizes="36,37,38,39,40,41,42,43,44,45" 
+            data-colors="White,Black-Leather,Green,Dark-Gray" 
+            data-price="8100" 
+            data-orig-price="18000" 
+            data-img-white="https://cdn.clothbase.com/uploads/bc3a8178-7fcc-4bb2-b9cc-b027e2ebd494/image.jpg"
+            data-img-black-Leather="https://www.mrporter.com/variants/images/1647597294521561/cu/w2000_q60.jpg"
+            data-img-green="https://www.mytheresa.com/media/1094/1238/100/4e/P01001476_d2.jpg"
+            data-img-dark-gray="https://www.mrporter.com/variants/images/1647597294521641/cu/w2000_q60.jpg">
+            <div class="product-img">
+                <img src="https://media-assets.grailed.com/prd/listing/47294752/da782adc9b964af09f259b6546d20c0a?h=700&fit=clip&auto=format" alt="Vintage Low-Top Sneakers">
+                <span class="discount">-55%</span>
+            </div>
+            <div class="product-info">
+                <h6>Vintage Low-Top Sneakers</h6>
+                <h3>₱8,100 <del>₱18,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 5,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Oversized Streetwear Joggers" 
+            data-sizes="S,M,L,XL,XXL,XXXL" 
+            data-colors="Black,Gray,khaki" 
+            data-price="300" 
+            data-orig-price="350"
+            data-img-black="https://media-assets.grailed.com/prd/listing/temp/e6abf8c9d40347b1a37d6640b76fcff5?w=1000"
+            data-img-gray="https://media-assets.grailed.com/prd/listing/temp/d8d385ab19bf4f9b891e6326fa393321?"
+            data-img-khaki="https://media-assets.grailed.com/prd/listing/temp/1015765063c74069a0694ed26bedce5c?w=1000">
+            <div class="product-img">
+                <img src="https://media-assets.grailed.com/prd/listing/temp/d8d385ab19bf4f9b891e6326fa393321?" alt="Oversized Streetwear Joggers">
+                <span class="discount">-5%</span>
+            </div>
+            <div class="product-info">
+                <h6>Baggy Sweat Pants</h6>
+                <h3>₱300 <del>₱350</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 8,980 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Minimalist Everyday Backpack" 
+            data-sizes="Default" 
+            data-colors="Black,white,green,orange" 
+            data-price="750" 
+            data-orig-price="1500"
+            data-img-black="https://www.uoozee.com/cdn/shop/files/6b1dd51f7df9c0a35230343ffc21cc3c.jpg?v=1748435092&width=960"
+            data-img-white="https://www.uoozee.com/cdn/shop/files/56f34dd51dd524e6bb28f1e248c3b004.jpg?v=1748435092&width=960"
+            data-img-green="https://www.uoozee.com/cdn/shop/files/18717bc5a61294a1f6ecd6d895065cfd.jpg?v=1748435092&width=960"
+            data-img-orange="https://www.uoozee.com/cdn/shop/files/5eeee630eb846468568a690c1171233f.jpg?v=1748435092&width=960">
+            <div class="product-img">
+                <img src="https://www.uoozee.com/cdn/shop/files/751ae0bcc7281673f383d0d20578e0d1.jpg?v=1748435092&width=1000" alt="Casual Backpack">
+                <span class="discount">-50%</span>
+            </div>
+            <div class="product-info">
+                <h6>Korean Aesthethic Shoulder Bag</h6>
+                <h3>₱750 <del>₱1,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,740 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Oversized 'Vibe Check' Hoodie" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Black,White,Pink,Blue" 
+            data-price="750" 
+            data-orig-price="1500"
+            data-img-black="https://i.pinimg.com/1200x/92/69/8d/92698d58e905b49c91b1c8f81c2b7dcc.jpg"
+            data-img-white="https://i.pinimg.com/736x/96/46/d8/9646d859d461d17aa30e592bece4fe31.jpg"
+            data-img-pink="https://i.pinimg.com/1200x/b9/1f/c8/b91fc82d03f19466295a0d7a4efb423f.jpg"
+            data-img-blue="https://i.pinimg.com/736x/6d/e5/55/6de5555c1347e3eec9f8c966bc588835.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/7c/5c/51/7c5c51e042c735453478a3328643c6f5.jpg" alt="Oversized Hoodie">
+                <span class="discount">-50%</span>
+            </div>
+            <div class="product-info">
+                <h6>F1 Racing Oversize Hoodie</h6>
+                <h3>₱750 <del>₱1,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,560 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Light-Wash Unisex Denim Jacket" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Light Blue,Dark Blue" 
+            data-price="1399" 
+            data-orig-price="2798"
+            data-img-lightblue="https://i.pinimg.com/736x/00/6b/e5/006be503a29755633eab2e80622501b6.jpg"
+            data-img-darkblue="https://i.pinimg.com/1200x/ef/7b/45/ef7b458dbce1a80ecc03c1205388d5b9.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/f7/e7/e7/f7e7e739c2b6012c731d1dd0e4b31d95.jpg" alt="Denim Jacket">
+                <span class="discount">-50%</span>
+            </div>
+            <div class="product-info">
+                <h6>Light-Wash Unisex Denim Jacket</h6>
+                <h3>₱1,399 <del>₱2,798</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,430 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Ribbed Knit Cropped Top" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Black" 
+            data-price="350" 
+            data-orig-price="450"
+            data-img-black="https://i.pinimg.com/1200x/48/e9/32/48e932a07da8b48ac272a24b06051be7.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/48/e9/32/48e932a07da8b48ac272a24b06051be7.jpg" alt="Cropped Top">
+                <span class="discount">-10%</span>
+            </div>
+            <div class="product-info">
+                <h6>Ribbed Knit Cropped Top</h6>
+                <h3>₱350 <del>₱450</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 5,860 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Adjustable Strapback Cap" 
+            data-sizes="OS" 
+            data-colors="Black,Pink,Gray,Blue" 
+            data-price="995" 
+            data-orig-price="1195"
+            data-img-black="https://i.pinimg.com/1200x/d6/33/3a/d6333a2fedc7e198dcbd9c607f5a3f31.jpg"
+            data-img-pink="https://i.pinimg.com/1200x/33/fa/bf/33fabf61e711219bf23e75c3838f1cf0.jpg"
+            data-img-Gray="https://i.pinimg.com/736x/c0/df/bd/c0dfbd1a31f36736781173181e4057b5.jpg"
+            data-img-blue="https://i.pinimg.com/736x/a4/ab/a4/a4aba41f4bf2761849597347e8a28ef9.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/d6/33/3a/d6333a2fedc7e198dcbd9c607f5a3f31.jpg" alt="Streetwear Cap">
+                <span class="discount">-17%</span>
+            </div>
+            <div class="product-info">
+                <h6>New York Yankees</h6>
+                <h3>₱995 <del>₱1,195</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,120 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Unisex Crewneck Sweater" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Dark-Gray,Gray,White,black,yellow" 
+            data-price="1072" 
+            data-orig-price="1599"
+            data-img-dark-gray="https://i.pinimg.com/1200x/0f/04/f6/0f04f674c9ae4430fc826e069c679804.jpg"
+            data-img-gray="https://i.pinimg.com/736x/34/f6/93/34f69334ae9678325b0f2e81120417e9.jpg"
+            data-img-white="https://i.pinimg.com/1200x/c5/17/89/c51789d9599e3f25fa3c9f5e9e56e97d.jpg"
+            data-img-Black="https://i.pinimg.com/736x/2c/df/c6/2cdfc6dc530ce0f7a65f49ec05d6b987.jpg"
+            data-img-yellow="https://i.pinimg.com/736x/7b/52/3e/7b523ed6e065e78fdf998d07efb747da.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/7b/52/3e/7b523ed6e065e78fdf998d07efb747da.jpg" alt="Crewneck Sweater">
+                <span class="discount">-35%</span>
+            </div>
+            <div class="product-info">
+                <h6>Standard Sweatshirt</h6>
+                <h3>₱1,072 <del>₱1,599</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,560 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Unisex Graphic T-Shirt" 
+            data-sizes="S,M,L,XL,2XL,3XL" 
+            data-colors="Black" 
+            data-price="1499" 
+            data-orig-price="3299"
+            data-img-white="https://i.pinimg.com/1200x/d9/4f/7b/d94f7b2222d32a52842369633787ef2d.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/d9/4f/7b/d94f7b2222d32a52842369633787ef2d.jpg" alt="Unisex Graphic T-Shirt">
+                <span class="discount">-55%</span>
+            </div>
+            <div class="product-info">
+                <h6>Men Cotton Plant & Slogan Tee</h6>
+                <h3>₱1,499 <del>₱3,299</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 6,010 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Street-Style Utility Backpack" 
+            data-sizes="S,M,L,XL,2XL,3XL"
+            data-colors="Black" 
+            data-price="2105" 
+            data-orig-price="3499"
+            data-img-gray="https://img.fantaskycdn.com/218caf07aca046878d82addf0d153326_2056x.jpeg">
+            <div class="product-img">
+                <img src="https://img.fantaskycdn.com/218caf07aca046878d82addf0d153326_2056x.jpeg" alt="Street-Style Backpack">
+                <span class="discount">-40%</span>
+            </div>
+            <div class="product-info">
+                <h6>Hidetaka Miyazaki's Dark Souls Soulsborne Vintage Washed Unisex T-Shirt</h6>
+                <h3>₱2,105 <del>₱3,499</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,010 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Oversized Printed Polo Shirt" 
+            data-sizes="S,M,L,XL,XXL" 
+            data-colors="Black,White,Navy" 
+            data-price="450" 
+            data-orig-price="600"
+            data-img-black="https://i.pinimg.com/1200x/b3/22/36/b32236ed2709c2374059d00f07451fa8.jpg"
+            data-img-white="https://i.pinimg.com/1200x/d8/9d/68/d89d68fb3bd77e4dd08ca6f418e6c4a1.jpg"
+            data-img-Navy="https://i.pinimg.com/1200x/a2/9a/35/a29a355ba4699c90dde6b2da0a1ea3ad.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/bb/ea/f8/bbeaf8fa3b46c94604d110a47e3c903d.jpg" alt="Oversized Printed Polo Shirt">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Tilley Pique Polo with 3D Logo - Men's</h6>
+                <h3>₱450 <del>₱600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,800 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Unisex Plain T-Shirt" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Black-Coffee-Beige,black-red-beige,black-white-candyblue,Black-white-candypink" 
+            data-price="179" 
+            data-orig-price="200"
+            data-img-black-coffee-beige="https://m.media-amazon.com/images/I/71i-1PgyreL._AC_SY550_.jpg"
+            data-img-black-red-beige="https://m.media-amazon.com/images/I/71mNQJFQJQL._AC_SY550_.jpg"
+            data-img-black-white-candyblue="https://m.media-amazon.com/images/I/71nFAn6ha8L._AC_SY550_.jpg"
+            data-img-Black-white-candypink="https://m.media-amazon.com/images/I/71AM75g8aWL._AC_SY550_.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/91HSvdBj3RL._AC_SX425_.jpg" alt="Unisex Plain T-Shirt">
+                <span class="discount">-10%</span>
+            </div>
+            <div class="product-info">
+                <h6>Comfy Crop Top</h6>
+                <h3>₱179 <del>₱200</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 10,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Tapered Fit Jeans" 
+            data-sizes="28,30,32,34,36" 
+            data-colors="Light Blue" 
+            data-price="980" 
+            data-orig-price="1400"
+            data-img-lightblue="https://i.pinimg.com/1200x/a7/de/b2/a7deb21266edd446b827dc8bbee2fe1b.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/a7/de/b2/a7deb21266edd446b827dc8bbee2fe1b.jpg" alt="Tapered Fit Jeans">
+                <span class="discount">-30%</span>
+            </div>
+            <div class="product-info">
+                <h6>Classic Tapered Fit Jeans</h6>
+                <h3>₱980 <del>₱1,400</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Polo Shirt" 
+            data-sizes="S,M,L,XL,2XL" 
+            data-colors="Default" 
+            data-price="595" 
+            data-orig-price="700"
+            data-img-gray="https://i.pinimg.com/1200x/ec/4c/76/ec4c76766d6af90f2d9ae2227b8765c0.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/ec/4c/76/ec4c76766d6af90f2d9ae2227b8765c0.jpg" alt="Polo Shirt">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>BOWSTONS JEANS - RAW DENIM</h6>
+                <h3>₱595 <del>₱700</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,500 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Linen Shorts" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Black,Gray" 
+            data-price="320" 
+            data-orig-price="400"
+            data-img-black="https://i.pinimg.com/736x/fb/82/09/fb82098577b983da19e6e79434d53dad.jpg"
+            data-img-gray="https://i.pinimg.com/1200x/f0/c8/42/f0c842ae065cfccdf7a3281884db4ae2.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/74/ab/c0/74abc0f1e83f4db4a416d634537bc216.jpg" alt="Linen Shorts">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>CORE SWEATSHORT</h6>
+                <h3>₱320 <del>₱400</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 6,700 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Unisex Hoodie" 
+            data-sizes="S,M,L,XL,2XL" 
+            data-colors="Default" 
+            data-price="825" 
+            data-orig-price="1100"
+            data-img-navy="https://i.pinimg.com/1200x/fb/f6/c2/fbf6c257cb034c81221b686656dae881.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/fb/f6/c2/fbf6c257cb034c81221b686656dae881.jpg" alt="Unisex Hoodie">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Spirit Led Tee</h6>
+                <h3>₱825 <del>₱1,100</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,900 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Unisex Sweatshirt" 
+            data-sizes="23,24,25,26,27,28,29,30,31,32,33,34,35" 
+            data-colors="Black,Brown,White" 
+            data-price="630" 
+            data-orig-price="900"
+            data-img-black="https://i.pinimg.com/736x/cb/5f/66/cb5f662a291bbc94dbee403d719c65fc.jpg"
+            data-img-white="https://i.pinimg.com/736x/0f/5c/ab/0f5cabc22501122cb42ab374b6f40c74.jpg"
+            data-img-Brown="https://i.pinimg.com/736x/12/c6/99/12c6999507273553f58d2770f743d4ff.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/cb/5f/66/cb5f662a291bbc94dbee403d719c65fc.jpg" alt="Unisex Sweatshirt">
+                <span class="discount">-30%</span>
+            </div>
+            <div class="product-info">
+                <h6>Trouser</h6>
+                <h3>₱630 <del>₱900</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,400 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Jogger Pants" 
+            data-sizes="S,M,L,XL" 
+            data-colors="Black,White" 
+            data-price="855" 
+            data-orig-price="950"
+            data-img-black="https://i.pinimg.com/736x/2e/7c/23/2e7c23cda59ea503c4084480ed13955a.jpg"
+            data-img-White="https://i.pinimg.com/1200x/ae/07/ea/ae07ea52b77c0dac3f29a902332ee2d6.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/ae/07/ea/ae07ea52b77c0dac3f29a902332ee2d6.jpg" alt="Jogger Pants">
+                <span class="discount">-10%</span>
+            </div>
+            <div class="product-info">
+                <h6>Lightweight Cuffed Jogger Pants</h6>
+                <h3>₱855 <del>₱950</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,900 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Cargo Pants" 
+            data-sizes="36,37,38,39,40,41,42,43,44,45" 
+            data-colors="White-Gray-Black,Green-White-Beige" 
+            data-price="1200" 
+            data-orig-price="1500"
+            data-img-Green-White-Beige="https://i.pinimg.com/1200x/e4/c2/b0/e4c2b0792241e18a335abfa312181df6.jpg"
+            data-img-White-Gray-Black="https://i.pinimg.com/736x/22/9d/91/229d91f13e2307aeea7ef85fd1541583.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/22/9d/91/229d91f13e2307aeea7ef85fd1541583.jpg" alt="Cargo Pants">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>New Balance 550</h6>
+                <h3>₱1,200 <del>₱1,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Windbreaker Jacket" 
+            data-sizes="36,37,38,39,40,41,42,43,44,45" 
+            data-colors="Black,White,Yellow,Red" 
+            data-price="1020" 
+            data-orig-price="1200"
+            data-img-black="https://i.pinimg.com/1200x/54/61/ac/5461ac9fc4f3256461fbe7a547b0270f.jpg"
+            data-img-white="https://i.pinimg.com/736x/ac/4e/b3/ac4eb34e08c8a2bc96bf924e7d8171a1.jpg"
+            data-img-red="https://i.pinimg.com/1200x/6f/66/c6/6f66c653a6cc79870cf633e1a77ccc8a.jpg"
+            data-img-yellow="https://i.pinimg.com/736x/ad/4f/7c/ad4f7ce9fca9e41eee54dd49cfd5c664.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/c3/33/95/c33395c568361dbab6833da2310c5fb8.jpg" alt="Windbreaker Jacket">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>Onitsuka Tiger</h6>
+                <h3>₱1,020 <del>₱1,200</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 850 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Denim Skirt" 
+            data-sizes="36,37,38,39,40,41,42,43,44,45"
+            data-colors="Green,Pink,Black,Black-Pink,Red" 
+            data-price="640" 
+            data-orig-price="800"
+            data-img-green="https://i.pinimg.com/736x/99/c9/e4/99c9e470716f98faa035625542158740.jpg"
+            data-img-Pink="https://i.pinimg.com/736x/82/3b/14/823b143071c53ffcb0a9232400e9e03a.jpg"
+            data-img-black="https://i.pinimg.com/736x/db/8c/b4/db8cb47a2000d7d1e4a1109ef8902e20.jpg"
+            data-img-Black-pink="https://i.pinimg.com/736x/6b/46/74/6b4674de94d2adbc81fff09419fd0304.jpg"
+            data-img-red="https://i.pinimg.com/1200x/9d/e1/cf/9de1cf0201e7769ef3907d2341282c94.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/2c/97/20/2c97207741572fa4a6e3d145350d233d.jpg" alt="Denim Skirt">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Puma Speedcat </h6>
+                <h3>₱640 <del>₱800</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,600 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Oversized Blazer" 
+            data-sizes="S,M,L" 
+            data-colors="Black" 
+            data-price="1500" 
+            data-orig-price="2000"
+            data-img-Black="https://i.pinimg.com/736x/53/1c/80/531c802f8e6ca88232b5c0c20ef5ec7b.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/79/64/c1/7964c139ec9abd1b16511354668b4156.jpg" alt="Oversized Blazer">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Stylish Oversized Blazer</h6>
+                <h3>₱1,500 <del>₱2,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 700 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Wide-Leg Trousers" 
+            data-sizes="23,24,25,26,27,28,29,30,31,32,33,34,35,36" 
+            data-colors="Black,Khaki,Dark-Gray,Gray" 
+            data-price="935" 
+            data-orig-price="1100"
+            data-img-black="https://i.pinimg.com/736x/c2/2e/76/c22e7686de1e904e95ac5693368eb2af.jpg"
+            data-img-gray="https://i.pinimg.com/736x/f0/2a/e5/f02ae508af28878fe64511eee676883e.jpg"
+            data-img-Dark-gray="https://i.pinimg.com/736x/36/15/d5/3615d5df09a0149ae9fdd1a3e2e75504.jpg"
+            data-img-khaki="https://i.pinimg.com/1200x/7e/5c/4d/7e5c4dfd874aeecac155608e41a3ad28.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/36/15/d5/3615d5df09a0149ae9fdd1a3e2e75504.jpg" alt="Wide-Leg Trousers">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>Pleated Wide-Leg Trousers</h6>
+                <h3>₱935 <del>₱1,100</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 900 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Graphic Crew Socks (3-pack)" 
+            data-sizes="default" 
+            data-colors="Black" 
+            data-price="270" 
+            data-orig-price="300"
+            data-img-black="https://i.pinimg.com/736x/0a/50/22/0a50225c9bd71881c6402ea3e555a7f7.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/0a/50/22/0a50225c9bd71881c6402ea3e555a7f7.jpg" alt="Graphic Crew Socks">
+                <span class="discount">-10%</span>
+            </div>
+            <div class="product-info">
+                <h6>Caleb Campbell</h6>
+                <h3>₱270 <del>₱300</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 11,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Casual Mini Shoulder Bag" 
+            data-sizes="Default" 
+            data-colors="Blue" 
+            data-price="560" 
+            data-orig-price="700"
+            data-img-blue="https://i.pinimg.com/736x/1f/d8/81/1fd88124b22b9fe5fad41f12ab80a359.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/1f/d8/81/1fd88124b22b9fe5fad41f12ab80a359.jpg" alt="Mini Shoulder Bag">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>ECOSUSI Mini Backpack</h6>
+                <h3>₱560 <del>₱700</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,000 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Unisex Corduroy Bucket Hat" 
+            data-sizes="35,36,37,38,39,40,41,42,43,44,45" 
+            data-colors="Black" 
+            data-price="360" 
+            data-orig-price="400"
+            data-img-black="https://i.pinimg.com/1200x/08/ec/27/08ec2781f5213e8e71b7b3a4a3de15fd.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/08/ec/27/08ec2781f5213e8e71b7b3a4a3de15fd.jpg" alt="Bucket Hat">
+                <span class="discount">-10%</span>
+            </div>
+            <div class="product-info">
+                <h6>Loafers</h6>
+                <h3>₱360 <del>₱400</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Classic Faux Leather Belt" 
+            data-sizes="Default" 
+            data-colors="Brown" 
+            data-price="425" 
+            data-orig-price="500"
+            data-img-Brown="https://i.pinimg.com/736x/45/30/5e/45305eef7e2621ea52c20ae28e2744af.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/45/30/5e/45305eef7e2621ea52c20ae28e2744af.jpg" alt="Leather Belt">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>Classic Faux Leather Belt</h6>
+                <h3>₱425 <del>₱500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Minimalist Leather Loafers" 
+            data-sizes="40,41,42,43,44" 
+            data-colors="Black,Brown" 
+            data-price="1750" 
+            data-orig-price="2500"
+            data-img-black="https://i.pinimg.com/1200x/38/31/af/3831afbf58e6f0738977faa036b2fed9.jpg"
+            data-img-brown="https://i.pinimg.com/736x/2a/c0/b4/2ac0b479ef02fde1daaf007f8ee50053.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/c7/a2/0c/c7a20ca896b243b04b5fbbbd636e293d.jpg" alt="Dressy Loafers">
+                <span class="discount">-30%</span>
+            </div>
+            <div class="product-info">
+                <h6>Asymmetric Leather Belt</h6>
+                <h3>₱1,750 <del>₱2,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,300 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Urban Running Shoes" 
+            data-sizes="S,M,L,XL,2XL,3XL"
+            data-colors="Gold" 
+            data-price="2400" 
+            data-orig-price="3000"
+            data-img-Gold="https://i.pinimg.com/1200x/99/bd/30/99bd30cb237349b730e3d89b72272a39.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/99/bd/30/99bd30cb237349b730e3d89b72272a39.jpg" alt="Running Shoes">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Urban Running Shoes</h6>
+                <h3>₱2,400 <del>₱3,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Flared Leggings" 
+            data-sizes="Default" 
+            data-colors="Anti-Radiation" 
+            data-price="510" 
+            data-orig-price="600"
+            data-img-maroon="https://img.lazcdn.com/g/p/l1m2n3o4p5q6r7s8t9u0v1w2x3y4z5a6.jpg_720x720q80.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/71/68/15/71681507338d022a00c68b91fcb5cef3.jpg" alt="Flared Leggings">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>Clean Fashion Glasses</h6>
+                <h3>₱510 <del>₱600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,500 sold</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div class="product-modal" id="productModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <img src="" alt="" class="modal-img" id="modalImg">
+        <div class="modal-details">
+            <h2 id="modalName">Product Name</h2>
+            <p class="modal-price"><span id="modalPrice">₱1,234</span> <del id="modalOrigPrice">₱5,678</del></p>
+            
+            <div class="modal-option-group" id="sizesGroup">
+                <h4>Sizes:</h4>
+                <div class="option-list" id="modalSizes">
+                    </div>
+            </div>
+            
+            <div class="modal-option-group" id="colorsGroup">
+                <h4>Colors:</h4>
+                <div class="option-list" id="modalColors">
+                    </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="add-to-cart-btn" id="addToCartBtn"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                <button class="checkout-btn" id="checkoutBtn"><i class="fas fa-credit-card"></i> Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="voice-chat-container" id="voice-chat-container">
+    <div class="voice-chat-header">
+        <span class="voice-chat-title">Voice Command AI</span>
+        <button class="voice-chat-close-btn" id="voice-close-chat-btn">&times;</button>
+    </div>
+    <div class="voice-chat-body" id="voice-chat-body">
+        <div class="voice-message voice-bot-message">Hello! Tap the microphone to start talking.</div>
+    </div>
+    <div class="voice-chat-input-area">
+        <button id="voice-mic-btn"><i class="ri-mic-fill"></i></button>
+    </div>
+</div>
+
+<button class="voice-toggle-btn" id="voice-toggle-btn">
+    Voice Command AI
+</button>
+  <footer class="footer">
+      <div class="footer-container">
+          <div class="footer-section">
+              <h5>Customer Care</h5>
+              <ul>
+                  <li><a href="customer.html">Customer Serice</a></li>
+                  <li><a href="#">How to Buy</a></li>
+                  <li><a href="#">Shipping & Delivery</a></li>
+                  <li><a href="#">Return & Refund</a></li>
+                  <li><a href="#">Contact Us</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h5>About ImarketPH</h5>
+              <ul>
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Careers</a></li>
+                  <li><a href="#">Terms & Conditions</a></li>
+                  <li><a href="#">Privacy Policy</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h5>Payment Methods</h5>
+              <div class="footer-logos">
+                  <img src="visa.png" alt="Visa">
+                  <img src="mastercard.png" alt="Mastercard">
+                  <img src="gcash.png" alt="GCash">
+                  <img src="maya.png" alt="Paymaya">
+              </div>
+          </div>
+          <div class="footer-section">
+              <h5>Delivery Services</h5>
+              <div class="footer-logos">
+                  <img src="jnt.png" alt="J&T Express">
+                  <img src="ninjavan.jpg" alt="Ninja Van">
+                  <img src="lbc.png" alt="LBC Express">
+                  <img src="flash.png" alt="Flash Express">
+              </div>
+          </div>
+          <div class="footer-section">
+              <h5>Follow Us</h5>
+              <div class="footer-socials">
+                  <a href="#"><img src="facebook.png" alt="Facebook"></a>
+                  <a href="#"><img src="instagram.jpg" alt="Instagram"></a>
+                  <a href="#"><img src="twitter.png" alt="Twitter"></a>
+                  <a href="#"><img src="youtube.png" alt="YouTube"></a>
+              </div>
+          </div>
+      </div>
+      <div class="footer-bottom">
+          <p>© 2025 All Rights Reserved by ImarketPH</p>
+      </div>
+  </footer> 
+        <button class="image-scan-fab" onclick="window.open('https://images.google.com/', '_blank')" title="Image Scan">
+        <i class="ri-camera-line"></i>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const productCards = document.querySelectorAll('.product-card');
+        const productModal = document.getElementById('productModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalName = document.getElementById('modalName');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalOrigPrice = document.getElementById('modalOrigPrice');
+        const modalSizes = document.getElementById('modalSizes');
+        const modalColors = document.getElementById('modalColors');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+
+        let selectedSize = '';
+        let selectedColor = '';
+        let currentProductData = {};
+
+        const openModal = (productData) => {
+            currentProductData = productData;
+            
+            modalImg.src = productData.imgSrc;
+            modalImg.alt = productData.name;
+
+            modalName.textContent = productData.name;
+            modalPrice.textContent = `₱${productData.price.toLocaleString()}`;
+            modalOrigPrice.textContent = `₱${productData.origPrice.toLocaleString()}`;
+            
+            modalSizes.innerHTML = '';
+            modalColors.innerHTML = '';
+
+            productData.sizes.split(',').forEach(size => {
+                const sizeOption = document.createElement('span');
+                sizeOption.classList.add('option');
+                sizeOption.textContent = size.trim();
+                modalSizes.appendChild(sizeOption);
+            });
+
+            productData.colors.split(',').forEach(color => {
+                const colorOption = document.createElement('span');
+                colorOption.classList.add('option');
+                colorOption.textContent = color.trim();
+                colorOption.setAttribute('data-color', color.trim().toLowerCase().replace(/ /g, ''));
+                modalColors.appendChild(colorOption);
+            });
+
+            productModal.style.display = 'flex';
+            
+            selectedSize = '';
+            selectedColor = '';
+        };
+
+        const closeModal = () => {
+            productModal.style.display = 'none';
+        };
+
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const productData = {
+                    name: card.getAttribute('data-name'),
+                    sizes: card.getAttribute('data-sizes'),
+                    colors: card.getAttribute('data-colors'),
+                    price: parseFloat(card.getAttribute('data-price')),
+                    origPrice: parseFloat(card.getAttribute('data-orig-price')),
+                    imgSrc: card.querySelector('.product-img img').src,
+                    colorImages: {}
+                };
+
+                const dataAttributes = card.attributes;
+                for (let i = 0; i < dataAttributes.length; i++) {
+                    const attr = dataAttributes[i];
+                    if (attr.name.startsWith('data-img-')) {
+                        const colorName = attr.name.replace('data-img-', '');
+                        productData.colorImages[colorName] = attr.value;
+                    }
+                }
+                
+                openModal(productData);
+            });
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target === productModal) {
+                closeModal();
+            }
+        });
+
+        const handleOptionSelection = (containerId, optionType) => {
+            const container = document.getElementById(containerId);
+            container.addEventListener('click', (e) => {
+                if (e.target.classList.contains('option')) {
+                    container.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    e.target.classList.add('selected');
+
+                    if (optionType === 'size') {
+                        selectedSize = e.target.textContent;
+                    } else if (optionType === 'color') {
+                        selectedColor = e.target.textContent;
+                        colorChangeHandler(e.target.getAttribute('data-color'));
+                    }
+                }
+            });
+        };
+
+        handleOptionSelection('modalSizes', 'size');
+        handleOptionSelection('modalColors', 'color');
+        
+        const colorChangeHandler = (color) => {
+            const newImageSrc = currentProductData.colorImages[color];
+            if (newImageSrc) {
+                modalImg.src = newImageSrc;
+            } else {
+                console.warn(`Image not found for color: ${color}`);
+            }
+        };
+        
+        addToCartBtn.addEventListener('click', () => {
+            const productName = modalName.textContent;
+            if (selectedSize && selectedColor) {
+                alert(`Added ${productName} (Size: ${selectedSize}, Color: ${selectedColor}) to cart!`);
+                closeModal();
+            } else {
+                alert('Please select a size and color.');
+            }
+        });
+
+        checkoutBtn.addEventListener('click', () => {
+            const productName = modalName.textContent;
+            if (selectedSize && selectedColor) {
+                alert(`Proceeding to checkout for ${productName} (Size: ${selectedSize}, Color: ${selectedColor}).`);
+                closeModal();
+            } else {
+                alert('Please select a size and color before checking out.');
+            }
+        });
+    });
+</script>
+  <script src="https://unpkg.com/scrollreveal"></script>
+  <script src="script.js"></script>
+</body>
+</html>

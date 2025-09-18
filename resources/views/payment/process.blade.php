@@ -1,295 +1,275 @@
 @extends('layouts.frontend')
 
-@section('title', 'iMarket - Payment')
+@section('title', 'Payment Processing - iMarket')
 
 @section('styles')
 <style>
-    .payment-method-card {
-        transition: all 0.3s ease;
+    .main-container {
+        padding-top: 100px;
+        min-height: 100vh;
+        background: var(--bg-color);
+    }
+    
+    .payment-section {
+        padding: 40px 20px;
+        background: white;
+        margin: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .payment-icon {
+        font-size: 4rem;
+        color: #f59e0b;
+        margin-bottom: 20px;
+    }
+    
+    .payment-title {
+        font-size: 2rem;
+        color: var(--text-color);
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+    
+    .payment-subtitle {
+        font-size: 1.1rem;
+        color: #6b7280;
+        margin-bottom: 30px;
+    }
+    
+    .order-summary {
+        background: #f8fafc;
+        padding: 30px;
+        border-radius: 12px;
+        margin: 30px 0;
+        text-align: left;
+    }
+    
+    .order-summary h3 {
+        color: var(--text-color);
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        text-align: center;
+    }
+    
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .summary-row:last-child {
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: var(--main-color);
+    }
+    
+    .summary-label {
+        color: #6b7280;
+        font-weight: 500;
+    }
+    
+    .summary-value {
+        color: var(--text-color);
+        font-weight: 600;
+    }
+    
+    .payment-options {
+        margin: 30px 0;
+    }
+    
+    .payment-option {
+        background: white;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        margin: 15px 0;
         cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: left;
     }
-    .payment-method-card:hover {
+    
+    .payment-option:hover {
+        border-color: var(--main-color);
+        background: #f0f9ff;
+    }
+    
+    .payment-option.selected {
+        border-color: var(--main-color);
+        background: #f0f9ff;
+    }
+    
+    .payment-option-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 10px;
+    }
+    
+    .payment-option img {
+        width: 40px;
+        height: 30px;
+        object-fit: contain;
+    }
+    
+    .payment-option-title {
+        font-weight: 600;
+        color: var(--text-color);
+        font-size: 1.1rem;
+    }
+    
+    .payment-option-description {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .proceed-button {
+        width: 100%;
+        padding: 15px;
+        background: var(--main-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+    }
+    
+    .proceed-button:hover:not(:disabled) {
+        background: #1e40af;
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
-    .payment-method-card.selected {
-        border-color: #2c3c8c;
-        background-color: #f8fafc;
+    
+    .proceed-button:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
     }
-    .stripe-form {
-        max-width: 400px;
-        margin: 0 auto;
+    
+    .loading {
+        display: none;
+        margin-top: 20px;
+    }
+    
+    .loading-spinner {
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid var(--main-color);
+        border-radius: 50%;
+        width: 40px;
+        height: 40px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 10px;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    @media (max-width: 768px) {
+        .payment-title {
+            font-size: 1.5rem;
+        }
+        
+        .order-summary {
+            padding: 20px;
+        }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-8 max-w-4xl">
-    <div class="bg-white rounded-lg shadow-md p-6">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">Complete Your Payment</h1>
+<div class="main-container">
+    <div class="payment-section">
+        <div class="payment-icon">
+            <i class="ri-credit-card-line"></i>
+        </div>
         
-        <div class="grid md:grid-cols-2 gap-8">
-            <!-- Order Summary -->
-            <div>
-                <h2 class="text-xl font-semibold mb-4">Order Summary</h2>
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <div class="space-y-2">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Order Number:</span>
-                            <span class="font-semibold">{{ $order->order_number }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Subtotal:</span>
-                            <span>₱{{ number_format($order->subtotal, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Tax:</span>
-                            <span>₱{{ number_format($order->tax, 2) }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Shipping:</span>
-                            <span>₱{{ number_format($order->shipping_cost, 2) }}</span>
-                        </div>
-                        <hr class="my-2">
-                        <div class="flex justify-between text-lg font-bold">
-                            <span>Total:</span>
-                            <span class="text-blue-600">₱{{ number_format($order->total, 2) }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <h3 class="font-semibold mb-2">Shipping Address</h3>
-                    <p class="text-gray-600">{{ $order->shipping_address }}</p>
-                </div>
+        <h1 class="payment-title">Complete Your Payment</h1>
+        <p class="payment-subtitle">Choose your preferred payment method to complete your order</p>
+        
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            
+            <div class="summary-row">
+                <span class="summary-label">Order Number:</span>
+                <span class="summary-value">{{ $order->order_number }}</span>
             </div>
-
-            <!-- Payment Methods -->
-            <div>
-                <h2 class="text-xl font-semibold mb-4">Choose Payment Method</h2>
-                
-                <div class="space-y-4">
-                    <!-- GCash -->
-                    <div class="payment-method-card border-2 border-gray-200 rounded-lg p-4" data-method="gcash">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://logodix.com/logo/2206207.png" alt="GCash" class="w-8 h-8">
-                            <div class="flex-1">
-                                <h3 class="font-semibold">GCash</h3>
-                                <p class="text-sm text-gray-600">Pay using your GCash wallet</p>
-                            </div>
-                            <input type="radio" name="payment_method" value="gcash" class="text-blue-600">
-                        </div>
-                    </div>
-
-                    <!-- PayMaya -->
-                    <div class="payment-method-card border-2 border-gray-200 rounded-lg p-4" data-method="paymaya">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://business.inquirer.net/wp-content/blogs.dir/5/files/2020/11/PayMaya-Logo_Vertical.png" alt="PayMaya" class="w-8 h-8">
-                            <div class="flex-1">
-                                <h3 class="font-semibold">PayMaya</h3>
-                                <p class="text-sm text-gray-600">Pay using your PayMaya wallet</p>
-                            </div>
-                            <input type="radio" name="payment_method" value="paymaya" class="text-blue-600">
-                        </div>
-                    </div>
-
-                    <!-- Credit/Debit Card -->
-                    <div class="payment-method-card border-2 border-gray-200 rounded-lg p-4" data-method="stripe">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://up.yimg.com/ib/th/id/OIP.Tm8I5fC59eVVStXCIObmMQHaE1?pid=Api&rs=1&c=1&qlt=95&w=106&h=69" alt="Card" class="w-8 h-8">
-                            <div class="flex-1">
-                                <h3 class="font-semibold">Credit/Debit Card</h3>
-                                <p class="text-sm text-gray-600">Pay using your card securely</p>
-                            </div>
-                            <input type="radio" name="payment_method" value="stripe" class="text-blue-600">
-                        </div>
-                    </div>
-
-                    <!-- Cash on Delivery -->
-                    <div class="payment-method-card border-2 border-gray-200 rounded-lg p-4" data-method="cod">
-                        <div class="flex items-center space-x-3">
-                            <img src="https://static.vecteezy.com/system/resources/previews/006/566/274/non_2x/cash-on-delivery-icon-design-illustration-in-flat-design-free-vector.jpg" alt="COD" class="w-8 h-8">
-                            <div class="flex-1">
-                                <h3 class="font-semibold">Cash on Delivery</h3>
-                                <p class="text-sm text-gray-600">Pay when you receive your order</p>
-                            </div>
-                            <input type="radio" name="payment_method" value="cod" class="text-blue-600">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Payment Forms -->
-                <div id="payment-forms" class="mt-6">
-                    <!-- Stripe Form -->
-                    <div id="stripe-form" class="hidden">
-                        <form id="stripe-payment-form" class="stripe-form">
-                            @csrf
-                            <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Card Information</label>
-                                <div id="card-element" class="border border-gray-300 rounded-md p-3"></div>
-                                <div id="card-errors" class="text-red-600 text-sm mt-2"></div>
-                            </div>
-                            <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
-                                Pay ₱{{ number_format($order->total, 2) }}
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- E-wallet Buttons -->
-                    <div id="ewallet-buttons" class="hidden space-y-3">
-                        <form action="{{ route('payment.gcash') }}" method="POST" class="w-full">
-                            @csrf
-                            <input type="hidden" name="order_id" value="{{ $order->id }}">
-                            <button type="submit" class="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition-colors">
-                                Pay with GCash
-                            </button>
-                        </form>
-                        
-                        <form action="{{ route('payment.paymaya') }}" method="POST" class="w-full">
-                            @csrf
-                            <input type="hidden" name="order_id" value="{{ $order->id }}">
-                            <button type="submit" class="w-full bg-purple-600 text-white py-3 px-4 rounded-md hover:bg-purple-700 transition-colors">
-                                Pay with PayMaya
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- COD Button -->
-                    <div id="cod-button" class="hidden">
-                        <form action="{{ route('checkout.process') }}" method="POST">
-                            @csrf
-                            <input type="hidden" name="payment_method" value="Cash on Delivery">
-                            <input type="hidden" name="shipping_address" value="{{ $order->shipping_address }}">
-                            <input type="hidden" name="contact_number" value="{{ $order->contact_number }}">
-                            <input type="hidden" name="email" value="{{ $order->email }}">
-                            <button type="submit" class="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-700 transition-colors">
-                                Confirm Cash on Delivery Order
-                            </button>
-                        </form>
+            
+            <div class="summary-row">
+                <span class="summary-label">Payment Method:</span>
+                <span class="summary-value">{{ $order->payment_method }}</span>
+            </div>
+            
+            <div class="summary-row">
+                <span class="summary-label">Subtotal:</span>
+                <span class="summary-value">₱{{ number_format($order->subtotal, 2) }}</span>
+            </div>
+            
+            <div class="summary-row">
+                <span class="summary-label">Shipping:</span>
+                <span class="summary-value">₱{{ number_format($order->shipping_cost, 2) }}</span>
+            </div>
+            
+            <div class="summary-row">
+                <span class="summary-label">Tax:</span>
+                <span class="summary-value">₱{{ number_format($order->tax, 2) }}</span>
+            </div>
+            
+            <div class="summary-row">
+                <span class="summary-label">Total Amount:</span>
+                <span class="summary-value">₱{{ number_format($order->total, 2) }}</span>
+            </div>
+        </div>
+        
+        <div class="payment-options">
+            <div class="payment-option selected" data-method="cod">
+                <div class="payment-option-header">
+                    <i class="ri-money-dollar-circle-line" style="font-size: 2rem; color: #10b981;"></i>
+                    <div>
+                        <div class="payment-option-title">Cash on Delivery (COD)</div>
+                        <div class="payment-option-description">Pay when you receive your order</div>
                     </div>
                 </div>
             </div>
+        </div>
+        
+        <button class="proceed-button" onclick="proceedWithPayment()">
+            Complete Order
+        </button>
+        
+        <div class="loading" id="loading">
+            <div class="loading-spinner"></div>
+            <p>Processing your order...</p>
         </div>
     </div>
 </div>
 @endsection
 
 @section('scripts')
-<script src="https://js.stripe.com/v3/"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const paymentCards = document.querySelectorAll('.payment-method-card');
-    const paymentForms = document.getElementById('payment-forms');
-    const stripeForm = document.getElementById('stripe-form');
-    const ewalletButtons = document.getElementById('ewallet-buttons');
-    const codButton = document.getElementById('cod-button');
-
-    // Initialize Stripe
-    const stripe = Stripe('{{ config("services.stripe.key") }}');
-    const elements = stripe.elements();
-    const cardElement = elements.create('card');
-    cardElement.mount('#card-element');
-
-    // Handle payment method selection
-    paymentCards.forEach(card => {
-        card.addEventListener('click', function() {
-            // Remove selected class from all cards
-            paymentCards.forEach(c => c.classList.remove('selected'));
-            
-            // Add selected class to clicked card
-            this.classList.add('selected');
-            
-            // Check the radio button
-            const radio = this.querySelector('input[type="radio"]');
-            radio.checked = true;
-            
-            // Show appropriate payment form
-            const method = this.dataset.method;
-            showPaymentForm(method);
-        });
-    });
-
-    function showPaymentForm(method) {
-        // Hide all forms
-        stripeForm.classList.add('hidden');
-        ewalletButtons.classList.add('hidden');
-        codButton.classList.add('hidden');
+    function proceedWithPayment() {
+        const button = document.querySelector('.proceed-button');
+        const loading = document.getElementById('loading');
         
-        // Show appropriate form
-        switch(method) {
-            case 'stripe':
-                stripeForm.classList.remove('hidden');
-                break;
-            case 'gcash':
-            case 'paymaya':
-                ewalletButtons.classList.remove('hidden');
-                break;
-            case 'cod':
-                codButton.classList.remove('hidden');
-                break;
-        }
+        // Show loading
+        button.disabled = true;
+        loading.style.display = 'block';
+        
+        // Simulate payment processing
+        setTimeout(() => {
+            // Redirect to order confirmation
+            window.location.href = '{{ route("order.confirmation", $order->id) }}';
+        }, 2000);
     }
-
-    // Handle Stripe form submission
-    const stripeFormElement = document.getElementById('stripe-payment-form');
-    stripeFormElement.addEventListener('submit', async function(event) {
-        event.preventDefault();
-        
-        const submitButton = stripeFormElement.querySelector('button[type="submit"]');
-        submitButton.disabled = true;
-        submitButton.textContent = 'Processing...';
-        
-        try {
-            const {paymentIntent, error} = await stripe.confirmCardPayment(
-                '{{ $stripeClientSecret ?? "" }}',
-                {
-                    payment_method: {
-                        card: cardElement,
-                        billing_details: {
-                            name: '{{ $order->user->name }}',
-                            email: '{{ $order->email }}'
-                        }
-                    }
-                }
-            );
-            
-            if (error) {
-                document.getElementById('card-errors').textContent = error.message;
-                submitButton.disabled = false;
-                submitButton.textContent = 'Pay ₱{{ number_format($order->total, 2) }}';
-            } else {
-                // Payment successful
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = '{{ route("payment.stripe") }}';
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                const orderId = document.createElement('input');
-                orderId.type = 'hidden';
-                orderId.name = 'order_id';
-                orderId.value = '{{ $order->id }}';
-                
-                const stripeToken = document.createElement('input');
-                stripeToken.type = 'hidden';
-                stripeToken.name = 'stripe_token';
-                stripeToken.value = paymentIntent.id;
-                
-                form.appendChild(csrfToken);
-                form.appendChild(orderId);
-                form.appendChild(stripeToken);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        } catch (error) {
-            document.getElementById('card-errors').textContent = 'An error occurred. Please try again.';
-            submitButton.disabled = false;
-            submitButton.textContent = 'Pay ₱{{ number_format($order->total, 2) }}';
-        }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Payment process page loaded');
     });
-});
 </script>
 @endsection

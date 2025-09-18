@@ -3,467 +3,575 @@
 @section('title', 'iMarket - My Profile')
 
 @section('styles')
+<link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 <style>
-    .profile-container {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        min-height: 100vh;
-        padding: 40px 0;
+    :root {
+        --bg-color: #f7f9fb;
+        --text-color: #0f172a;
+        --main-color: #2c3c8c;
+        --other-color: #2c3c8c;
     }
-
-    .profile-card {
+    
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        overflow-x: hidden;
+    }
+    
+    .account-container {
+        display: flex;
+        min-height: calc(100vh - 100px);
+        padding-top: 100px;
+        background: var(--bg-color);
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 20px;
+    }
+    
+    .sidebar {
+        width: 280px;
         background: white;
-        border-radius: 20px;
-        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        margin-bottom: 30px;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        padding: 30px 20px;
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+        max-height: calc(100vh - 120px);
+        overflow-y: auto;
+        border-radius: 12px;
+        flex-shrink: 0;
     }
-
-    .profile-header {
-        background: linear-gradient(135deg, #4bc5ec 0%, #2c3c8c 100%);
-        color: white;
-        padding: 40px;
+    
+    .user-info {
         text-align: center;
-        position: relative;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
     }
-
-    .profile-avatar {
-        width: 120px;
-        height: 120px;
+    
+    .user-avatar {
+        width: 80px;
+        height: 80px;
         border-radius: 50%;
-        border: 4px solid white;
-        object-fit: cover;
-        margin: 0 auto 20px;
-        display: block;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-    }
-
-    .profile-avatar-placeholder {
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        border: 4px solid white;
-        background: rgba(255, 255, 255, 0.2);
-        margin: 0 auto 20px;
+        background: var(--main-color);
+        color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 48px;
-        color: white;
-    }
-
-    .profile-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 20px;
-        margin-top: 30px;
-    }
-
-    .stat-card {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 15px;
-        padding: 20px;
-        text-align: center;
-        backdrop-filter: blur(10px);
-    }
-
-    .stat-number {
         font-size: 2rem;
-        font-weight: bold;
-        margin-bottom: 5px;
+        margin: 0 auto 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
-
-    .stat-label {
+    
+    .user-avatar:hover {
+        transform: scale(1.05);
+    }
+    
+    .user-avatar img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .user-photo-upload {
+        color: var(--main-color);
+        text-decoration: none;
         font-size: 0.9rem;
-        opacity: 0.9;
+        font-weight: 500;
+        cursor: pointer;
     }
-
-    .profile-content {
-        padding: 40px;
+    
+    .user-photo-upload:hover {
+        text-decoration: underline;
     }
-
-    .profile-section {
-        margin-bottom: 40px;
+    
+    .account-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
     }
-
-    .section-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
-        margin-bottom: 20px;
+    
+    .nav-item {
         display: flex;
         align-items: center;
-        gap: 10px;
-    }
-
-    .info-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-    }
-
-    .info-item {
-        background: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-        border-left: 4px solid #4bc5ec;
-    }
-
-    .info-label {
-        font-size: 0.9rem;
-        color: #666;
+        gap: 12px;
+        padding: 15px 20px;
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: 8px;
         margin-bottom: 5px;
-        text-transform: uppercase;
-        font-weight: 600;
-    }
-
-    .info-value {
-        font-size: 1.1rem;
-        color: #333;
+        transition: all 0.3s ease;
         font-weight: 500;
     }
-
-    .action-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-top: 30px;
+    
+    .nav-item:hover {
+        background: #f0f9ff;
+        color: var(--main-color);
     }
-
-    .action-btn {
-        padding: 15px 25px;
-        border-radius: 10px;
-        text-decoration: none;
-        text-align: center;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #4bc5ec 0%, #2c3c8c 100%);
+    
+    .nav-item.active {
+        background: var(--main-color);
         color: white;
     }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(75, 197, 236, 0.3);
-        color: white;
-    }
-
-    .btn-secondary {
-        background: #f8f9fa;
-        color: #333;
-        border: 2px solid #e9ecef;
-    }
-
-    .btn-secondary:hover {
-        background: #e9ecef;
-        transform: translateY(-2px);
-        color: #333;
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a52 100%);
-        color: white;
-    }
-
-    .btn-danger:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 10px 20px rgba(255, 107, 107, 0.3);
-        color: white;
-    }
-
-    .completion-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 5px 12px;
-        border-radius: 20px;
-        font-size: 0.8rem;
-        font-weight: 600;
-        margin-left: 10px;
-    }
-
-    .badge-complete {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .badge-incomplete {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .recent-activity {
-        background: #f8f9fa;
-        border-radius: 15px;
-        padding: 25px;
-        margin-top: 30px;
-    }
-
-    .activity-item {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 15px 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .activity-item:last-child {
-        border-bottom: none;
-    }
-
-    .activity-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
+    
+    .nav-item i {
         font-size: 1.2rem;
+        width: 20px;
+        text-align: center;
     }
-
-    .activity-content {
+    
+    .content {
         flex: 1;
+        padding: 30px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        min-height: 500px;
+        overflow-x: hidden;
+        word-wrap: break-word;
     }
-
-    .activity-title {
+    
+    .content-section {
+        display: none;
+    }
+    
+    .content-section.active {
+        display: block;
+    }
+    
+    .content-section h2 {
+        color: var(--text-color);
+        margin-bottom: 30px;
+        font-size: 1.8rem;
         font-weight: 600;
-        color: #333;
-        margin-bottom: 2px;
     }
-
-    .activity-time {
-        font-size: 0.9rem;
-        color: #666;
+    
+    .profile-form, .address-form, .password-form {
+        max-width: 600px;
     }
-
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--text-color);
+        font-weight: 500;
+    }
+    
+    .form-group input, .form-group textarea {
+        width: 100%;
+        max-width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    .form-group input:focus, .form-group textarea:focus {
+        outline: none;
+        border-color: var(--main-color);
+        box-shadow: 0 0 0 3px rgba(44, 60, 140, 0.1);
+    }
+    
+    .error-input {
+        border-color: #dc2626 !important;
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+    }
+    
+    .error-message {
+        color: #dc2626;
+        font-size: 0.875rem;
+        margin-top: 5px;
+        display: block;
+    }
+    
+    .save-button {
+        background: var(--main-color);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .save-button:hover {
+        background: #1e40af;
+        transform: translateY(-2px);
+    }
+    
+    .logout-section {
+        text-align: center;
+        padding: 40px 20px;
+    }
+    
+    .logout-section h2 {
+        color: #dc2626;
+        margin-bottom: 20px;
+    }
+    
+    .logout-section p {
+        color: #6b7280;
+        margin-bottom: 30px;
+        font-size: 1.1rem;
+    }
+    
+    .logout-section .save-button {
+        background: #dc2626;
+    }
+    
+    .logout-section .save-button:hover {
+        background: #b91c1c;
+    }
+    
+    @media (max-width: 1024px) {
+        .account-container {
+            max-width: 100%;
+            margin: 0 10px;
+            gap: 15px;
+        }
+        
+        .sidebar {
+            width: 250px;
+        }
+    }
+    
     @media (max-width: 768px) {
-        .profile-header {
-            padding: 30px 20px;
+        .account-container {
+            flex-direction: column;
+            padding-top: 80px;
+            margin: 0;
+            gap: 10px;
         }
-
-        .profile-content {
-            padding: 30px 20px;
+        
+        .sidebar {
+            position: static;
+            width: 100%;
+            height: auto;
+            max-height: none;
+            border-radius: 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-
-        .profile-stats {
-            grid-template-columns: 1fr;
+        
+        .content {
+            margin: 0;
+            padding: 20px;
+            border-radius: 0;
+            min-height: auto;
         }
-
-        .action-buttons {
-            grid-template-columns: 1fr;
+        
+        .user-info {
+            margin-bottom: 20px;
+        }
+        
+        .nav-item {
+            padding: 12px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input, .form-group textarea {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+        }
+        
+        .save-button {
+            padding: 10px 25px;
+            font-size: 0.9rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .account-container {
+            padding-top: 70px;
+        }
+        
+        .sidebar {
+            padding: 20px 15px;
+        }
+        
+        .content {
+            padding: 15px;
+        }
+        
+        .content-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
         }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="profile-container">
-    <div class="container mx-auto px-4">
-        @if(session('success'))
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <!-- Profile Header -->
-        <div class="profile-card">
-            <div class="profile-header">
+<div class="account-container">
+    <aside class="sidebar">
+        <div class="user-info">
+            <div class="user-avatar" id="user-avatar-preview">
                 @if($user->avatar)
-                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}" class="profile-avatar">
+                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->name }}">
                 @else
-                    <div class="profile-avatar-placeholder">
-                        <i class="fas fa-user"></i>
-                    </div>
+                    <i class="ri-user-line"></i>
                 @endif
-
-                <h1 class="text-3xl font-bold mb-2">{{ $user->name }}</h1>
-                <p class="text-lg opacity-90 mb-2">{{ $user->email }}</p>
-                <p class="text-sm opacity-75">Member since {{ $user->created_at->format('F Y') }}</p>
-
-                <div class="completion-badge {{ $user->has_complete_profile ? 'badge-complete' : 'badge-incomplete' }}">
-                    <i class="fas {{ $user->has_complete_profile ? 'fa-check-circle' : 'fa-exclamation-circle' }}"></i>
-                    {{ $user->has_complete_profile ? 'Profile Complete' : 'Profile Incomplete' }}
-                </div>
-
-                <!-- Profile Stats -->
-                <div class="profile-stats">
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $user->orders()->count() }}</div>
-                        <div class="stat-label">Total Orders</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $user->reviews()->count() }}</div>
-                        <div class="stat-label">Reviews Written</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">{{ $user->created_at->diffInDays(now()) }}</div>
-                        <div class="stat-label">Days as Member</div>
-                    </div>
-                </div>
             </div>
-
-            <div class="profile-content">
-                <!-- Personal Information -->
-                <div class="profile-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-user text-blue-500"></i>
-                        Personal Information
-                    </h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Full Name</div>
-                            <div class="info-value">{{ $user->name }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Email Address</div>
-                            <div class="info-value">{{ $user->email }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Phone Number</div>
-                            <div class="info-value">{{ $user->phone ?: 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Date of Birth</div>
-                            <div class="info-value">{{ $user->birth_date ? $user->birth_date->format('M d, Y') : 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Gender</div>
-                            <div class="info-value">{{ $user->gender ? ucfirst($user->gender) : 'Not specified' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Age</div>
-                            <div class="info-value">{{ $user->age ? $user->age . ' years' : 'Not provided' }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Address Information -->
-                <div class="profile-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-map-marker-alt text-green-500"></i>
-                        Address Information
-                    </h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Address Line 1</div>
-                            <div class="info-value">{{ $user->address_line1 ?: 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Address Line 2</div>
-                            <div class="info-value">{{ $user->address_line2 ?: 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">City</div>
-                            <div class="info-value">{{ $user->city ?: 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">State/Province</div>
-                            <div class="info-value">{{ $user->state ?: 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Postal Code</div>
-                            <div class="info-value">{{ $user->postal_code ?: 'Not provided' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Country</div>
-                            <div class="info-value">{{ $user->country ?: 'Not provided' }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Preferences -->
-                <div class="profile-section">
-                    <h2 class="section-title">
-                        <i class="fas fa-cog text-purple-500"></i>
-                        Preferences
-                    </h2>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <div class="info-label">Email Notifications</div>
-                            <div class="info-value">{{ $user->email_notifications ? 'Enabled' : 'Disabled' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">SMS Notifications</div>
-                            <div class="info-value">{{ $user->sms_notifications ? 'Enabled' : 'Disabled' }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Preferred Language</div>
-                            <div class="info-value">{{ strtoupper($user->preferred_language) }}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Timezone</div>
-                            <div class="info-value">{{ $user->timezone }}</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Buttons -->
-                <div class="action-buttons">
-                    <a href="{{ route('profile.edit') }}" class="action-btn btn-primary">
-                        <i class="fas fa-edit"></i>
-                        Edit Profile
-                    </a>
-                    <a href="{{ route('profile.addresses') }}" class="action-btn btn-secondary">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Manage Addresses
-                    </a>
-                    <a href="{{ route('profile.orders') }}" class="action-btn btn-secondary">
-                        <i class="fas fa-shopping-bag"></i>
-                        View Orders
-                    </a>
-                    <a href="{{ route('profile.preferences') }}" class="action-btn btn-secondary">
-                        <i class="fas fa-cog"></i>
-                        Preferences
-                    </a>
-                    <a href="{{ route('profile.change-password') }}" class="action-btn btn-secondary">
-                        <i class="fas fa-key"></i>
-                        Change Password
-                    </a>
-                    <a href="{{ route('profile.delete-account') }}" class="action-btn btn-danger">
-                        <i class="fas fa-trash"></i>
-                        Delete Account
-                    </a>
-                </div>
-
-                <!-- Recent Activity -->
-                <div class="recent-activity">
-                    <h3 class="text-xl font-semibold text-gray-800 mb-4">
-                        <i class="fas fa-clock mr-2"></i>
-                        Recent Activity
-                    </h3>
-                    
-                    @if($user->orders()->count() > 0)
-                        @foreach($user->orders()->latest()->take(3)->get() as $order)
-                        <div class="activity-item">
-                            <div class="activity-icon bg-blue-500">
-                                <i class="fas fa-shopping-bag"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Order #{{ $order->id }} placed</div>
-                                <div class="activity-time">{{ $order->created_at->diffForHumans() }}</div>
-                            </div>
-                        </div>
-                        @endforeach
-                    @else
-                        <div class="activity-item">
-                            <div class="activity-icon bg-gray-400">
-                                <i class="fas fa-info"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">No recent activity</div>
-                                <div class="activity-time">Start shopping to see your activity here</div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
+            <a href="#" class="user-photo-upload" onclick="document.getElementById('profile-picture-input').click(); return false;">Change Photo</a>
+            <input type="file" id="profile-picture-input" style="display: none;" accept="image/*">
         </div>
-    </div>
+        <nav class="account-nav">
+            <a href="#" class="nav-item active" data-target="profile-section">
+                <i class="ri-user-line"></i> My Profile
+            </a>
+            <a href="#" class="nav-item" data-target="addresses-section">
+                <i class="ri-map-pin-line"></i> My Addresses
+            </a>
+            <a href="#" class="nav-item" data-target="password-section">
+                <i class="ri-lock-line"></i> Change Password
+            </a>
+            <a href="{{ route('tracking') }}" class="nav-item">
+                <i class="ri-truck-line"></i> Track Orders
+            </a>
+            <a href="#" class="nav-item" data-target="logout-section">
+                <i class="ri-logout-box-r-line"></i> Log Out
+            </a>
+        </nav>
+    </aside>
+
+    <section class="content">
+        <div id="profile-section" class="content-section active">
+            <h2>Edit Profile</h2>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            <form class="profile-form" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+                @csrf
+                @method('PUT')
+                <div class="form-group">
+                    <label for="avatar">Profile Picture</label>
+                    <input type="file" id="avatar" name="avatar" accept="image/*" class="@error('avatar') error-input @enderror">
+                    @error('avatar')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                    <small style="color: #6b7280; font-size: 0.875rem;">Upload a profile picture (max 2MB, JPG/PNG/GIF)</small>
+                </div>
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" placeholder="Enter your full name" class="@error('name') error-input @enderror">
+                    @error('name')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}" placeholder="Enter your email address" class="@error('email') error-input @enderror">
+                    @error('email')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" value="{{ old('phone', $user->phone) }}" placeholder="Enter your cellphone number" class="@error('phone') error-input @enderror">
+                    @error('phone')
+                        <span class="error-message">{{ $message }}</span>
+                    @enderror
+                </div>
+                <button type="submit" class="save-button">Save Changes</button>
+            </form>
+        </div>
+        
+        <div id="addresses-section" class="content-section">
+            <h2>My Addresses</h2>
+            <p>Add and manage your shipping addresses here.</p>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            <form class="address-form" method="POST" action="{{ route('profile.update-address') }}">
+                @csrf
+                @method('PUT')
+                <div class="form-group">
+                    <label for="address_line1">House Number/Unit No.</label>
+                    <input type="text" id="address_line1" name="address_line1" value="{{ $user->address_line1 }}" placeholder="Apartment, unit, floor, etc.">
+                </div>
+                <div class="form-group">
+                    <label for="address_line2">Street Name</label>
+                    <input type="text" id="address_line2" name="address_line2" value="{{ $user->address_line2 }}" placeholder="Street Name">
+                </div>
+                <div class="form-group">
+                    <label for="city">City</label>
+                    <input type="text" id="city" name="city" value="{{ $user->city }}" placeholder="City">
+                </div>
+                <div class="form-group">
+                    <label for="state">State/Province</label>
+                    <input type="text" id="state" name="state" value="{{ $user->state }}" placeholder="State/Province">
+                </div>
+                <div class="form-group">
+                    <label for="postal_code">Postal Code</label>
+                    <input type="text" id="postal_code" name="postal_code" value="{{ $user->postal_code }}" placeholder="Postal Code">
+                </div>
+                <div class="form-group">
+                    <label for="country">Country</label>
+                    <input type="text" id="country" name="country" value="{{ $user->country }}" placeholder="Country">
+                </div>
+                <button type="submit" class="save-button">Update Address</button>
+            </form>
+        </div>
+        
+        <div id="password-section" class="content-section">
+            <h2>Change Password</h2>
+            
+            @if ($errors->any())
+                <div class="alert alert-danger" style="background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    <ul style="margin: 0; padding-left: 20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="alert alert-success" style="background: #f0fdf4; border: 1px solid #bbf7d0; color: #16a34a; padding: 12px; border-radius: 8px; margin-bottom: 20px;">
+                    {{ session('success') }}
+                </div>
+            @endif
+            
+            <form class="password-form" method="POST" action="{{ route('profile.update-password') }}">
+                @csrf
+                @method('PUT')
+                <div class="form-group">
+                    <label for="current_password">Current Password</label>
+                    <input type="password" id="current_password" name="current_password" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label for="password">New Password</label>
+                    <input type="password" id="password" name="password" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label for="password_confirmation">Confirm New Password</label>
+                    <input type="password" id="password_confirmation" name="password_confirmation" placeholder="Confirm new password">
+                </div>
+                <button type="submit" class="save-button">Update Password</button>
+            </form>
+        </div>
+        
+        <div id="logout-section" class="content-section">
+            <h2>Log Out</h2>
+            <p>Are you sure you want to log out?</p>
+            <form method="POST" action="{{ route('logout') }}">
+                @csrf
+                <button type="submit" class="save-button">Log Out</button>
+            </form>
+        </div>
+    </section>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const navItems = document.querySelectorAll('.account-nav .nav-item');
+        const sections = document.querySelectorAll('.content-section');
+        const profilePictureInput = document.getElementById('profile-picture-input');
+        const userAvatarPreview = document.getElementById('user-avatar-preview');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (event) => {
+                if (item.getAttribute('href') === '{{ route('tracking') }}') {
+                    return;
+                }
+                
+                event.preventDefault();
+
+                navItems.forEach(nav => nav.classList.remove('active'));
+                sections.forEach(sec => sec.classList.remove('active'));
+
+                item.classList.add('active');
+
+                const targetId = item.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+            });
+        });
+
+        profilePictureInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                // Validate file size (2MB max)
+                if (file.size > 2 * 1024 * 1024) {
+                    alert('File size must be less than 2MB');
+                    this.value = '';
+                    return;
+                }
+                
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert('Please select an image file');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.width = '100%';
+                    img.style.height = '100%';
+                    img.style.objectFit = 'cover';
+                    img.style.borderRadius = '50%';
+                    userAvatarPreview.innerHTML = '';
+                    userAvatarPreview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
+        }, 5000);
+    });
+</script>
 @endsection

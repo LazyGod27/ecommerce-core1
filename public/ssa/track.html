@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+   
+    <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,
+100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,
+500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>User</title>
+</head>
+<body>
+    <style>         
+    body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding-top: 3rem;
+            padding-bottom: 1rem;
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }</style>
+
+<header>
+  <div class="logo">
+    <img src="logo.png" alt="IMARKET PH Logo">
+  </div>
+
+  <ul class="navbar" id="navbar">
+    <li><a href="index.html" class="active"><i class="ri-home-line"></i> Home</a></li>
+    <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
+    <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
+    
+    <li class="dropdown">
+        <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
+        <ul class="dropdown-menu">
+            <li><a href="#"><i class="ri-fire-line"></i> Best Selling</a></li>
+            <li><a href="#"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+            <li><a href="#"><i class="ri-computer-line"></i> Electronics</a></li>
+            <li><a href="#"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+            <li><a href="#"><i class="ri-home-4-line"></i> Home & Living</a></li>
+            <li><a href="#"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+            <li><a href="#"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+            <li><a href="#"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+            <li><a href="#"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+        </ul>
+    </li>
+
+    
+  </ul>
+<div class="search-bar">
+  <input type="text" placeholder="Search for products, brands and more..." />
+  <button class="search-btn"><i class="ri-search-line"></i></button>
+</div>
+<div class="icons">
+   <a href="cart.html"><i class="ri-shopping-cart-line"></i></a>
+  <a href="user.html"><i class="ri-user-line"></i></a>
+
+</div>
+</header>
+<body>
+
+    <div class="container mt-6">
+        <!-- Left Panel for Status and Products -->
+        <div class="left-panel">
+            <div class="header">
+                <a href="#" class="text-gray-500 hover:text-gray-800">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </a>
+                <h1 class="text-lg font-semibold">Your Orders</h1>
+                <div class="flex items-center gap-2">
+                    <a href="#" class="text-blue-500 hover:underline text-sm font-medium">View All ></a>
+                    <a href="#" class="cancel-btn text-sm" id="cancel-order-btn">Cancel Order</a>
+                </div>
+            </div>
+    
+            <!-- Progress bar Section -->
+            <div class="progress-container">
+                <div class="progress-line"></div>
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                
+                <div class="progress-step active" data-status="to-pay">
+                    <div class="progress-circle"></div>
+                    <p class="progress-text">To Pay</p>
+                </div>
+                <div class="progress-step" data-status="to-ship">
+                    <div class="progress-circle"></div>
+                    <p class="progress-text">To Ship</p>
+                </div>
+                <div class="progress-step" data-status="to-receive">
+                    <div class="progress-circle"></div>
+                    <p class="progress-text">To Receive</p>
+                </div>
+                <div class="progress-step" data-status="to-review">
+                    <div class="progress-circle"></div>
+                    <p class="progress-text">To Review</p>
+                </div>
+                <div class="progress-step" data-status="returns">
+                    <div class="progress-circle"></div>
+                    <p class="progress-text">Returns</p>
+                </div>
+            </div>
+            
+            <!-- Dynamic Product List Section -->
+            <div class="product-list-section">
+                <h2 class="font-semibold text-lg mb-4">Items</h2>
+                <div id="product-list">
+                    <!-- Product cards will be dynamically inserted here -->
+                </div>
+                <div id="no-products-message" class="hidden text-center text-gray-500 mt-8">
+                    <p>No products found in this category.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel for Address and Summary -->
+        <div class="right-panel">
+            <!-- Delivery Address Section -->
+            <div class="info-section">
+                <h2 class="font-semibold text-lg mb-4">Delivery Address</h2>
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <p class="text-sm text-gray-600">No address found</p>
+                </div>
+                <!-- You can add a map or address details here later -->
+            </div>
+    
+            <!-- Order Summary Section -->
+            <div class="info-section">
+                <h2 class="font-semibold text-lg mb-4">Order Summary</h2>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Order Total</span>
+                        <span class="font-semibold">₱ 0.00</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Shipping Fee</span>
+                        <span class="font-semibold">₱ 0.00</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-base mt-4">
+                        <span>Total Payment</span>
+                        <span class="text-orange-500">₱ 0.00</span>
+                    </div>
+                </div>
+            </div>
+            <div class="info-section">
+                <h2 class="font-semibold text-lg mb-4">Suggested Products</h2>
+                <div class="suggested-products-grid">
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://dlcdnimgs.asus.com/websites/global/products/rq4syeyq3zyjvubn/img/new/01-bg_m.jpg" alt="Suggested Product A">
+                        <span class="text-sm font-medium text-center">Asus Mechanical Keyboard</span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://3.kixify.com/sites/default/files/imagecache/product_full/product/2023/02/09/p_34475983_198712531_111814.jpg" alt="Suggested Product B">
+                        <span class="text-sm font-medium text-center">New Balance 550</span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://cdn.vox-cdn.com/thumbor/jXZJmX2EJYsOydXhyVwUWiOTO50=/0x0:1238x825/1720x0/filters:focal(0x0:1238x825):no_upscale()/cdn.vox-cdn.com/uploads/chorus_asset/file/24878879/blacksharkv2inline.jpg" alt="Suggested Product C">
+                        <span class="text-sm font-medium text-center">Razer Headset</span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://static-01.daraz.pk/p/91b1ca3d8371df14ef2e1512a1464d36.png" alt="Suggested Product D">
+                        <span class="text-sm font-medium text-center">M90 Earbuds</span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://cf.shopee.ph/file/sg-11134201-22100-yteqt1thheiv6f" alt="Suggested Product D">
+                        <span class="text-sm font-medium text-center">Aqua Flask </span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://img1.wushang.com/pn/wsec-img1/2020/7/5/5862eff1-31c8-4534-afc1-e77b800709d3.jpg?x-oss-process=image/resize,w_800,h_800" alt="Suggested Product D">
+                        <span class="text-sm font-medium text-center">JBL Speaker</span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://down-ph.img.susercontent.com/file/ph-11134207-7r98r-lrmrz5wqmm0l1e" alt="Suggested Product D">
+                        <span class="text-sm font-medium text-center">Grasya Hoodie</span>
+                    </a>
+                    <a href="#" class="suggested-product-card block">
+                        <img src="https://www.techpowerup.com/img/15-03-24/Logitech_MX_Master_Wireless_Mouse.jpg" alt="Suggested Product D">
+                        <span class="text-sm font-medium text-center">Logitech</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="cancellation-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="text-lg font-semibold">Cancel Order</h3>
+                <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800 transition-colors duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-4">Please select the reason for canceling your order:</p>
+                <form id="cancellation-form">
+                    <div class="reason-item">
+                        <input type="radio" id="reason1" name="cancel-reason" value="I no longer want the product" class="text-main-orange focus:ring-main-orange">
+                        <label for="reason1">I no longer want the product</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="radio" id="reason2" name="cancel-reason" value="Ordered by mistake" class="text-main-orange focus:ring-main-orange">
+                        <label for="reason2">Ordered by mistake</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="radio" id="reason3" name="cancel-reason" value="Found a cheaper price elsewhere" class="text-main-orange focus:ring-main-orange">
+                        <label for="reason3">Found a cheaper price elsewhere</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="radio" id="reason4" name="cancel-reason" value="Others" class="text-main-orange focus:ring-main-orange">
+                        <label for="reason4">Others</label>
+                    </div>
+                    <textarea class="mt-4 p-2 w-full border rounded-md" rows="3" placeholder="You may provide additional details..."></textarea>
+                    <div class="flex justify-end mt-4">
+                        <button type="button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2" id="cancel-modal-btn">Cancel</button>
+                        <button type="submit" class="bg-main-orange text-white px-4 py-2 rounded-md">Submit</button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    </body>
+</main>
+<div class="voice-chat-container" id="voice-chat-container">
+    <div class="voice-chat-header">
+        <span class="voice-chat-title">Voice Command AI</span>
+        <button class="voice-chat-close-btn" id="voice-close-chat-btn">&times;</button>
+    </div>
+    <div class="voice-chat-body" id="voice-chat-body">
+        <div class="voice-message voice-bot-message">Hello! Tap the microphone to start talking.</div>
+    </div>
+    <div class="voice-chat-input-area">
+        <button id="voice-mic-btn"><i class="ri-mic-fill"></i></button>
+    </div>
+</div>
+
+<button class="voice-toggle-btn" id="voice-toggle-btn">
+    Voice Command AI
+</button>
+<footer class="footer">
+  <div class="footer-container">
+  
+    <div class="footer-section">
+      <h5>Customer Care</h5>
+      <ul>
+        <li><a href="customer.html">Customer Serice</a></li>
+        <li><a href="#">How to Buy</a></li>
+        <li><a href="#">Shipping & Delivery</a></li>
+        <li><a href="#">Return & Refund</a></li>
+        <li><a href="#">Contact Us</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h5>About ImarketPH</h5>
+      <ul>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Careers</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+      </ul>
+    </div>
+    <div class="footer-section">
+      <h5>Payment Methods</h5>
+      <div class="footer-logos">
+        <img src="visa.png" alt="Visa">
+        <img src="mastercard.png" alt="Mastercard">
+        <img src="gcash.png" alt="GCash">
+        <img src="maya.png" alt="Paymaya">
+      </div>
+    </div>
+    <div class="footer-section">
+      <h5>Delivery Services</h5>
+      <div class="footer-logos">
+        <img src="jnt.png" alt="J&T Express">
+        <img src="ninjavan.jpg" alt="Ninja Van">
+        <img src="lbc.png" alt="LBC Express">
+        <img src="flash.png" alt="Flash Express">
+      </div>
+    </div>
+    <div class="footer-section">
+      <h5>Follow Us</h5>
+      <div class="footer-socials">
+        <a href="#"><img src="facebook.png" alt="Facebook"></a>
+        <a href="#"><img src="instagram.jpg" alt="Instagram"></a>
+        <a href="#"><img src="twitter.png" alt="Twitter"></a>
+        <a href="#"><img src="youtube.png" alt="YouTube"></a>
+      </div>
+    </div>
+
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 All Rights Reserved by ImarketPH</p>
+  </div>
+</footer>
+      <button class="image-scan-fab" onclick="window.open('https://images.google.com/', '_blank')" title="Image Scan">
+        <i class="ri-camera-line"></i>
+<script>        const ordersData = {
+            'to-pay': [],
+            'to-ship': [],
+            'to-receive': [],
+            'to-review': [],
+            'returns': []
+        };
+
+        const progressSteps = document.querySelectorAll('.progress-step');
+        const productListContainer = document.getElementById('product-list');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const noProductsMessage = document.getElementById('no-products-message');
+        const cancelButton = document.getElementById('cancel-order-btn');
+        const modal = document.getElementById('cancellation-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const cancelModalBtn = document.getElementById('cancel-modal-btn');
+        const cancellationForm = document.getElementById('cancellation-form');
+        function renderProducts(status) {
+            productListContainer.innerHTML = '';
+            
+            const products = ordersData[status];
+            if (products && products.length > 0) {
+                noProductsMessage.classList.add('hidden');
+                products.forEach(product => {
+                    const productCard = document.createElement('div');
+                    productCard.className = 'product-card';
+                    productCard.innerHTML = `
+                        <img src="${product.img}" alt="${product.name}" class="product-image">
+                        <div class="product-details">
+                            <h3 class="product-name">${product.name}</h3>
+                            <p class="text-gray-500 text-sm">${product.details}</p>
+                            <p class="product-price font-bold mt-2">${product.price}</p>
+                        </div>
+                    `;
+                    productListContainer.appendChild(productCard);
+                });
+            } else {
+                noProductsMessage.classList.remove('hidden');
+            }
+        }
+
+        function updateActiveStatus(activeStep) {
+            progressSteps.forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            let completedCount = 0;
+            let foundActive = false;
+            progressSteps.forEach(step => {
+                if (step === activeStep) {
+                    step.classList.add('active');
+                    foundActive = true;
+                } else if (!foundActive) {
+                    step.classList.add('completed');
+                    completedCount++;
+                }
+            });
+
+
+            const progress = (completedCount / (progressSteps.length - 1)) * 100;
+            progressBarFill.style.width = `${progress}%`;
+        }
+
+       progressSteps.forEach(step => {
+            step.addEventListener('click', () => {
+                const status = step.dataset.status;
+                updateActiveStatus(step);
+                renderProducts(status);
+            });
+        });
+
+        cancelButton.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        closeModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        cancelModalBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        cancellationForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            modal.style.display = 'none';
+        });
+
+        updateActiveStatus(progressSteps[0]);
+        renderProducts('to-pay');
+        document.addEventListener("DOMContentLoaded", function() {
+    const dropdown = document.querySelector(".dropdown > a");
+    const dropdownMenu = document.querySelector(".dropdown-menu");
+
+    if (dropdown && dropdownMenu) {
+        dropdown.addEventListener("click", function(e) {
+            e.preventDefault();
+            dropdownMenu.classList.toggle("show");
+        });
+        document.addEventListener("click", function(e) {
+            if (!dropdown.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove("show");
+            }
+        });
+    }
+});
+        </script>
+</body>
+</html>

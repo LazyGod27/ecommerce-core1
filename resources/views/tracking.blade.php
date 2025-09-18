@@ -1,335 +1,524 @@
 @extends('layouts.frontend')
 
-@section('title', 'iMarket - Order Tracking')
+@section('title', 'iMarket - Track Your Orders')
 
 @section('styles')
 <style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        margin: 0;
+        padding-top: 100px;
+        min-height: 100vh;
+    }
+    
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        display: flex;
+        gap: 20px;
+    }
+    
+    .left-panel {
+        flex: 2;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 30px;
+    }
+    
+    .right-panel {
+        flex: 1;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 30px;
+        height: fit-content;
+    }
+    
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .header h1 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .header a {
+        color: var(--main-color);
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .cancel-btn {
+        background: #dc2626;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .cancel-btn:hover {
+        background: #b91c1c;
+    }
+    
+    .progress-container {
+        position: relative;
+        margin: 30px 0;
+        padding: 20px 0;
+    }
+    
+    .progress-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: #e5e7eb;
+        z-index: 1;
+    }
+    
+    .progress-bar-fill {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        height: 2px;
+        background: var(--main-color);
+        z-index: 2;
+        transition: width 0.5s ease;
+    }
+    
     .progress-step {
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        text-align: center;
-        position: relative;
-        z-index: 1;
+        z-index: 3;
+        cursor: pointer;
+        transition: all 0.3s ease;
     }
-
-    .progress-step-icon {
+    
+    .progress-step:hover {
+        transform: translateY(-2px);
+    }
+    
+    .progress-circle {
         width: 40px;
         height: 40px;
         border-radius: 50%;
+        background: #e5e7eb;
         display: flex;
-        justify-content: center;
         align-items: center;
-        color: white;
-        font-size: 1rem;
-        margin-bottom: 8px;
-        transition: background-color 0.3s ease;
-    }
-
-    .progress-step-text {
-        font-size: 0.875rem;
-        color: #888;
-        transition: color 0.3s ease;
-        white-space: nowrap;
-    }
-
-    .progress-line {
-        position: absolute;
-        top: 60px;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background-color: #e5e7eb;
-        z-index: 0;
+        justify-content: center;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        position: relative;
     }
     
-    .progress-line-fill {
-        height: 100%;
-        background-color: #2c3c8c;
-        transition: width 0.5s ease-in-out;
-    }
-
-    .message-box {
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        animation: fadeInOut 3s forwards;
-    }
-
-    @keyframes fadeInOut {
-        0% { opacity: 0; transform: translate(-50%, -20px); }
-        10% { opacity: 1; transform: translate(-50%, 0); }
-        90% { opacity: 1; transform: translate(-50%, 0); }
-        100% { opacity: 0; transform: translate(-50%, -20px); }
-    }
-
-    .tracking-search {
-        background: linear-gradient(135deg, #4bc5ec 0%, #2c3c8c 100%);
-        border-radius: 15px;
-        padding: 30px;
-        margin-bottom: 30px;
+    .progress-step.active .progress-circle {
+        background: var(--main-color);
         color: white;
     }
-
-    .tracking-input {
-        border: none;
-        border-radius: 10px;
-        padding: 15px 20px;
-        font-size: 16px;
-        width: 100%;
+    
+    .progress-step.completed .progress-circle {
+        background: #10b981;
+        color: white;
+    }
+    
+    .progress-step.completed .progress-circle::after {
+        content: '✓';
+        font-weight: bold;
+    }
+    
+    .progress-text {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #6b7280;
+        text-align: center;
+    }
+    
+    .progress-step.active .progress-text {
+        color: var(--main-color);
+        font-weight: 600;
+    }
+    
+    .progress-step.completed .progress-text {
+        color: #10b981;
+        font-weight: 600;
+    }
+    
+    .product-list-section h2 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: var(--text-color);
+    }
+    
+    .product-card {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
         margin-bottom: 15px;
-    }
-
-    .tracking-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 15px 30px;
-        border-radius: 10px;
-        font-weight: 600;
+        background: #f9fafb;
         transition: all 0.3s ease;
-        cursor: pointer;
     }
-
-    .tracking-btn:hover {
-        background: rgba(255, 255, 255, 0.3);
+    
+    .product-card:hover {
         transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
-
-    .order-card {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        transition: transform 0.3s ease;
+    
+    .product-image {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 8px;
     }
-
-    .order-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .status-badge {
-        padding: 8px 16px;
-        border-radius: 20px;
-        font-size: 12px;
+    
+    .product-details h3 {
+        font-size: 1rem;
         font-weight: 600;
-        text-transform: uppercase;
+        color: var(--text-color);
+        margin-bottom: 5px;
     }
-
-    .status-placed { background: #e3f2fd; color: #1976d2; }
-    .status-shipped { background: #fff3e0; color: #f57c00; }
-    .status-transit { background: #e8f5e8; color: #388e3c; }
-    .status-delivered { background: #e8f5e8; color: #2e7d32; }
-    .status-cancelled { background: #ffebee; color: #d32f2f; }
-    .status-pending { background: #fff3e0; color: #f57c00; }
-    .status-processing { background: #e3f2fd; color: #1976d2; }
-    .status-completed { background: #e8f5e8; color: #2e7d32; }
-
-    .recent-orders {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        padding: 25px;
+    
+    .product-details p {
+        color: #6b7280;
+        font-size: 0.9rem;
+        margin-bottom: 5px;
     }
-
-    .order-item {
-        border-bottom: 1px solid #f0f0f0;
-        padding: 15px 0;
-        transition: background-color 0.3s ease;
+    
+    .product-price {
+        color: var(--main-color);
+        font-weight: 600;
+        font-size: 1.1rem;
     }
-
-    .order-item:hover {
-        background-color: #f8f9fa;
+    
+    .info-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #e5e7eb;
     }
-
-    .order-item:last-child {
+    
+    .info-section:last-child {
         border-bottom: none;
+    }
+    
+    .info-section h2 {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 15px;
+        color: var(--text-color);
+    }
+    
+    .suggested-products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+    }
+    
+    .suggested-product-card {
+        text-align: center;
+        padding: 15px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+    }
+    
+    .suggested-product-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    
+    .suggested-product-card img {
+        width: 100%;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 6px;
+        margin-bottom: 10px;
+    }
+    
+    .suggested-product-card span {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 30px;
+        max-width: 500px;
+        width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .modal-header h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+    
+    .modal-header button {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #6b7280;
+    }
+    
+    .modal-header button:hover {
+        color: var(--text-color);
+    }
+    
+    .reason-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .reason-item:last-child {
+        border-bottom: none;
+    }
+    
+    .reason-item input[type="radio"] {
+        accent-color: var(--main-color);
+    }
+    
+    .reason-item label {
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+    
+    .hidden {
+        display: none !important;
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            flex-direction: column;
+        }
+        
+        .left-panel, .right-panel {
+            flex: none;
+        }
+        
+        .progress-step {
+            margin-bottom: 20px;
+        }
     }
 </style>
 @endsection
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
-    <div class="mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-4 text-center">Order Tracking</h1>
-        <p class="text-gray-600 text-center">Track your orders and stay updated on delivery status</p>
-    </div>
+<div class="container">
+    <!-- Left Panel for Status and Products -->
+    <div class="left-panel">
+        <div class="header">
+            <a href="#" class="text-gray-500 hover:text-gray-800">
+                <i class="ri-arrow-left-line"></i>
+            </a>
+            <h1>Your Orders</h1>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <a href="#" class="text-blue-500 hover:underline text-sm font-medium">View All ></a>
+                <button class="cancel-btn" id="cancel-order-btn">Cancel Order</button>
+            </div>
+        </div>
 
-    <!-- Message box for user feedback -->
-    <div id="message-box" class="message-box fixed p-4 rounded-md shadow-lg text-white font-semibold transition-all duration-300 opacity-0 z-50"></div>
-
-    <!-- Tracking Search Section -->
-    <div class="tracking-search">
-        <div class="text-center mb-6">
-            <h2 class="text-2xl font-bold mb-2">Track Your Order</h2>
-            <p class="opacity-90">Enter your order ID to get real-time updates</p>
+        <!-- Progress bar Section -->
+        <div class="progress-container">
+            <div class="progress-line"></div>
+            <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            
+            <div class="progress-step active" data-status="to-pay">
+                <div class="progress-circle"></div>
+                <p class="progress-text">To Pay</p>
+            </div>
+            <div class="progress-step" data-status="to-ship">
+                <div class="progress-circle"></div>
+                <p class="progress-text">To Ship</p>
+            </div>
+            <div class="progress-step" data-status="to-receive">
+                <div class="progress-circle"></div>
+                <p class="progress-text">To Receive</p>
+            </div>
+            <div class="progress-step" data-status="to-review">
+                <div class="progress-circle"></div>
+                <p class="progress-text">To Review</p>
+            </div>
+            <div class="progress-step" data-status="returns">
+                <div class="progress-circle"></div>
+                <p class="progress-text">Returns</p>
+            </div>
         </div>
         
-        <div class="max-w-md mx-auto">
-            <input type="text" id="order-id-input" placeholder="Enter Order ID (e.g., odr1, odr2, odr3, odr4)" 
-                   class="tracking-input text-gray-800">
-            <button id="search-order-btn" class="tracking-btn w-full">
-                <i class="fas fa-search mr-2"></i>
-                Track Order
+        <!-- Dynamic Product List Section -->
+        <div class="product-list-section">
+            <h2>Items</h2>
+            <div id="product-list">
+                <!-- Product cards will be dynamically inserted here -->
+            </div>
+            <div id="no-products-message" class="hidden text-center text-gray-500 mt-8">
+                <p>No products found in this category.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Panel for Address and Summary -->
+    <div class="right-panel">
+        <!-- Delivery Address Section -->
+        <div class="info-section">
+            <h2>Delivery Address</h2>
+            <div style="background: #f3f4f6; padding: 20px; border-radius: 8px;">
+                @if($user && $user->address_line1)
+                    <p style="font-size: 0.9rem; color: #6b7280;">
+                        {{ $user->address_line1 }}<br>
+                        @if($user->address_line2){{ $user->address_line2 }}<br>@endif
+                        {{ $user->city }}, {{ $user->state }} {{ $user->postal_code }}<br>
+                        {{ $user->country }}
+                    </p>
+                @else
+                    <p style="font-size: 0.9rem; color: #6b7280;">No address found</p>
+                @endif
+            </div>
+        </div>
+
+        <!-- Order Summary Section -->
+        <div class="info-section">
+            <h2>Order Summary</h2>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Order Total</span>
+                    <span style="font-weight: 600;">₱ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span>Shipping Fee</span>
+                    <span style="font-weight: 600;">₱ 0.00</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-weight: bold; font-size: 1rem; margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e7eb;">
+                    <span>Total Payment</span>
+                    <span style="color: #f97316;">₱ 0.00</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>Suggested Products</h2>
+            <div class="suggested-products-grid">
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/keyboard.jpg') }}" alt="Suggested Product A">
+                    <span>Mechanical Keyboard</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/shoes.jpg') }}" alt="Suggested Product B">
+                    <span>Nike Sneakers</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/headset.jpg') }}" alt="Suggested Product C">
+                    <span>Gaming Headset</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/ultra.jpg') }}" alt="Suggested Product D">
+                    <span>Smart Watch</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/jbl.png') }}" alt="Suggested Product E">
+                    <span>JBL Speaker</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/water.jpg') }}" alt="Suggested Product F">
+                    <span>Water Bottle</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/hoodie.jpg') }}" alt="Suggested Product G">
+                    <span>Hoodie</span>
+                </a>
+                <a href="#" class="suggested-product-card">
+                    <img src="{{ asset('ssa/mouse.jpg') }}" alt="Suggested Product H">
+                    <span>Gaming Mouse</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cancellation Modal -->
+<div id="cancellation-modal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Cancel Order</h3>
+            <button id="close-modal-btn">
+                <i class="ri-close-line"></i>
             </button>
         </div>
-    </div>
-
-    <!-- Recent Orders Section (for logged-in users) -->
-    @auth
-    <div class="recent-orders mb-8">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">
-            <i class="fas fa-clock mr-2"></i>
-            Recent Orders
-        </h3>
-        <div id="recent-orders-list">
-            @if($orders && count($orders) > 0)
-                @foreach($orders as $order)
-                <div class="order-item">
-                    <div class="flex justify-between items-center">
-                        <div class="flex-1">
-                            <div class="flex items-center space-x-4">
-                                <div>
-                                    <h4 class="font-semibold text-gray-800">Order #{{ $order->order_number }}</h4>
-                                    <p class="text-sm text-gray-600">{{ $order->created_at->format('M d, Y h:i A') }}</p>
-                                    <p class="text-sm text-gray-600">{{ $order->items->count() }} item(s) - ₱{{ number_format($order->total, 2) }}</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="status-badge status-{{ strtolower($order->status) }}">
-                                {{ ucfirst($order->status) }}
-                            </span>
-                            <a href="{{ route('tracking.show', $order->id) }}" 
-                               class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm">
-                                Track Order
-                            </a>
-                        </div>
-                    </div>
+        <div class="modal-body">
+            <p style="margin-bottom: 20px;">Please select the reason for canceling your order:</p>
+            <form id="cancellation-form">
+                <div class="reason-item">
+                    <input type="radio" id="reason1" name="cancel-reason" value="I no longer want the product">
+                    <label for="reason1">I no longer want the product</label>
                 </div>
-                @endforeach
-            @else
-                <div class="text-center py-8">
-                    <i class="fas fa-shopping-bag text-4xl text-gray-400 mb-4"></i>
-                    <p class="text-gray-600">No orders found. Start shopping to see your orders here!</p>
-                    <a href="{{ route('home') }}" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors">
-                        Start Shopping
-                    </a>
+                <div class="reason-item">
+                    <input type="radio" id="reason2" name="cancel-reason" value="Ordered by mistake">
+                    <label for="reason2">Ordered by mistake</label>
                 </div>
-            @endif
-        </div>
-    </div>
-    @endauth
-
-    <!-- Order Details Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" id="order-details-section" style="display: none;">
-        
-        <!-- Order Progress -->
-        <div class="lg:col-span-2 order-card p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-semibold text-gray-700">Order: <span id="order-number"></span></h2>
-                <span id="order-status-badge" class="status-badge"></span>
-            </div>
-            
-            <div class="relative flex justify-between items-start pt-8 pb-4">
-                <!-- Progress line and fill -->
-                <div class="progress-line absolute top-1/2 left-0 w-full h-1 bg-gray-200 -z-10">
-                    <div id="progress-line-fill" class="progress-line-fill"></div>
+                <div class="reason-item">
+                    <input type="radio" id="reason3" name="cancel-reason" value="Found a cheaper price elsewhere">
+                    <label for="reason3">Found a cheaper price elsewhere</label>
                 </div>
-                
-                <div id="step-order-placed" class="progress-step">
-                    <div class="progress-step-icon bg-gray-400">
-                        <i class="fas fa-box-open"></i>
-                    </div>
-                    <span class="progress-step-text">Order Placed</span>
+                <div class="reason-item">
+                    <input type="radio" id="reason4" name="cancel-reason" value="Others">
+                    <label for="reason4">Others</label>
                 </div>
-                
-                <div id="step-shipped" class="progress-step">
-                    <div class="progress-step-icon bg-gray-400">
-                        <i class="fas fa-warehouse"></i>
-                    </div>
-                    <span class="progress-step-text">Shipped</span>
+                <textarea style="margin-top: 20px; padding: 12px; width: 100%; border: 1px solid #d1d5db; border-radius: 6px; resize: vertical; min-height: 80px;" rows="3" placeholder="You may provide additional details..."></textarea>
+                <div style="display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px;">
+                    <button type="button" style="background: #6b7280; color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;" id="cancel-modal-btn">Cancel</button>
+                    <button type="submit" style="background: var(--main-color); color: white; padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer;">Submit</button>
                 </div>
-                
-                <div id="step-in-transit" class="progress-step">
-                    <div class="progress-step-icon bg-gray-400">
-                        <i class="fas fa-truck"></i>
-                    </div>
-                    <span class="progress-step-text">In Transit</span>
-                </div>
-                
-                <div id="step-delivered" class="progress-step">
-                    <div class="progress-step-icon bg-gray-400">
-                        <i class="fas fa-home"></i>
-                    </div>
-                    <span class="progress-step-text">Delivered</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Order Summary -->
-        <div class="order-card p-6">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Order Summary</h2>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center text-sm text-gray-600">
-                    <span>Order Date:</span>
-                    <span id="order-date" class="font-semibold text-gray-800"></span>
-                </div>
-                <div class="flex justify-between items-center text-sm text-gray-600">
-                    <span>Estimated Delivery:</span>
-                    <span id="estimated-delivery" class="font-semibold text-gray-800"></span>
-                </div>
-                <div class="flex justify-between items-center text-sm text-gray-600">
-                    <span>Shipped To:</span>
-                    <span id="shipping-address" class="text-right"></span>
-                </div>
-                
-                <hr class="my-4 border-gray-200">
-                
-                <div class="flex justify-between items-center text-sm text-gray-800">
-                    <span class="font-semibold">Subtotal:</span>
-                    <span id="subtotal"></span>
-                </div>
-                <div class="flex justify-between items-center text-sm text-gray-800">
-                    <span class="font-semibold">Shipping:</span>
-                    <span id="shipping-cost"></span>
-                </div>
-                <div class="flex justify-between items-center text-lg font-bold text-gray-900 mt-4 pt-2 border-t border-gray-200">
-                    <span>Total:</span>
-                    <span id="total-cost"></span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Order Items -->
-        <div class="lg:col-span-3 order-card p-6">
-            <h2 class="text-xl font-semibold text-gray-700 mb-4">Order Items</h2>
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody id="order-items-table-body" class="bg-white divide-y divide-gray-200">
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Sample Orders for Demo -->
-    <div class="mt-8 text-center">
-        <h3 class="text-lg font-semibold text-gray-700 mb-4">Try these sample order IDs:</h3>
-        <div class="flex flex-wrap justify-center gap-2">
-            <button onclick="trackOrder('odr1')" class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">odr1 (Order Placed)</button>
-            <button onclick="trackOrder('odr2')" class="px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors">odr2 (Shipped)</button>
-            <button onclick="trackOrder('odr3')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">odr3 (In Transit)</button>
-            <button onclick="trackOrder('odr4')" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors">odr4 (Delivered)</button>
+            </form>
         </div>
     </div>
 </div>
@@ -337,213 +526,96 @@
 
 @section('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const sampleOrderDatabase = {
-            'odr1': {
-                orderId: 'odr1',
-                status: 'Order Placed',
-                orderDate: 'Aug 15, 2024',
-                estimatedDelivery: 'Aug 20, 2024',
-                shippingAddress: '123 E-Commerce Way, Suite 400, Shopping City, SC 12345',
-                subtotal: 149.98,
-                shipping: 10.00,
-                total: 159.98,
-                items: [
-                    { name: 'Wireless Bluetooth Headphones', price: 79.99, quantity: 1 },
-                    { name: 'Ergonomic Gaming Mouse', price: 69.99, quantity: 1 },
-                ]
-            },
-            'odr2': {
-                orderId: 'odr2',
-                status: 'Shipped',
-                orderDate: 'Aug 14, 2024',
-                estimatedDelivery: 'Aug 19, 2024',
-                shippingAddress: '456 Tech Park Ave, Innovation Hub, CA 90210',
-                subtotal: 49.99,
-                shipping: 5.00,
-                total: 54.99,
-                items: [
-                    { name: 'USB-C Fast Charger', price: 29.99, quantity: 1 },
-                    { name: 'Braided USB-C Cable', price: 20.00, quantity: 1 },
-                ]
-            },
-            'odr3': {
-                orderId: 'odr3',
-                status: 'In Transit',
-                orderDate: 'Aug 12, 2024',
-                estimatedDelivery: 'Aug 17, 2024',
-                shippingAddress: '789 Business Blvd, Business Town, TX 75001',
-                subtotal: 249.50,
-                shipping: 15.50,
-                total: 265.00,
-                items: [
-                    { name: '4K Smart LED TV (55 inch)', price: 200.00, quantity: 1 },
-                    { name: 'HDMI 2.1 Cable', price: 19.50, quantity: 2 },
-                    { name: 'Wall Mount Bracket', price: 10.50, quantity: 1 }
-                ]
-            },
-            'odr4': {
-                orderId: 'odr4',
-                status: 'Delivered',
-                orderDate: 'Aug 05, 2024',
-                estimatedDelivery: 'Aug 10, 2024',
-                shippingAddress: '987 Main Street, Apt 5B, New York, NY 10001',
-                subtotal: 9.99,
-                shipping: 0.00,
-                total: 9.99,
-                items: [
-                    { name: 'Phone Case (iPhone 14)', price: 9.99, quantity: 1 },
-                ]
-            }
-        };
+    const ordersData = {
+        'to-pay': [],
+        'to-ship': [],
+        'to-receive': [],
+        'to-review': [],
+        'returns': []
+    };
 
-        const orderIdInput = document.getElementById('order-id-input');
-        const searchOrderBtn = document.getElementById('search-order-btn');
-        const messageBox = document.getElementById('message-box');
-        const orderDetailsSection = document.getElementById('order-details-section');
+    const progressSteps = document.querySelectorAll('.progress-step');
+    const productListContainer = document.getElementById('product-list');
+    const progressBarFill = document.getElementById('progress-bar-fill');
+    const noProductsMessage = document.getElementById('no-products-message');
+    const cancelButton = document.getElementById('cancel-order-btn');
+    const modal = document.getElementById('cancellation-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const cancelModalBtn = document.getElementById('cancel-modal-btn');
+    const cancellationForm = document.getElementById('cancellation-form');
 
-        function renderOrderDetails(order) {
-            const orderNumberEl = document.getElementById('order-number');
-            const statusBadgeEl = document.getElementById('order-status-badge');
-            const orderDateEl = document.getElementById('order-date');
-            const estimatedDeliveryEl = document.getElementById('estimated-delivery');
-            const shippingAddressEl = document.getElementById('shipping-address');
-            const subtotalEl = document.getElementById('subtotal');
-            const shippingCostEl = document.getElementById('shipping-cost');
-            const totalCostEl = document.getElementById('total-cost');
-            const itemsTableBodyEl = document.getElementById('order-items-table-body');
-            const progressLineFillEl = document.getElementById('progress-line-fill');
-            
-            if (!order) {
-                showTemporaryMessage("Order not found. Please try a different ID.", 'bg-red-500');
-                orderDetailsSection.style.display = 'none';
-                return;
-            }
-
-            orderDetailsSection.style.display = 'grid';
-            orderNumberEl.textContent = order.orderId;
-
-            // Set status badge
-            statusBadgeEl.textContent = order.status;
-            statusBadgeEl.className = 'status-badge';
-            
-            switch(order.status) {
-                case 'Order Placed':
-                    statusBadgeEl.classList.add('status-placed');
-                    break;
-                case 'Shipped':
-                    statusBadgeEl.classList.add('status-shipped');
-                    break;
-                case 'In Transit':
-                    statusBadgeEl.classList.add('status-transit');
-                    break;
-                case 'Delivered':
-                    statusBadgeEl.classList.add('status-delivered');
-                    break;
-                default:
-                    statusBadgeEl.classList.add('status-cancelled');
-            }
-
-            // Update progress bar
-            const statusSteps = ['Order Placed', 'Shipped', 'In Transit', 'Delivered'];
-            const currentStatusIndex = statusSteps.indexOf(order.status);
-            const totalSteps = statusSteps.length;
-            const progressPercentage = (currentStatusIndex / (totalSteps - 1)) * 100;
-            progressLineFillEl.style.width = `${progressPercentage}%`;
-
-            // Update progress steps
-            statusSteps.forEach((status, index) => {
-                const stepEl = document.querySelector(`#step-${status.toLowerCase().replace(/ /g, '-')}`);
-                if (stepEl) {
-                    const iconDiv = stepEl.querySelector('.progress-step-icon');
-                    const textSpan = stepEl.querySelector('.progress-step-text');
-                    
-                    iconDiv.className = 'progress-step-icon bg-gray-400';
-                    textSpan.className = 'progress-step-text text-gray-500';
-
-                    if (index <= currentStatusIndex) {
-                        iconDiv.classList.remove('bg-gray-400');
-                        if (status === 'Delivered') {
-                            iconDiv.classList.add('bg-green-500');
-                            textSpan.classList.add('text-green-500', 'font-semibold');
-                        } else if (status === 'In Transit') {
-                            iconDiv.classList.add('bg-blue-500');
-                            textSpan.classList.add('text-blue-500', 'font-semibold');
-                        } else {
-                            iconDiv.classList.add('bg-blue-600');
-                            textSpan.classList.add('text-blue-600', 'font-semibold');
-                        }
-                    }
-                }
-            });
-
-            // Update order details
-            orderDateEl.textContent = order.orderDate;
-            estimatedDeliveryEl.textContent = order.estimatedDelivery;
-            shippingAddressEl.textContent = order.shippingAddress;
-            subtotalEl.textContent = `₱${order.subtotal.toFixed(2)}`;
-            shippingCostEl.textContent = `₱${order.shipping.toFixed(2)}`;
-            totalCostEl.textContent = `₱${order.total.toFixed(2)}`;
-
-            // Update order items table
-            itemsTableBodyEl.innerHTML = '';
-            order.items.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        ${item.name}
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱${item.price.toFixed(2)}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.quantity}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₱${(item.price * item.quantity).toFixed(2)}</td>
+    function renderProducts(status) {
+        productListContainer.innerHTML = '';
+        
+        const products = ordersData[status];
+        if (products && products.length > 0) {
+            noProductsMessage.classList.add('hidden');
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <img src="${product.img}" alt="${product.name}" class="product-image">
+                    <div class="product-details">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p style="color: #6b7280; font-size: 0.9rem;">${product.details}</p>
+                        <p class="product-price" style="font-weight: 600; margin-top: 8px;">${product.price}</p>
+                    </div>
                 `;
-                itemsTableBodyEl.appendChild(row);
+                productListContainer.appendChild(productCard);
             });
+        } else {
+            noProductsMessage.classList.remove('hidden');
         }
+    }
 
-        function showTemporaryMessage(message, colorClass) {
-            messageBox.textContent = message;
-            messageBox.className = `message-box fixed p-4 rounded-md shadow-lg font-semibold transition-all duration-300 ${colorClass} text-white opacity-100 z-50`;
-            
-            messageBox.style.animation = 'none';
-            void messageBox.offsetWidth; 
-            messageBox.style.animation = null; 
-        }
-
-        function handleSearch() {
-            const orderId = orderIdInput.value.trim().toLowerCase();
-            if (orderId) {
-                const orderData = sampleOrderDatabase[orderId];
-                renderOrderDetails(orderData);
-                if (orderData) {
-                    showTemporaryMessage(`Order ${orderData.orderId} found.`, 'bg-green-500');
-                }
-            } else {
-                showTemporaryMessage("Please enter an Order ID.", 'bg-red-500');
-                orderDetailsSection.style.display = 'none';
+    function updateActiveStatus(activeStep) {
+        progressSteps.forEach(step => {
+            step.classList.remove('active', 'completed');
+        });
+        let completedCount = 0;
+        let foundActive = false;
+        progressSteps.forEach(step => {
+            if (step === activeStep) {
+                step.classList.add('active');
+                foundActive = true;
+            } else if (!foundActive) {
+                step.classList.add('completed');
+                completedCount++;
             }
-        }
+        });
 
-        // Global function for demo buttons
-        window.trackOrder = function(orderId) {
-            orderIdInput.value = orderId;
-            handleSearch();
-        };
+        const progress = (completedCount / (progressSteps.length - 1)) * 100;
+        progressBarFill.style.width = `${progress}%`;
+    }
 
-        if (searchOrderBtn) {
-            searchOrderBtn.addEventListener('click', handleSearch);
-        }
-
-        if (orderIdInput) {
-            orderIdInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    handleSearch();
-                }
-            });
-        }
-
-        // Show default order on page load
-        renderOrderDetails(sampleOrderDatabase['odr3']);
+    progressSteps.forEach(step => {
+        step.addEventListener('click', () => {
+            const status = step.dataset.status;
+            updateActiveStatus(step);
+            renderProducts(status);
+        });
     });
+
+    cancelButton.addEventListener('click', () => {
+        modal.style.display = 'flex';
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    cancelModalBtn.addEventListener('click', () => {
+        modal.style.display = 'none';
+    });
+
+    cancellationForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        modal.style.display = 'none';
+        // Handle cancellation logic here
+    });
+
+    // Initialize
+    updateActiveStatus(progressSteps[0]);
+    renderProducts('to-pay');
 </script>
 @endsection

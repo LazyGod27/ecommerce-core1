@@ -19,26 +19,55 @@ class CartController extends Controller
     public function index()
     {
         $cart = session('cart', []);
+        
+        
         $subtotal = collect($cart)->sum('price');
         $shippingCost = $this->calculateShippingCost($subtotal);
         $tax = $this->calculateTax($subtotal);
         $total = $subtotal + $shippingCost + $tax;
         
-        return view('cart', compact('cart', 'subtotal', 'shippingCost', 'tax', 'total'));
+        // Get user profile information for auto-filling
+        $user = Auth::user();
+        $userPhone = $user ? $user->phone : '';
+        $userEmail = $user ? $user->email : '';
+        $userAddress = $user ? ($user->address_line1 . ', ' . $user->city . ', ' . $user->state . ' ' . $user->postal_code) : '';
+        
+        return view('cart', compact('cart', 'subtotal', 'shippingCost', 'tax', 'total', 'userPhone', 'userEmail', 'userAddress'));
     }
 
-    public function add(Request $request, Product $product)
+    public function add(Request $request, $productId)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->stock
+            'quantity' => 'required|integer|min:1'
         ]);
+
+        // Try to find the product in the database first
+        $product = Product::find($productId);
+        
+        // If product exists in database, use it for validation
+        if ($product) {
+            $request->validate([
+                'quantity' => 'required|integer|min:1|max:' . $product->stock
+            ]);
+            
+            $productName = $product->name;
+            $productPrice = $product->price;
+            $productImage = $product->image ?? 'default.jpg';
+            $productStock = $product->stock;
+        } else {
+            // For demo products that don't exist in database, get data from request
+            $productName = $request->input('product_name', 'Demo Product');
+            $productPrice = $request->input('product_price', 100);
+            $productImage = $request->input('product_image', 'default.jpg');
+            $productStock = 999; // Set high stock for demo products
+        }
 
         $cart = session('cart', []);
         
         // Check if product already exists in cart
         $existingItem = null;
         foreach ($cart as $rowId => $item) {
-            if ($item['id'] == $product->id) {
+            if ($item['id'] == $productId) {
                 $existingItem = $rowId;
                 break;
             }
@@ -47,26 +76,27 @@ class CartController extends Controller
         if ($existingItem) {
             // Update existing item quantity
             $newQuantity = $cart[$existingItem]['quantity'] + $request->quantity;
-            if ($newQuantity > $product->stock) {
+            if ($newQuantity > $productStock) {
                 return redirect()->back()->with('error', 'Quantity exceeds available stock!');
             }
             $cart[$existingItem]['quantity'] = $newQuantity;
-            $cart[$existingItem]['price'] = $product->price * $newQuantity;
+            $cart[$existingItem]['price'] = $productPrice * $newQuantity;
         } else {
             // Add new item
             $rowId = uniqid();
             $cart[$rowId] = [
                 'rowId' => $rowId,
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->price * $request->quantity,
+                'id' => $productId,
+                'name' => $productName,
+                'price' => $productPrice * $request->quantity,
                 'quantity' => $request->quantity,
-                'image' => $product->image ?? 'default.jpg',
-                'stock' => $product->stock
+                'image' => $productImage,
+                'stock' => $productStock
             ];
         }
         
         session(['cart' => $cart]);
+        
         
         return redirect()->route('cart')->with('success', 'Product added to cart!');
     }
@@ -78,7 +108,16 @@ class CartController extends Controller
         if (isset($cart[$rowId])) {
             unset($cart[$rowId]);
             session(['cart' => $cart]);
+            
+            if (request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Item removed from cart!']);
+            }
+            
             return redirect()->route('cart')->with('success', 'Item removed from cart!');
+        }
+        
+        if (request()->expectsJson()) {
+            return response()->json(['success' => false, 'message' => 'Item not found in cart!'], 404);
         }
         
         return redirect()->route('cart')->with('error', 'Item not found in cart!');
@@ -96,10 +135,16 @@ class CartController extends Controller
             $product = Product::find($cart[$rowId]['id']);
             
             if (!$product) {
+                if (request()->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Product not found!'], 404);
+                }
                 return redirect()->route('cart')->with('error', 'Product not found!');
             }
             
             if ($request->quantity > $product->stock) {
+                if (request()->expectsJson()) {
+                    return response()->json(['success' => false, 'message' => 'Quantity exceeds available stock!'], 400);
+                }
                 return redirect()->route('cart')->with('error', 'Quantity exceeds available stock!');
             }
             
@@ -107,7 +152,15 @@ class CartController extends Controller
             $cart[$rowId]['price'] = $product->price * $request->quantity;
             session(['cart' => $cart]);
             
+            if (request()->expectsJson()) {
+                return response()->json(['success' => true, 'message' => 'Cart updated!']);
+            }
+            
             return redirect()->route('cart')->with('success', 'Cart updated!');
+        }
+        
+        if (request()->expectsJson()) {
+            return response()->json(['success' => false, 'message' => 'Item not found in cart!'], 404);
         }
         
         return redirect()->route('cart')->with('error', 'Item not found in cart!');
@@ -117,6 +170,28 @@ class CartController extends Controller
     {
         session()->forget('cart');
         return redirect()->route('cart')->with('success', 'Cart cleared!');
+    }
+
+    public function checkout()
+    {
+        $cart = session('cart', []);
+        
+        if (empty($cart)) {
+            return redirect()->route('cart')->with('error', 'Your cart is empty!');
+        }
+        
+        $subtotal = collect($cart)->sum('price');
+        $shippingCost = $this->calculateShippingCost($subtotal);
+        $tax = $this->calculateTax($subtotal);
+        $total = $subtotal + $shippingCost + $tax;
+        
+        // Get user profile information for auto-filling
+        $user = Auth::user();
+        $userPhone = $user ? $user->phone : '';
+        $userEmail = $user ? $user->email : '';
+        $userAddress = $user ? ($user->address_line1 . ', ' . $user->city . ', ' . $user->state . ' ' . $user->postal_code) : '';
+        
+        return view('checkout', compact('cart', 'subtotal', 'shippingCost', 'tax', 'total', 'userPhone', 'userEmail', 'userAddress', 'user'));
     }
 
     public function processCheckout(Request $request)
@@ -137,9 +212,13 @@ class CartController extends Controller
         // Validate stock availability
         foreach ($cart as $item) {
             $product = Product::find($item['id']);
-            if (!$product || $product->stock < $item['quantity']) {
-                return redirect()->route('cart')->with('error', "Insufficient stock for {$product->name}!");
+            if ($product) {
+                // Real product from database - check stock
+                if ($product->stock < $item['quantity']) {
+                    return redirect()->route('cart')->with('error', "Insufficient stock for {$product->name}!");
+                }
             }
+            // Demo products (not in database) are assumed to have sufficient stock
         }
 
         try {
@@ -177,9 +256,11 @@ class CartController extends Controller
                     'total' => $item['price']
                 ]);
 
-                // Update product stock
+                // Update product stock (only for real products in database)
                 $product = Product::find($item['id']);
-                $product->decrement('stock', $item['quantity']);
+                if ($product) {
+                    $product->decrement('stock', $item['quantity']);
+                }
             }
 
             // Create tracking record
@@ -205,14 +286,10 @@ class CartController extends Controller
             // Clear cart
             session()->forget('cart');
 
-            // Redirect based on payment method
-            if ($request->payment_method === 'Cash on Delivery') {
-                return redirect()->route('order.confirmation', $order->id)
-                    ->with('success', 'Order placed successfully! You will receive a confirmation email shortly.');
-            } else {
-                return redirect()->route('payment.process', $order->id)
-                    ->with('success', 'Order created! Please complete your payment.');
-            }
+            // For now, always redirect to order confirmation
+            // In a real application, you would handle different payment methods differently
+            return redirect()->route('order.confirmation', $order->id)
+                ->with('success', 'Order placed successfully! You will receive a confirmation email shortly.');
 
         } catch (\Exception $e) {
             DB::rollBack();

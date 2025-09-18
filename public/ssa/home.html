@@ -1,0 +1,1182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+    <title>User</title>
+    <style>
+  .image-scan-fab {
+        position: fixed;
+        bottom: 20px;
+        left: 20px; 
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 999;
+        transition: transform 0.3s ease;
+    }
+    .image-scan-fab:hover {
+        transform: scale(1.1);
+    }
+     .voice-toggle-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px; 
+        width: 180px;
+        height: 50px;
+        border-radius: 50px;
+        background-color: #007bff;
+        color: #000000;
+        border: none;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        transition: transform 0.3s ease;
+    }
+    .voice-toggle-btn:hover {
+        transform: scale(1.05);
+    }
+    .voice-chat-container {
+        position: fixed;
+        bottom: -100%;
+        right: 20px; 
+        width: 350px;
+        height: 450px;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        display: flex;
+        flex-direction: column;
+        z-index: 1001;
+        transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    }
+    .voice-chat-container.open {
+        bottom: 90px;
+    }
+    .voice-chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: var(--primary-color);
+        color: #00008a;
+        border-top-left-radius: 12px;
+        border-top-right-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .voice-chat-close-btn {
+        background: none;
+        border: none;
+        color: #ffffff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        line-height: 1;
+    }
+    .voice-chat-body {
+        flex-grow: 1;
+        padding: 20px;
+        overflow-y: auto;
+        background-color: #4f549c;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .voice-message {
+        padding: 10px 15px;
+        border-radius: 15px;
+        max-width: 80%;
+        word-wrap: break-word;
+    }
+    .voice-bot-message {
+        background-color: #e0e0e0;
+        align-self: flex-start;
+    }
+    .voice-user-message {
+        background-color: var(--primary-color);
+        color: #fff;
+        align-self: flex-end;
+    }
+    .voice-chat-input-area {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 15px;
+        border-top: 1px solid #000000;
+    }
+    #voice-mic-btn {
+        background-color: rgb(125, 125, 241);
+        color: #000000;
+        border: none;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease;
+    }
+    #voice-mic-btn.listening {
+        background-color: #dc3545;
+        animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+    }
+    </style>
+</head>
+<body>
+
+<div class="login-modal" id="loginModal">
+    <div class="login-content">
+        <span class="close-btn" id="closeLogin">&times;</span>
+        <h2>Login</h2>
+        <form>
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter username" required>
+            <label for="password">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="password" placeholder="Enter password" required>
+                <i class="ri-eye-line" id="togglePassword"></i>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+        </form>
+        <p class="signup-text">
+            Don't have an account yet? 
+            <a href="#" id="openSignup">Sign up here</a>
+        </p>
+    </div>
+</div>
+
+<div class="signup-modal" id="signupModal">
+    <div class="signup-content">
+        <span class="close-btn" id="closeSignup">&times;</span>
+        <h2>Sign Up</h2>
+        <form>
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="Enter email" required>
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" placeholder="Enter phone number" required>
+            <label for="newPassword">Password</label>
+            <div class="password-wrapper">
+                <input type="password" id="newPassword" placeholder="Enter password" required>
+                <i class="ri-eye-line toggleSignupPassword"></i>
+            </div>
+            <button type="submit" class="login-btn">Create Account</button>
+        </form>
+        <div class="divider">
+            <span>OR</span>
+        </div>
+        <div class="social-login">
+            <button type="button" class="google-btn">
+                <img src="google.png" alt="Google Logo">
+                Sign up with Google
+            </button>
+            <button type="button" class="facebook-btn">
+                <i class="ri-facebook-fill"></i> Sign up with Facebook
+            </button>
+        </div>
+        <p class="signup-text">
+            Already have an account? 
+            <a href="#" id="openLoginFromSignup">Login here</a>
+        </p>
+    </div>
+</div>
+
+<header>
+    <div class="logo">
+        <img src="logo.png" alt="IMARKET PH Logo">
+    </div>
+    <ul class="navbar" id="navbar">
+        <li><a href="index.html" class="active"><i class="ri-home-line"></i> Home</a></li>
+        <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
+        <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
+        <li class="dropdown">
+            <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
+            <ul class="dropdown-menu">
+                <li><a href="#"><i class="ri-fire-line"></i> Best Selling</a></li>
+                <li><a href="#"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+                <li><a href="electronics.html"><i class="ri-computer-line"></i> Electronics</a></li>
+                <li><a href="#"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+                <li><a href="#"><i class="ri-home-4-line"></i> Home & Living</a></li>
+                <li><a href="#"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+                <li><a href="#"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+                <li><a href="#"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+                <li><a href="#"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+            </ul>
+        </li>
+    </ul>
+    <div class="search-bar">
+        <input type="text" placeholder="Search for products, brands and more..." />
+        <button class="search-btn"><i class="ri-search-line"></i></button>
+    </div>
+    <div class="icons">
+        <a href="cart.html"><i class="ri-shopping-cart-line"></i></a>
+        <a href="user.html"><i class="ri-user-line"></i></a>
+        <div class="bx bx-menu" id="menu-icon"></div>
+    </div>
+</header>
+<div class="overlay" id="overlay"></div>
+
+<section class="hero">
+    <div class="hero-slides">
+        <img class="slide active" src="https://i.pinimg.com/736x/a2/4a/b5/a24ab53b4bf89b079978fad2e813e6d8.jpg" alt="Slide 1">
+        <img class="slide" src="https://i.pinimg.com/1200x/95/62/40/9562401b17aa8803c45564fa87a7523a.jpg" alt="Slide 2">
+        <img class="slide" src="https://i.pinimg.com/1200x/3f/29/e2/3f29e2a0f203313db21fa45734f73b29.jpg" alt="Slide 3">
+        <img class="slide" src="https://i.pinimg.com/736x/fd/a6/8c/fda68c5189f7cd37f044e201a77acc1e.jpg" alt="Slide 4">
+        <img class="slide" src="https://i.pinimg.com/736x/5c/b4/98/5cb49830b398136f9c2aa341f847958d.jpg" alt="Slide 5">
+    </div>
+    <div class="hero-content">
+        <h1>HOME LIVING</h1>
+    </div>
+    <div class="hero-dots">
+        <span class="dot active" data-index="0"></span>
+        <span class="dot" data-index="1"></span>
+        <span class="dot" data-index="2"></span>
+        <span class="dot" data-index="3"></span>
+        <span class="dot" data-index="4"></span>
+    </div>
+</section>
+
+<section class="feature">
+    <div class="feature-content">
+        <div class="product-card" 
+            data-name="Modern Ceramic Vase" 
+            data-sizes="small,medium" 
+            data-colors="white,gray" 
+            data-price="₱850" 
+            data-orig-price="₱1,060" 
+            data-img-white="https://m.media-amazon.com/images/I/718Btp+-iCL._AC_.jpg" 
+            data-img-gray="https://infinitebasics.com/cdn/shop/files/main_71e69d6a-e0b0-4af1-b272-c75b8353b0b2.jpg?v=1730917133">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/718Btp+-iCL._AC_.jpg" alt="Modern Ceramic Vase">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Modern Ceramic Vase</h6>
+                <h3>₱850 <del>₱1,060</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Soft Chenille Throw Blanket" 
+            data-sizes="N/A" 
+            data-colors="navy,ivory" 
+            data-price="₱1,200" 
+            data-orig-price="₱1,500"
+            data-img-navy="https://resource.astrogaming.com/d_transparent.gif/content/dam/astro/en/products/a30/pdp-gallery-a30-white-01.png"
+            data-img-ivory="https://m.media-amazon.com/images/I/71p5fisYQCL._AC_SL1500_.jpg">
+            <div class="product-img">
+                <img src="https://resource.astrogaming.com/d_transparent.gif/content/dam/astro/en/products/a30/pdp-gallery-a30-white-01.png" alt="Soft Chenille Throw Blanket">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Soft Chenille Throw Blanket</h6>
+                <h3>₱1,200 <del>₱1,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Scented Soy Candle" 
+            data-sizes="100g,250g" 
+            data-colors="N/A" 
+            data-price="₱500" 
+            data-orig-price="₱850"
+            data-img-default="https://images-na.ssl-images-amazon.com/images/I/61wk1z9PrZL.jpg">
+            <div class="product-img">
+                <img src="https://images-na.ssl-images-amazon.com/images/I/61wk1z9PrZL.jpg" alt="Scented Soy Candle">
+                <span class="discount">-41%</span>
+            </div>
+            <div class="product-info">
+                <h6>Scented Soy Candle</h6>
+                <h3>₱500 <del>₱850</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 650 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Decorative Wall Mirror" 
+            data-sizes="N/A" 
+            data-colors="gold,silver" 
+            data-price="₱2,800" 
+            data-orig-price="₱3,500"
+            data-img-gold="https://m.media-amazon.com/images/I/61Q79ulDs6L._AC_SL1500_.jpg"
+            data-img-silver="https://i.pinimg.com/736x/87/1b/30/871b30f5d475c4d3d2a02b66236b9e15.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/61Q79ulDs6L._AC_SL1500_.jpg" alt="Decorative Wall Mirror">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Decorative Wall Mirror</h6>
+                <h3>₱2,800 <del>₱3,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 300 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Set of 3 Photo Frames" 
+            data-sizes="4x6,5x7,8x10" 
+            data-colors="black,white" 
+            data-price="₱650" 
+            data-orig-price="₱800"
+            data-img-black="https://i5.walmartimages.com/asr/e21a1dff-559d-4ef0-a06a-764c1b7cd4ed_1.b0b46d7905d569fb68cbfa8862099d69.jpeg"
+            data-img-white="https://m.media-amazon.com/images/I/61Nl42G+BPL._AC_SL1500_.jpg">
+            <div class="product-img">
+                <img src="https://i5.walmartimages.com/asr/e21a1dff-559d-4ef0-a06a-764c1b7cd4ed_1.b0b46d7905d569fb68cbfa8862099d69.jpeg" alt="Photo Frames">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Set of 3 Photo Frames</h6>
+                <h3>₱650 <del>₱800</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 900 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Faux Potted Plant" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱1,200" 
+            data-orig-price="₱1,600"
+            data-img-default="https://i5.walmartimages.com/asr/d493dbcf-87a9-49d6-a3d9-ce24b976e839.decbcde8849150199b8f1e0d47787236.jpeg">
+            <div class="product-img">
+                <img src="https://i5.walmartimages.com/asr/d493dbcf-87a9-49d6-a3d9-ce24b976e839.decbcde8849150199b8f1e0d47787236.jpeg" alt="Faux Potted Plant">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Faux Potted Plant</h6>
+                <h3>₱1,200 <del>₱1,600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="LED Floor Lamp" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱3,450" 
+            data-orig-price="₱4,600"
+            data-img-default="https://img.freepik.com/premium-photo/smart-speaker-with-voice-assistant_506134-10019.jpg">
+            <div class="product-img">
+                <img src="https://img.freepik.com/premium-photo/smart-speaker-with-voice-assistant_506134-10019.jpg" alt="LED Floor Lamp">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>LED Floor Lamp</h6>
+                <h3>₱3,450 <del>₱4,600</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 450 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Woven Storage Basket" 
+            data-sizes="small,large" 
+            data-colors="N/A" 
+            data-price="₱580" 
+            data-orig-price="₱890"
+            data-img-default="https://www.royalcomputersolution.com/wp-content/uploads/2019/06/lenovo-extrnal-2tb-hard-drive-3-1024x984.jpg">
+            <div class="product-img">
+                <img src="https://www.royalcomputersolution.com/wp-content/uploads/2019/06/lenovo-extrnal-2tb-hard-drive-3-1024x984.jpg" alt="Woven Storage Basket">
+                <span class="discount">-35%</span>
+            </div>
+            <div class="product-info">
+                <h6>Woven Storage Basket</h6>
+                <h3>₱580 <del>₱890</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 700 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Modern Coffee Table" 
+            data-sizes="N/A" 
+            data-colors="oak,walnut" 
+            data-price="₱4,500" 
+            data-orig-price="₱5,200"
+            data-img-oak="https://www.electrical-deals.co.uk/media/catalog/product/cache/1/image/1800x/040ec09b1e35df139433887a97daa66f/5/5/55U6863DB-left.jpg"
+            data-img-walnut="https://i5.walmartimages.com/asr/b30bd280-e303-4d72-802e-1098752e3741_1.f164d3532b3ba852a89e92972f4d4754.jpeg">
+            <div class="product-img">
+                <img src="https://www.electrical-deals.co.uk/media/catalog/product/cache/1/image/1800x/040ec09b1e35df139433887a97daa66f/5/5/55U6863DB-left.jpg" alt="Modern Coffee Table">
+                <span class="discount">-13%</span>
+            </div>
+            <div class="product-info">
+                <h6>Modern Coffee Table</h6>
+                <h3>₱4,500 <del>₱5,200</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 250 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Cozy Velvet Cushion Cover" 
+            data-sizes="18x18,20x20" 
+            data-colors="blue,pink" 
+            data-price="₱280" 
+            data-orig-price="₱350"
+            data-img-blue="https://i.pinimg.com/736x/21/57/42/2157423c10a173e6d22d207c42b5826f.jpg"
+            data-img-pink="https://microless.com/cdn/products/6a05af6ac59c50a51c41219ac3dbc57c-hi.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/21/57/42/2157423c10a173e6d22d207c42b5826f.jpg" alt="Cozy Velvet Cushion Cover">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Cozy Velvet Cushion Cover</h6>
+                <h3>₱280 <del>₱350</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 950 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Blackout Curtain Panel" 
+            data-sizes="small,large" 
+            data-colors="gray,black" 
+            data-price="₱750" 
+            data-orig-price="₱1,000"
+            data-img-gray="https://i5.walmartimages.com/seo/Bluetooth-Speaker-HD-Sound-Portable-Wireless-IPX5-Water-proof-Up-24H-Playtime-TWS-Pairing-BT5-3-Home-Party-Outdoor-Beach-Electronic-Gadgets-Birthday-G_6b79ed12-e892-459c-a917-b00eb54c8c20.c08273c52c6820892dfc55dfdcd9ca0e.jpeg"
+            data-img-black="https://down-my.img.susercontent.com/file/my-11134207-7r98q-lq4ig9w0mehhc5">
+            <div class="product-img">
+                <img src="https://i5.walmartimages.com/seo/Bluetooth-Speaker-HD-Sound-Portable-Wireless-IPX5-Water-proof-Up-24H-Playtime-TWS-Pairing-BT5-3-Home-Party-Outdoor-Beach-Electronic-Gadgets-Birthday-G_6b79ed12-e892-459c-a917-b00eb54c8c20.c08273c52c6820892dfc55dfdcd9ca0e.jpeg" alt="Blackout Curtain Panel">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Blackout Curtain Panel</h6>
+                <h3>₱750 <del>₱1,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Wall Art Canvas Print" 
+            data-sizes="30x40,40x60" 
+            data-colors="N/A" 
+            data-price="₱1,800" 
+            data-orig-price="₱2,000"
+            data-img-default="https://m.media-amazon.com/images/I/61MScwtXX2L._AC_SL1500_.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/61MScwtXX2L._AC_SL1500_.jpg" alt="Wall Art Canvas Print">
+                <span class="discount">-10%</span>
+            </div>
+            <div class="product-info">
+                <h6>Wall Art Canvas Print</h6>
+                <h3>₱1,800 <del>₱2,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Decorative Table Lamp" 
+            data-sizes="N/A" 
+            data-colors="gold,silver" 
+            data-price="₱1,300" 
+            data-orig-price="₱1,800"
+            data-img-gold="https://down-id.img.susercontent.com/file/sg-11134201-7qvg2-lhyo2uv9l8ia6a"
+            data-img-silver="https://m.media-amazon.com/images/I/61L-mHU13oL._AC_SL1500_.jpg">
+            <div class="product-img">
+                <img src="https://down-id.img.susercontent.com/file/sg-11134201-7qvg2-lhyo2uv9l8ia6a" alt="Decorative Table Lamp">
+                <span class="discount">-28%</span>
+            </div>
+            <div class="product-info">
+                <h6>Decorative Table Lamp</h6>
+                <h3>₱1,300 <del>₱1,800</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Plush Area Rug" 
+            data-sizes="small,medium,large" 
+            data-colors="cream,charcoal" 
+            data-price="₱3,200" 
+            data-orig-price="₱4,000"
+            data-img-cream="https://i.pinimg.com/736x/87/1b/30/871b30f5d475c4d3d2a02b66236b9e15.jpg"
+            data-img-charcoal="https://www.electrical-deals.co.uk/media/catalog/product/cache/1/image/1800x/040ec09b1e35df139433887a97daa66f/5/5/55U6863DB-left.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/87/1b/30/871b30f5d475c4d3d2a02b66236b9e15.jpg" alt="Plush Area Rug">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Plush Area Rug</h6>
+                <h3>₱3,200 <del>₱4,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Wall Clock with Wooden Frame" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱950" 
+            data-orig-price="₱1,150"
+            data-img-default="https://m.media-amazon.com/images/I/61Q79ulDs6L._AC_SL1500_.jpg">
+            <div class="product-img">
+                <img src="https://m.media-amazon.com/images/I/61Q79ulDs6L._AC_SL1500_.jpg" alt="Wall Clock">
+                <span class="discount">-17%</span>
+            </div>
+            <div class="product-info">
+                <h6>Wall Clock with Wooden Frame</h6>
+                <h3>₱950 <del>₱1,150</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Handmade Ceramic Mug Set" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱600" 
+            data-orig-price="₱700"
+            data-img-default="https://images-na.ssl-images-amazon.com/images/I/61wk1z9PrZL.jpg">
+            <div class="product-img">
+                <img src="https://images-na.ssl-images-amazon.com/images/I/61wk1z9PrZL.jpg" alt="Ceramic Mug Set">
+                <span class="discount">-14%</span>
+            </div>
+            <div class="product-info">
+                <h6>Handmade Ceramic Mug Set</h6>
+                <h3>₱600 <del>₱700</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 5,000 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Assorted Herbal Tea" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱250" 
+            data-orig-price="₱280"
+            data-img-gray="https://tse2.mm.bing.net/th/id/OIP.nzLpsWGEeNacPkD0qKICNAHaHa?pid=Api&P=0&h=180">
+            <div class="product-img">
+                <img src="https://tse2.mm.bing.net/th/id/OIP.nzLpsWGEeNacPkD0qKICNAHaHa?pid=Api&P=0&h=180" alt="Assorted Herbal Tea">
+                <span class="discount">-11%</span>
+            </div>
+            <div class="product-info">
+                <h6>Assorted Herbal Tea</h6>
+                <h3>₱250 <del>₱280</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,000 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Vegan Protein Powder" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱1,850" 
+            data-orig-price="₱2,400"
+            data-img-black="https://i.pinimg.com/736x/21/57/42/2157423c10a173e6d22d207c42b5826f.jpg">
+            <div class="product-img">
+                <img src="https://pisces.bbystatic.com/image2/BestBuy_US/images/products/6554/6554460_sd.jpg" alt="Vegan Protein Powder">
+                <span class="discount">-23%</span>
+            </div>
+            <div class="product-info">
+                <h6>Vegan Protein Powder (1kg)</h6>
+                <h3>₱1,850 <del>₱2,400</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Fitness Tracker" 
+            data-sizes="N/A" 
+            data-colors="black,blue" 
+            data-price="₱950" 
+            data-orig-price="₱1,150"
+            data-img-black="https://wearablefitnesstracker.com/wp-content/uploads/2020/06/image-ip67-waterproof-fitness-tracker.jpg"
+            data-img-blue="https://i.pinimg.com/736x/ac/4e/b3/ac4eb34e08c8a2bc96bf924e7d8171a1.jpg">
+            <div class="product-img">
+                <img src="https://wearablefitnesstracker.com/wp-content/uploads/2020/06/image-ip67-waterproof-fitness-tracker.jpg" alt="Fitness Tracker">
+                <span class="discount">-17%</span>
+            </div>
+            <div class="product-info">
+                <h6>Waterproof Fitness Tracker</h6>
+                <h3>₱950 <del>₱1,150</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,100 sold</p>
+            </div>
+        </div>
+        <div class="product-card" 
+            data-name="Yoga Mat with Carrying Strap" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱680" 
+            data-orig-price="₱1,015"
+            data-img-black="https://i.pinimg.com/originals/a7/de/b2/a7deb21266edd446b827dc8bbee2fe1b.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/originals/a7/de/b2/a7deb21266edd446b827dc8bbee2fe1b.jpg" alt="Yoga Mat">
+                <span class="discount">-33%</span>
+            </div>
+            <div class="product-info">
+                <h6>Yoga Mat with Carrying Strap</h6>
+                <h3>₱680 <del>₱1,015</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 950 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Smart Digital Scale" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱1,250" 
+            data-orig-price="₱1,400"
+            data-img-black="https://i.pinimg.com/originals/ec/4c/76/ec4c76766d6af90f2d9ae2227b8765c0.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/originals/ec/4c/76/ec4c76766d6af90f2d9ae2227b8765c0.jpg" alt="Smart Digital Scale">
+                <span class="discount">-11%</span>
+            </div>
+            <div class="product-info">
+                <h6>Smart Digital Scale</h6>
+                <h3>₱1,250 <del>₱1,400</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,800 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Rechargeable Massage Gun" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱2,500" 
+            data-orig-price="₱3,100"
+            data-img-black="https://i.pinimg.com/736x/fb/82/09/fb82098577b983da19e6e79434d53dad.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/74/ab/c0/74abc0f1e83f4db4a416d634537bc216.jpg" alt="Massage Gun">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Rechargeable Massage Gun</h6>
+                <h3>₱2,500 <del>₱3,100</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Collagen Supplement Capsules" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱750" 
+            data-orig-price="₱1,000"
+            data-img-black="https://i.pinimg.com/1200x/fb/f6/c2/fbf6c257cb034c81221b686656dae881.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/fb/f6/c2/fbf6c257cb034c81221b686656dae881.jpg" alt="Collagen Supplement">
+                <span class="discount">-25%</span>
+            </div>
+            <div class="product-info">
+                <h6>Collagen Supplement Capsules</h6>
+                <h3>₱750 <del>₱1,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,900 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Resistance Bands Set" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱480" 
+            data-orig-price="₱590"
+            data-img-black="https://i.pinimg.com/736x/cb/5f/66/cb5f662a291bbc94dbee403d719c65fc.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/cb/5f/66/cb5f662a291bbc94dbee403d719c65fc.jpg" alt="Resistance Bands">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Resistance Bands Set (5pcs)</h6>
+                <h3>₱480 <del>₱590</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 5,100 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Digital Blood Pressure Monitor" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱1,850" 
+            data-orig-price="₱2,100"
+            data-img-black="https://i.pinimg.com/736x/2e/7c/23/2e7c23cda59ea503c4084480ed13955a.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/ae/07/ea/ae07ea52b77c0dac3f29a902332ee2d6.jpg" alt="Blood Pressure Monitor">
+                <span class="discount">-12%</span>
+            </div>
+            <div class="product-info">
+                <h6>Digital Blood Pressure Monitor</h6>
+                <h3>₱1,850 <del>₱2,100</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Essential Oil Diffuser" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱850" 
+            data-orig-price="₱1,000"
+            data-img-black="https://i.pinimg.com/736x/22/9d/91/229d91f13e2307aeea7ef85fd1541583.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/22/9d/91/229d91f13e2307aeea7ef85fd1541583.jpg" alt="Essential Oil Diffuser">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>Essential Oil Diffuser</h6>
+                <h3>₱850 <del>₱1,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Foam Roller for Muscle Relief" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱550" 
+            data-orig-price="₱700"
+            data-img-white="https://i.pinimg.com/736x/ac/4e/b3/ac4eb34e08c8a2bc96bf924e7d8171a1.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/c3/33/95/c33395c568361dbab6833da2310c5fb8.jpg" alt="Foam Roller">
+                <span class="discount">-21%</span>
+            </div>
+            <div class="product-info">
+                <h6>Foam Roller for Muscle Relief</h6>
+                <h3>₱550 <del>₱700</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 8,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Natural Fiber Body Brush" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱350" 
+            data-orig-price="₱430"
+            data-img-black="https://i.pinimg.com/736x/db/8c/b4/db8cb47a2000d7d1e4a1109ef8902e20.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/2c/97/20/2c97207741572fa4a6e3d145350d233d.jpg" alt="Body Brush">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Natural Fiber Body Brush</h6>
+                <h3>₱350 <del>₱430</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,200 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Electric Toothbrush" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱1,199" 
+            data-orig-price="₱1,500"
+            data-img-white="https://i.pinimg.com/1200x/79/64/c1/7964c139ec9abd1b16511354668b4156.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/79/64/c1/7964c139ec9abd1b16511354668b4156.jpg" alt="Electric Toothbrush">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Electric Toothbrush</h6>
+                <h3>₱1,199 <del>₱1,500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,900 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Reusable Water Bottle" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱420" 
+            data-orig-price="₱500"
+            data-img-black="https://i.pinimg.com/736x/c2/2e/76/c22e7686de1e904e95ac5693368eb2af.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/36/15/d5/3615d5df09a0149ae9fdd1a3e2e75504.jpg" alt="Water Bottle">
+                <span class="discount">-16%</span>
+            </div>
+            <div class="product-info">
+                <h6>Reusable Water Bottle</h6>
+                <h3>₱420 <del>₱500</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Aromatherapy Essential Oil Set" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱850" 
+            data-orig-price="₱1,050"
+            data-img-black="https://i.pinimg.com/736x/0a/50/22/0a50225c9bd71881c6402ea3e555a7f7.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/0a/50/22/0a50225c9bd71881c6402ea3e555a7f7.jpg" alt="Essential Oil Set">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Aromatherapy Essential Oil Set</h6>
+                <h3>₱850 <del>₱1,050</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,600 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Adjustable Dumbbell Set" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱2,450" 
+            data-orig-price="₱3,000"
+            data-img-black="https://i.pinimg.com/736x/1f/d8/81/1fd88124b22b9fe5fad41f12ab80a359.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/1f/d8/81/1fd88124b22b9fe5fad41f12ab80a359.jpg" alt="Dumbbell Set">
+                <span class="discount">-18%</span>
+            </div>
+            <div class="product-info">
+                <h6>Adjustable Dumbbell Set</h6>
+                <h3>₱2,450 <del>₱3,000</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,900 sold</p>
+            </div>
+        </div>
+        
+        <div class="product-card" 
+            data-name="Acupressure Mat and Pillow Set" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱750" 
+            data-orig-price="₱900"
+            data-img-white="https://i.pinimg.com/1200x/08/ec/27/08ec2781f5213e8e71b7b3a4a3de15fd.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/08/ec/27/08ec2781f5213e8e71b7b3a4a3de15fd.jpg" alt="Acupressure Mat">
+                <span class="discount">-17%</span>
+            </div>
+            <div class="product-info">
+                <h6>Acupressure Mat and Pillow Set</h6>
+                <h3>₱750 <del>₱900</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 4,000 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="High-Density Resistance Loop Bands" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱220" 
+            data-orig-price="₱260"
+            data-img-black="https://i.pinimg.com/736x/45/30/5e/45305eef7e2621ea52c20ae28e2744af.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/736x/45/30/5e/45305eef7e2621ea52c20ae28e2744af.jpg" alt="Resistance Loop Bands">
+                <span class="discount">-15%</span>
+            </div>
+            <div class="product-info">
+                <h6>High-Density Resistance Loop Bands</h6>
+                <h3>₱220 <del>₱260</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 1,100 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Silicone Face Cleansing Brush" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱680" 
+            data-orig-price="₱850"
+            data-img-black="https://i.pinimg.com/1200x/38/31/af/3831afbf58e6f0738977faa036b2fed9.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/c7/a2/0c/c7a20ca896b243b04b5fbbbd636e293d.jpg" alt="Face Cleansing Brush">
+                <span class="discount">-20%</span>
+            </div>
+            <div class="product-info">
+                <h6>Silicone Face Cleansing Brush</h6>
+                <h3>₱680 <del>₱850</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,800 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Electric Muscle Stimulator" 
+            data-sizes="N/A"
+            data-colors="N/A" 
+            data-price="₱2,500" 
+            data-orig-price="₱3,100"
+            data-img-black="https://i.pinimg.com/1200x/99/bd/30/99bd30cb237349b730e3d89b72272a39.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/99/bd/30/99bd30cb237349b730e3d89b72272a39.jpg" alt="Electric Muscle Stimulator">
+                <span class="discount">-19%</span>
+            </div>
+            <div class="product-info">
+                <h6>Electric Muscle Stimulator</h6>
+                <h3>₱2,500 <del>₱3,100</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 2,500 sold</p>
+            </div>
+        </div>
+
+        <div class="product-card" 
+            data-name="Collapsible Water Bottle" 
+            data-sizes="N/A" 
+            data-colors="N/A" 
+            data-price="₱350" 
+            data-orig-price="₱450"
+            data-img-black="https://img.lazcdn.com/g/p/l1m2n3o4p5q6r7s8t9u0v1w2x3y4z5a6.jpg_720x720q80.jpg">
+            <div class="product-img">
+                <img src="https://i.pinimg.com/1200x/71/68/15/71681507338d022a00c68b91fcb5cef3.jpg" alt="Collapsible Water Bottle">
+                <span class="discount">-22%</span>
+            </div>
+            <div class="product-info">
+                <h6>Collapsible Water Bottle</h6>
+                <h3>₱350 <del>₱450</del></h3>
+                <p class="buyers"><i class="fas fa-user-check"></i> 3,800 sold</p>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<div class="product-modal" id="productModal">
+    <div class="modal-content">
+        <span class="close-modal" id="closeModal">&times;</span>
+        <img src="" alt="" class="modal-img" id="modalImg">
+        <div class="modal-details">
+            <h2 id="modalName">Product Name</h2>
+            <p class="modal-price"><span id="modalPrice">₱1,234</span> <del id="modalOrigPrice">₱5,678</del></p>
+            
+            <div class="modal-option-group" id="sizesGroup">
+                <h4>Sizes:</h4>
+                <div class="option-list" id="modalSizes">
+                    </div>
+            </div>
+            
+            <div class="modal-option-group" id="colorsGroup">
+                <h4>Colors:</h4>
+                <div class="option-list" id="modalColors">
+                    </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="add-to-cart-btn" id="addToCartBtn"><i class="fas fa-shopping-cart"></i> Add to Cart</button>
+                <button class="checkout-btn" id="checkoutBtn"><i class="fas fa-credit-card"></i> Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="voice-chat-container" id="voice-chat-container">
+    <div class="voice-chat-header">
+        <span class="voice-chat-title">Voice Command AI</span>
+        <button class="voice-chat-close-btn" id="voice-close-chat-btn">&times;</button>
+    </div>
+    <div class="voice-chat-body" id="voice-chat-body">
+        <div class="voice-message voice-bot-message">Hello! Tap the microphone to start talking.</div>
+    </div>
+    <div class="voice-chat-input-area">
+        <button id="voice-mic-btn"><i class="ri-mic-fill"></i></button>
+    </div>
+</div>
+
+<button class="voice-toggle-btn" id="voice-toggle-btn">
+    Voice Command AI
+</button>
+  <footer class="footer">
+      <div class="footer-container">
+          <div class="footer-section">
+              <h5>Customer Care</h5>
+              <ul>
+                  <li><a href="customer.html">Customer Serice</a></li>
+                  <li><a href="#">How to Buy</a></li>
+                  <li><a href="#">Shipping & Delivery</a></li>
+                  <li><a href="#">Return & Refund</a></li>
+                  <li><a href="#">Contact Us</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h5>About ImarketPH</h5>
+              <ul>
+                  <li><a href="#">About Us</a></li>
+                  <li><a href="#">Careers</a></li>
+                  <li><a href="#">Terms & Conditions</a></li>
+                  <li><a href="#">Privacy Policy</a></li>
+              </ul>
+          </div>
+          <div class="footer-section">
+              <h5>Payment Methods</h5>
+              <div class="footer-logos">
+                  <img src="visa.png" alt="Visa">
+                  <img src="mastercard.png" alt="Mastercard">
+                  <img src="gcash.png" alt="GCash">
+                  <img src="maya.png" alt="Paymaya">
+              </div>
+          </div>
+          <div class="footer-section">
+              <h5>Delivery Services</h5>
+              <div class="footer-logos">
+                  <img src="jnt.png" alt="J&T Express">
+                  <img src="ninjavan.jpg" alt="Ninja Van">
+                  <img src="lbc.png" alt="LBC Express">
+                  <img src="flash.png" alt="Flash Express">
+              </div>
+          </div>
+          <div class="footer-section">
+              <h5>Follow Us</h5>
+              <div class="footer-socials">
+                  <a href="#"><img src="facebook.png" alt="Facebook"></a>
+                  <a href="#"><img src="instagram.jpg" alt="Instagram"></a>
+                  <a href="#"><img src="twitter.png" alt="Twitter"></a>
+                  <a href="#"><img src="youtube.png" alt="YouTube"></a>
+              </div>
+          </div>
+      </div>
+      <div class="footer-bottom">
+          <p>© 2025 All Rights Reserved by ImarketPH</p>
+      </div>
+  </footer> 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const productCards = document.querySelectorAll('.product-card');
+        const productModal = document.getElementById('productModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const modalImg = document.getElementById('modalImg');
+        const modalName = document.getElementById('modalName');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalOrigPrice = document.getElementById('modalOrigPrice');
+        const modalSizes = document.getElementById('modalSizes');
+        const modalColors = document.getElementById('modalColors');
+        const addToCartBtn = document.getElementById('addToCartBtn');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+
+        let selectedSize = '';
+        let selectedColor = '';
+        let currentProductData = {};
+
+        const openModal = (productData) => {
+            currentProductData = productData;
+            
+            modalImg.src = productData.imgSrc;
+            modalImg.alt = productData.name;
+             modalName.textContent = productData.name;
+            modalPrice.textContent = `₱${productData.price.toLocaleString()}`;
+            modalOrigPrice.textContent = `₱${productData.origPrice.toLocaleString()}`;
+            
+            modalSizes.innerHTML = '';
+            modalColors.innerHTML = '';
+
+            productData.sizes.split(',').forEach(size => {
+                const sizeOption = document.createElement('span');
+                sizeOption.classList.add('option');
+                sizeOption.textContent = size.trim();
+                modalSizes.appendChild(sizeOption);
+            });
+
+            productData.colors.split(',').forEach(color => {
+                const colorOption = document.createElement('span');
+                colorOption.classList.add('option');
+                colorOption.textContent = color.trim();
+                colorOption.setAttribute('data-color', color.trim().toLowerCase().replace(/ /g, ''));
+                modalColors.appendChild(colorOption);
+            });
+
+            productModal.style.display = 'flex';
+            
+            selectedSize = '';
+            selectedColor = '';
+        };
+
+        const closeModal = () => {
+            productModal.style.display = 'none';
+        };
+
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                const productData = {
+                    name: card.getAttribute('data-name'),
+                    sizes: card.getAttribute('data-sizes'),
+                    colors: card.getAttribute('data-colors'),
+                    price: parseFloat(card.getAttribute('data-price')),
+                    origPrice: parseFloat(card.getAttribute('data-orig-price')),
+                    imgSrc: card.querySelector('.product-img img').src,
+                    colorImages: {}
+                };
+
+                const dataAttributes = card.attributes;
+                for (let i = 0; i < dataAttributes.length; i++) {
+                    const attr = dataAttributes[i];
+                    if (attr.name.startsWith('data-img-')) {
+                        const colorName = attr.name.replace('data-img-', '');
+                        productData.colorImages[colorName] = attr.value;
+                    }
+                }
+                
+                openModal(productData);
+            });
+        });
+
+        closeModalBtn.addEventListener('click', closeModal);
+
+        window.addEventListener('click', (event) => {
+            if (event.target === productModal) {
+                closeModal();
+            }
+        });
+
+        const handleOptionSelection = (containerId, optionType) => {
+            const container = document.getElementById(containerId);
+            container.addEventListener('click', (e) => {
+                if (e.target.classList.contains('option')) {
+                    container.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    e.target.classList.add('selected');
+
+                    if (optionType === 'size') {
+                        selectedSize = e.target.textContent;
+                    } else if (optionType === 'color') {
+                        selectedColor = e.target.textContent;
+                        colorChangeHandler(e.target.getAttribute('data-color'));
+                    }
+                }
+            });
+        };
+
+        handleOptionSelection('modalSizes', 'size');
+        handleOptionSelection('modalColors', 'color');
+        
+        const colorChangeHandler = (color) => {
+            const newImageSrc = currentProductData.colorImages[color];
+            if (newImageSrc) {
+                modalImg.src = newImageSrc;
+            } else {
+                console.warn(`Image not found for color: ${color}`);
+            }
+        };
+        
+        addToCartBtn.addEventListener('click', () => {
+            const productName = modalName.textContent;
+            if (selectedSize && selectedColor) {
+                alert(`Added ${productName} (Size: ${selectedSize}, Color: ${selectedColor}) to cart!`);
+                closeModal();
+            } else {
+                alert('Please select a size and color.');
+            }
+        });
+
+        checkoutBtn.addEventListener('click', () => {
+            const productName = modalName.textContent;
+            if (selectedSize && selectedColor) {
+                alert(`Proceeding to checkout for ${productName} (Size: ${selectedSize}, Color: ${selectedColor}).`);
+                closeModal();
+            } else {
+                alert('Please select a size and color before checking out.');
+            }
+        });
+    });
+</script>
+  <script src="https://unpkg.com/scrollreveal"></script>
+  <script src="script.js"></script>
+</body>
+</html>
