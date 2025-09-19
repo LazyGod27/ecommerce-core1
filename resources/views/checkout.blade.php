@@ -19,6 +19,85 @@
         gap: 30px;
     }
     
+    .checkout-progress {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+    }
+    
+    .progress-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        flex: 1;
+        position: relative;
+    }
+    
+    .progress-step::after {
+        content: '';
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        width: 100%;
+        height: 2px;
+        background: #e5e7eb;
+        z-index: 1;
+    }
+    
+    .progress-step:last-child::after {
+        display: none;
+    }
+    
+    .progress-step.active::after {
+        background: var(--main-color);
+    }
+    
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e5e7eb;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        position: relative;
+        z-index: 2;
+        transition: all 0.3s ease;
+    }
+    
+    .progress-step.active .step-circle {
+        background: var(--main-color);
+        color: white;
+    }
+    
+    .progress-step.completed .step-circle {
+        background: #10b981;
+        color: white;
+    }
+    
+    .step-label {
+        margin-top: 8px;
+        font-size: 0.875rem;
+        color: #6b7280;
+        text-align: center;
+    }
+    
+    .progress-step.active .step-label {
+        color: var(--main-color);
+        font-weight: 600;
+    }
+    
     .checkout-main {
         background: white;
         border-radius: 12px;
@@ -155,7 +234,7 @@
     .checkout-button {
         width: 100%;
         padding: 15px;
-        background: var(--main-color);
+        background: #6b7280;
         color: white;
         border: none;
         border-radius: 8px;
@@ -163,11 +242,13 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
     
     .checkout-button:hover:not(:disabled) {
-        background: #1e40af;
+        background: var(--main-color);
         transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
     }
     
     .checkout-button:disabled {
@@ -304,6 +385,28 @@
 
 @section('content')
 <div class="checkout-container">
+    <!-- Checkout Progress Indicator -->
+    <div class="checkout-progress">
+        <div class="progress-steps">
+            <div class="progress-step active">
+                <div class="step-circle">1</div>
+                <div class="step-label">Shipping Info</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-circle">2</div>
+                <div class="step-label">Payment</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-circle">3</div>
+                <div class="step-label">Review</div>
+            </div>
+            <div class="progress-step">
+                <div class="step-circle">4</div>
+                <div class="step-label">Complete</div>
+            </div>
+        </div>
+    </div>
+    
     <div class="checkout-content">
         <div class="checkout-main">
             <h1 class="section-title">Checkout</h1>
@@ -320,17 +423,28 @@
                 </div>
             @endif
 
-            @if(session('cart') && count(session('cart')) > 0)
+            @if($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+                    <ul>
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if(isset($selectedCart) && count($selectedCart) > 0)
                 <form method="POST" action="{{ route('checkout.process') }}" id="checkout-form">
                     @csrf
                     <input type="hidden" name="payment_method" id="payment_method">
+                    <input type="hidden" name="selected_items" id="selected_items" value="{{ json_encode(array_keys($selectedCart)) }}">
                     
                     <!-- Cart Items -->
                     <div class="cart-items">
-                        <h2 class="section-title">Your Cart</h2>
-                        @foreach(session('cart') as $item)
+                        <h2 class="section-title">Selected Items for Checkout</h2>
+                        @foreach($selectedCart as $item)
                             <div class="cart-item">
-                                <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset('storage/' . $item['image']) }}" 
+                                <img src="{{ str_starts_with($item['image'], 'http') ? $item['image'] : asset($item['image']) }}" 
                                      alt="{{ $item['name'] }}">
                                 <div class="cart-item-details">
                                     <div class="cart-item-name">{{ $item['name'] }}</div>
@@ -352,6 +466,20 @@
 
                     <!-- Shipping Information -->
                     <h2 class="section-title">Shipping Information</h2>
+                    @auth
+                    <div class="form-group">
+                        <label for="address_select">Select Saved Address</label>
+                        <select id="address_select" class="w-full" onchange="onSelectSavedAddress(this.value)">
+                            <option value="">-- Choose an address --</option>
+                            @foreach(auth()->user()->addresses as $addr)
+                                <option value='@json($addr)'>{{ $addr->label ?? 'Address' }} — {{ $addr->address_line1 }}, {{ $addr->city }}</option>
+                            @endforeach
+                        </select>
+                        <div style="margin-top:8px">
+                            <button type="button" class="voucher-button" onclick="autoLocate()"><i class="ri-map-pin-line"></i> Use Current Location</button>
+                        </div>
+                    </div>
+                    @endauth
                     <div class="form-row">
                         <div class="form-group">
                             <label for="shipping_name">Full Name *</label>
@@ -366,6 +494,8 @@
                     <div class="form-group">
                         <label for="shipping_address">Shipping Address *</label>
                         <textarea id="shipping_address" name="shipping_address" rows="3" required>{{ $user->address_line1 ?? '' }}</textarea>
+                        <input type="hidden" id="shipping_lat" name="shipping_lat">
+                        <input type="hidden" id="shipping_lng" name="shipping_lng">
                     </div>
                     
                     <div class="form-row">
@@ -440,7 +570,7 @@
                 </div>
             </div>
 
-            @if(session('cart') && count(session('cart')) > 0)
+            @if(isset($selectedCart) && count($selectedCart) > 0)
                 @auth
                     <button type="submit" form="checkout-form" class="checkout-button" id="place-order-btn" disabled>
                         Place Order
@@ -509,6 +639,8 @@
                 selectedMethod = method.dataset.method;
                 paymentMethodInput.value = selectedMethod;
                 placeOrderBtn.disabled = false;
+                console.log('Payment method selected:', selectedMethod);
+                console.log('Place order button enabled');
             });
         });
 
@@ -569,5 +701,62 @@
         // Initialize
         updateOrderSummary();
     });
+
+    // Add form submission debugging
+    document.getElementById('checkout-form').addEventListener('submit', function(e) {
+        console.log('Form submission started');
+        console.log('Payment method:', document.getElementById('payment_method').value);
+        console.log('Selected items:', document.getElementById('selected_items').value);
+        
+        // Check if payment method is selected
+        if (!document.getElementById('payment_method').value) {
+            e.preventDefault();
+            alert('Please select a payment method before placing your order.');
+            return false;
+        }
+        
+        console.log('Form submission proceeding...');
+    });
+
+    async function autoLocate() {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(async (pos) => {
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+            document.getElementById('shipping_lat').value = lat;
+            document.getElementById('shipping_lng').value = lng;
+            try {
+                // Simple reverse geocoding via Nominatim (public API)
+                const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                const data = await res.json();
+                const addr = data.display_name || '';
+                if (addr) {
+                    document.getElementById('shipping_address').value = addr;
+                }
+            } catch (e) {
+                console.warn('Reverse geocoding failed', e);
+            }
+        }, (err) => {
+            alert('Unable to retrieve your location.');
+            console.warn(err);
+        }, { enableHighAccuracy: true, timeout: 10000 });
+    }
+
+    function onSelectSavedAddress(json) {
+        if (!json) return;
+        try {
+            const a = JSON.parse(json);
+            document.getElementById('shipping_name').value = '{{ $user->name ?? '' }}';
+            document.getElementById('shipping_phone').value = '{{ $user->phone ?? '' }}';
+            document.getElementById('shipping_address').value = [a.address_line1, a.address_line2].filter(Boolean).join(', ');
+            document.getElementById('shipping_city').value = a.city || '';
+            document.getElementById('shipping_postal').value = a.postal_code || '';
+            document.getElementById('shipping_lat').value = a.latitude || '';
+            document.getElementById('shipping_lng').value = a.longitude || '';
+        } catch (e) { console.warn('Invalid address JSON', e); }
+    }
 </script>
 @endsection

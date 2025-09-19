@@ -6,87 +6,112 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'iMarket')</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" crossorigin="anonymous" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/frontend.css') }}">
+    <style>
+        /* Scoped layout polish */
+        body { background: #f7f8fc; color: #353c61; }
+        header { position: sticky; top: 0; z-index: 50; background: #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,.06); padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .logo img { height: 34px; width: auto; display: block; }
+        .navbar { list-style: none; padding: 0; margin: 0; display: flex; align-items: center; gap: 14px; flex: 1 1 auto; }
+        .navbar > li { position: relative; }
+        .navbar a { color: #1f2937; text-decoration: none; font-weight: 500; padding: 6px 10px; border-radius: 8px; display: inline-flex; align-items: center; gap: 6px; }
+        .navbar a.active, .navbar a:hover { background: #f2f5fb; color: #111827; }
+        .navbar .dropdown:hover .dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+        .navbar .dropdown-menu { position: absolute; top: 100%; left: 0; min-width: 220px; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.08); padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(6px); transition: all .18s ease; z-index: 40; }
+        .navbar .dropdown-menu a { display: flex; padding: 8px 12px; color: #374151; }
+        .navbar .dropdown-menu a:hover { background: #f9fafb; color: #111827; }
+        .search-bar { flex: 1 1 420px; max-width: 640px; margin: 0 12px; display: flex; align-items: center; gap: 8px; }
+        .search-bar input { flex: 1; height: 38px; border: 1px solid #e5e7eb; border-radius: 10px; padding: 0 12px; outline: none; }
+        .search-bar .search-btn, .search-bar button[type="submit"] { height: 38px; padding: 0 12px; background: #4bc5ec; color: #0b2857; border: none; border-radius: 10px; cursor: pointer; }
+        .icons { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+        .icons a { color: #1f2937; text-decoration: none; font-size: 20px; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; }
+        .icons a:hover { background: #f2f5fb; }
+        .user-dropdown { position: relative; }
+        .user-dropdown-menu { position: absolute; right: 0; top: 100%; background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,.08); min-width: 220px; padding: 8px 0; opacity: 0; visibility: hidden; transform: translateY(6px); transition: all .18s ease; z-index: 40; }
+        .user-dropdown:hover .user-dropdown-menu { opacity: 1; visibility: visible; transform: translateY(0); }
+        .user-dropdown-menu a { display: flex; align-items: center; gap: 8px; padding: 8px 12px; color: #374151; text-decoration: none; }
+        .user-dropdown-menu a:hover { background: #f9fafb; color: #111827; }
+        .page-container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 16px; }
+        .footer { background: #0b4d70; color: #e5f3fb; margin-top: 24px; }
+        .footer .footer-content { max-width: 1200px; margin: 0 auto; padding: 24px 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; }
+        .footer .footer-bottom { text-align: center; padding: 12px; background: rgba(0,0,0,.08); }
+        @media (max-width: 640px) {
+            .page-container { padding: 12px; }
+            .search-bar { flex: 1 1 100%; order: 3; }
+        }
+    </style>
     @yield('styles')
 </head>
-<body class="bg-[#e6e6fa] text-[#353c61] min-w-[320px] min-h-screen flex flex-col">
-    <header class="header flex items-center justify-between p-4 bg-[#353c61] text-white text-sm sticky top-0 z-20 flex-wrap">
-        <div class="flex items-center gap-4">
-            <a href="{{ route('home') }}" class="logo p-2 rounded-md hover:border-white border border-transparent">
-                <span class="font-bold text-lg">iMarket</span>
-            </a>
-            <div class="hidden sm:flex items-end gap-1 p-2 rounded-md cursor-pointer hover:border-white border border-transparent">
-                <i class="fas fa-map-marker-alt text-xl"></i>
-                <a href="{{ route('tracking') }}" class="flex flex-col leading-none">
-                    <span class="text-xs">Track Your Order(s)</span>
-                </a>
-            </div>
+<body class="min-w-[320px] min-h-screen flex flex-col">
+    <header>
+        <div class="logo">
+            <img src="{{ asset('ssa/logo.png') }}" alt="IMARKET PH Logo">
         </div>
-        
-        <div class="search-bar flex flex-grow h-10 rounded-md overflow-hidden mx-2 sm:mx-4 mt-2 sm:mt-0 order-3 sm:order-none focus-within:ring-2 focus-within:ring-[#4bc5ec]">
-            <div class="search-dropdown bg-[#bdccdc] text-[#353c61] px-2 flex items-center gap-1 border-r border-gray-300 cursor-pointer text-xs">
-                <span>All</span>
-                <i class="fas fa-caret-down text-gray-500"></i>
-            </div>
-            <form action="{{ route('products.search') }}" method="GET" class="flex flex-grow">
-                <input type="text" name="q" placeholder="Search iMarket" class="w-full px-3 text-base outline-none border-none" value="{{ request('q') }}">
-                <button type="submit" class="search-button bg-[#4bc5ec] text-[#2c3c8c] px-4 cursor-pointer text-lg hover:bg-[#2c3c8c] hover:text-white transition-colors duration-200">
-                    <i class="fas fa-search"></i>
-                </button>
+        <ul class="navbar" id="navbar">
+            <li><a href="{{ route('home') }}" class="{{ request()->is('/') ? 'active' : '' }}"><i class="ri-home-line"></i> Home</a></li>
+            <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
+            <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
+            <li class="dropdown">
+                <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
+                <ul class="dropdown-menu">
+                    <li><a href="{{ route('products') }}"><i class="ri-fire-line"></i> Best Selling</a></li>
+                    <li><a href="{{ route('products') }}"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'electronics']) }}"><i class="ri-computer-line"></i> Electronics</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'fashion']) }}"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'home']) }}"><i class="ri-home-4-line"></i> Home & Living</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'beauty']) }}"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'sports']) }}"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'toys']) }}"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+                    <li><a href="{{ route('products.category', ['category' => 'groceries']) }}"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="search-bar">
+            <form action="{{ route('search') }}" method="GET" class="flex flex-grow relative" id="searchForm">
+                <input type="text" 
+                       name="q" 
+                       id="searchInput"
+                       placeholder="Search for products, brands and more..." 
+                       class="w-full px-3 text-base outline-none border-none" 
+                       value="{{ request('q') }}" 
+                       autocomplete="off" />
+                <button type="submit" class="search-btn"><i class="ri-search-line"></i></button>
+                <div id="searchSuggestions" class="search-suggestions hidden" style="display: none;"></div>
             </form>
         </div>
-
-        <div class="header-right flex items-center gap-2 sm:gap-4 mt-2 sm:mt-0">
-            <div class="language-selector hidden sm:flex items-end gap-1 p-2 rounded-md cursor-pointer hover:border-white border border-transparent">
-                <i class="fas fa-globe text-lg"></i>
-                <span class="font-bold">EN</span>
-                <i class="fas fa-caret-down text-sm"></i>
-            </div>
-            <div class="account-lists p-2 rounded-md cursor-pointer hover:border-white border border-transparent whitespace-nowrap">
-                @auth
-                    <a href="{{ route('account') }}">
-                        <span class="text-xs">Welcome</span>
-                        <br>
-                        <span class="font-bold">{{ auth()->user()->name }} <i class="fas fa-caret-down text-sm"></i></span>
+        <div class="icons">
+            <a href="{{ route('cart') }}"><i class="ri-shopping-cart-line"></i></a>
+            @auth
+                <div class="user-dropdown">
+                    <a href="#" class="user-link">
+                        <i class="ri-user-line"></i>
+                        <span class="user-name">{{ auth()->user()->name }}</span>
+                        <i class="ri-arrow-down-s-line"></i>
                     </a>
-                @else
-                    <a href="{{ route('login') }}">
-                        <span class="text-xs">Sign in</span>
-                        <br>
-                        <span class="font-bold">Account <i class="fas fa-caret-down text-sm"></i></span>
-                    </a>
-                @endauth
-            </div>
-            <div class="returns-orders hidden sm:block p-2 rounded-md cursor-pointer hover:border-white border border-transparent whitespace-nowrap">
-                <a href="#">
-                    <span class="text-xs">Returns</span>
-                    <br>
-                    <span class="font-bold">& Orders</span>
-                </a>
-            </div>
-            <div class="cart flex items-end gap-1 font-bold p-2 rounded-md cursor-pointer hover:border-white border border-transparent">
-                <a href="{{ route('cart') }}" class="flex items-center gap-1">
-                    <i class="fas fa-shopping-cart text-2xl"></i>
-                    <span class="text-xs sm:text-base">Cart</span>
-                    @if(session('cart') && count(session('cart')) > 0)
-                        <span class="bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">{{ count(session('cart')) }}</span>
-                    @endif
-                </a>
-            </div>
+                    <div class="user-dropdown-menu">
+                        <a href="{{ route('profile.index') }}"><i class="ri-user-line"></i> My Profile</a>
+                        <a href="{{ route('profile.orders') }}"><i class="ri-shopping-bag-line"></i> My Orders</a>
+                        <a href="{{ route('tracking') }}"><i class="ri-truck-line"></i> Track Orders</a>
+                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form-layout').submit();"><i class="ri-logout-box-line"></i> Logout</a>
+                    </div>
+                </div>
+                <form id="logout-form-layout" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            @else
+                <a href="{{ route('login') }}"><i class="ri-user-line"></i></a>
+            @endauth
+            <div class="bx bx-menu" id="menu-icon"></div>
         </div>
     </header>
     
-    <nav class="sub-nav bg-[#2c3c8c] text-white p-2 sm:px-4 text-sm flex items-center z-10">
-        <ul class="flex flex-wrap gap-x-4 sm:gap-x-6 list-none m-0 p-0">
-            <li><a href="#" class="nav-item text-white p-1 rounded-md border border-transparent hover:border-white transition-all duration-100 ease-in-out">Feedback</a></li>
-            <li><a href="{{ route('customer-service') }}" class="nav-item text-white p-1 rounded-md border border-transparent hover:border-white transition-all duration-100 ease-in-out">Customer Service</a></li>
-            <li><a href="#" class="nav-item text-white p-1 rounded-md border border-transparent hover:border-white transition-all duration-100 ease-in-out">Sell</a></li>
-        </ul>
-    </nav>
-    
-    <main class="main-content max-w-7xl mx-auto p-5 flex flex-col gap-5 flex-grow">
-        @yield('content')
+    <main class="flex-grow">
+        <div class="page-container">
+            @yield('content')
+        </div>
     </main>
 
     <footer class="footer">

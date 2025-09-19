@@ -171,8 +171,27 @@ class CartController extends Controller
         session()->forget('cart');
         return redirect()->route('cart')->with('success', 'Cart cleared!');
     }
+    
+    public function saveForLater($rowId)
+    {
+        $cart = session('cart', []);
+        
+        if (isset($cart[$rowId])) {
+            $item = $cart[$rowId];
+            
+            // Remove from cart
+            unset($cart[$rowId]);
+            session(['cart' => $cart]);
+            
+            // In a real application, you would save to a wishlist table
+            // For now, we'll just show a success message
+            return redirect()->route('cart')->with('success', 'Item saved for later!');
+        }
+        
+        return redirect()->route('cart')->with('error', 'Item not found in cart.');
+    }
 
-    public function checkout()
+    public function checkout(Request $request)
     {
         $cart = session('cart', []);
         
@@ -180,7 +199,26 @@ class CartController extends Controller
             return redirect()->route('cart')->with('error', 'Your cart is empty!');
         }
         
-        $subtotal = collect($cart)->sum('price');
+        // Get selected items from request or session storage
+        $selectedItems = $request->get('selected_items', []);
+        
+        // If no selected items provided, use all cart items (fallback)
+        if (empty($selectedItems)) {
+            $selectedItems = array_keys($cart);
+        }
+        
+        // Filter cart to only include selected items
+        $selectedCart = array_filter($cart, function($key) use ($selectedItems) {
+            return in_array($key, $selectedItems);
+        }, ARRAY_FILTER_USE_KEY);
+        
+        if (empty($selectedCart)) {
+            return redirect()->route('cart')->with('error', 'No items selected for checkout!');
+        }
+        
+        $subtotal = collect($selectedCart)->sum(function($item) {
+            return $item['price'] * $item['quantity'];
+        });
         $shippingCost = $this->calculateShippingCost($subtotal);
         $tax = $this->calculateTax($subtotal);
         $total = $subtotal + $shippingCost + $tax;
@@ -191,17 +229,33 @@ class CartController extends Controller
         $userEmail = $user ? $user->email : '';
         $userAddress = $user ? ($user->address_line1 . ', ' . $user->city . ', ' . $user->state . ' ' . $user->postal_code) : '';
         
-        return view('checkout', compact('cart', 'subtotal', 'shippingCost', 'tax', 'total', 'userPhone', 'userEmail', 'userAddress', 'user'));
+        return view('checkout', compact('selectedCart', 'subtotal', 'shippingCost', 'tax', 'total', 'userPhone', 'userEmail', 'userAddress', 'user'));
     }
 
     public function processCheckout(Request $request)
     {
-        $request->validate([
-            'payment_method' => 'required|string|in:GCash,PayMaya,Card,Cash on Delivery',
-            'shipping_address' => 'required|string|max:500',
-            'contact_number' => 'required|string|max:20',
-            'email' => 'required|email'
+        Log::info('Checkout process started', [
+            'user_id' => Auth::id(),
+            'request_data' => $request->all()
         ]);
+
+        try {
+            $request->validate([
+                'payment_method' => 'required|string|in:GCash,PayMaya,Card,Cash on Delivery,COD',
+                'shipping_address' => 'required|string|max:500',
+                'shipping_phone' => 'required|string|max:20',
+                'shipping_name' => 'required|string|max:255',
+                'shipping_city' => 'required|string|max:100',
+                'shipping_postal' => 'required|string|max:20'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Validation failed', [
+                'user_id' => Auth::id(),
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            return redirect()->route('checkout')->withErrors($e->errors())->withInput();
+        }
 
         $cart = session('cart', []);
         
@@ -209,13 +263,47 @@ class CartController extends Controller
             return redirect()->route('cart')->with('error', 'Your cart is empty!');
         }
 
-        // Validate stock availability
-        foreach ($cart as $item) {
-            $product = Product::find($item['id']);
-            if ($product) {
-                // Real product from database - check stock
-                if ($product->stock < $item['quantity']) {
-                    return redirect()->route('cart')->with('error', "Insufficient stock for {$product->name}!");
+        // Get selected items from the checkout form
+        $selectedItems = $request->get('selected_items', []);
+        
+        Log::info('Selected items from request', [
+            'raw_selected_items' => $selectedItems,
+            'type' => gettype($selectedItems)
+        ]);
+        
+        // If selected_items is a JSON string, decode it
+        if (is_string($selectedItems)) {
+            $selectedItems = json_decode($selectedItems, true) ?? [];
+        }
+        
+        Log::info('Selected items after processing', [
+            'selected_items' => $selectedItems,
+            'cart_keys' => array_keys($cart)
+        ]);
+        
+        // If no selected items provided, use all cart items (fallback)
+        if (empty($selectedItems)) {
+            $selectedItems = array_keys($cart);
+        }
+        
+        // Filter cart to only include selected items
+        $selectedCart = array_filter($cart, function($key) use ($selectedItems) {
+            return in_array($key, $selectedItems);
+        }, ARRAY_FILTER_USE_KEY);
+
+        if (empty($selectedCart)) {
+            return redirect()->route('cart')->with('error', 'No items selected for checkout!');
+        }
+
+        // Validate stock availability for selected items only
+        foreach ($selectedCart as $item) {
+            if (isset($item['id'])) {
+                $product = Product::find($item['id']);
+                if ($product) {
+                    // Real product from database - check stock
+                    if ($product->stock < $item['quantity']) {
+                        return redirect()->route('cart')->with('error', "Insufficient stock for {$product->name}!");
+                    }
                 }
             }
             // Demo products (not in database) are assumed to have sufficient stock
@@ -224,7 +312,10 @@ class CartController extends Controller
         try {
             DB::beginTransaction();
 
-            $subtotal = collect($cart)->sum('price');
+            // In session, item['price'] already stores the line total (unit_price * quantity)
+            $subtotal = collect($selectedCart)->sum(function($item) {
+                return $item['price'];
+            });
             $shippingCost = $this->calculateShippingCost($subtotal);
             $tax = $this->calculateTax($subtotal);
             $total = $subtotal + $shippingCost + $tax;
@@ -247,31 +338,38 @@ class CartController extends Controller
             ]);
 
             // Create order items
-            foreach ($cart as $item) {
+            foreach ($selectedCart as $key => $item) {
+                $product = isset($item['id']) ? Product::find($item['id']) : null;
+
+                if (!$product) {
+                    // Skip items that don't map to a real product record
+                    Log::warning('Skipping cart item without valid product during checkout', [
+                        'cart_key' => $key,
+                        'item' => $item,
+                    ]);
+                    continue;
+                }
+
                 OrderItem::create([
                     'order_id' => $order->id,
-                    'product_id' => $item['id'],
+                    'product_id' => $product->id,
                     'quantity' => $item['quantity'],
-                    'price' => $item['price'] / $item['quantity'], // Unit price
-                    'total' => $item['price']
+                    // Store unit price in the order_items.price column
+                    'price' => $item['quantity'] > 0 ? ($item['price'] / $item['quantity']) : 0,
                 ]);
 
-                // Update product stock (only for real products in database)
-                $product = Product::find($item['id']);
-                if ($product) {
-                    $product->decrement('stock', $item['quantity']);
-                }
+                // Update product stock
+                $product->decrement('stock', $item['quantity']);
             }
 
-            // Create tracking record
+            // Create tracking record (schema uses 'history' JSON column)
             Tracking::create([
                 'order_id' => $order->id,
                 'tracking_number' => 'TRK-' . strtoupper(Str::random(10)),
                 'carrier' => 'Standard Shipping',
                 'status' => 'pending',
                 'estimated_delivery' => now()->addDays(3),
-                'current_location' => 'Processing Center',
-                'tracking_details' => [
+                'history' => [
                     [
                         'status' => 'Order Placed',
                         'location' => 'Processing Center',
@@ -283,8 +381,19 @@ class CartController extends Controller
 
             DB::commit();
 
-            // Clear cart
-            session()->forget('cart');
+            // Remove only selected items from cart
+            $remainingCart = array_diff_key($cart, $selectedCart);
+            if (empty($remainingCart)) {
+                session()->forget('cart');
+            } else {
+                session(['cart' => $remainingCart]);
+            }
+
+            Log::info('Order created successfully', [
+                'order_id' => $order->id,
+                'order_number' => $order->order_number,
+                'total' => $order->total
+            ]);
 
             // For now, always redirect to order confirmation
             // In a real application, you would handle different payment methods differently
@@ -293,8 +402,12 @@ class CartController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Checkout error: ' . $e->getMessage());
-            return redirect()->route('cart')->with('error', 'An error occurred while processing your order. Please try again.');
+            Log::error('Checkout error: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return redirect()->route('checkout')->with('error', 'An error occurred while processing your order: ' . $e->getMessage());
         }
     }
 
@@ -318,5 +431,55 @@ class CartController extends Controller
         $count = collect($cart)->sum('quantity');
         
         return response()->json(['count' => $count]);
+    }
+    
+    public function orderConfirmation($orderId)
+    {
+        $order = Order::with(['items.product', 'tracking'])->findOrFail($orderId);
+        
+        // Check if the order belongs to the authenticated user
+        if (Auth::id() !== $order->user_id) {
+            abort(403, 'Unauthorized access to order details.');
+        }
+        
+        return view('order-confirmation', compact('order'));
+    }
+    
+    public function getSimilarProducts($orderId)
+    {
+        $order = Order::with('items.product')->findOrFail($orderId);
+        
+        // Get categories from ordered products
+        $categories = $order->items->pluck('product.category')->filter()->unique();
+        
+        // Get similar products based on categories
+        $similarProducts = Product::whereIn('category', $categories)
+            ->where('id', '!=', $order->items->pluck('product_id')->filter())
+            ->inRandomOrder()
+            ->limit(4)
+            ->get();
+        
+        // If not enough products from same categories, get random popular products
+        if ($similarProducts->count() < 4) {
+            $additionalProducts = Product::whereNotIn('id', $similarProducts->pluck('id'))
+                ->inRandomOrder()
+                ->limit(4 - $similarProducts->count())
+                ->get();
+            
+            $similarProducts = $similarProducts->merge($additionalProducts);
+        }
+        
+        return response()->json([
+            'products' => $similarProducts->map(function($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => $product->price,
+                    'image' => $product->image,
+                    'rating' => rand(4, 5), // Mock rating
+                    'reviews_count' => rand(10, 50), // Mock reviews count
+                ];
+            })
+        ]);
     }
 }

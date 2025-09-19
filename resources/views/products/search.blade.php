@@ -7,13 +7,37 @@
     <div class="mb-8">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">Search Results</h1>
         <p class="text-gray-600">Showing results for: "<span class="font-semibold">{{ $query }}</span>"</p>
+        
+        @if(isset($categorySuggestions) && count($categorySuggestions) > 0)
+        <div class="mt-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">You might also be interested in:</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach($categorySuggestions as $category)
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-4 border border-blue-200">
+                    <div class="flex items-center mb-2">
+                        <i class="{{ $category['icon'] }} text-2xl text-blue-600 mr-3"></i>
+                        <h4 class="text-lg font-semibold text-gray-800">{{ $category['title'] }}</h4>
+                    </div>
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($category['suggestions'] as $suggestion)
+                        <a href="{{ route('search', ['q' => $suggestion]) }}" 
+                           class="bg-white text-blue-600 px-3 py-1 rounded-full text-sm hover:bg-blue-100 transition-colors duration-200">
+                            {{ $suggestion }}
+                        </a>
+                        @endforeach
+                    </div>
+                </div>
+                @endforeach
+            </div>
+        </div>
+        @endif
     </div>
 
     @if($products->count() > 0)
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($products as $product)
             <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <img src="{{ asset('storage/' . ($product->image ?? 'default.jpg')) }}" 
+                <img src="{{ asset($product->image ?? 'ssa/default.jpg') }}" 
                      alt="{{ $product->name }}" 
                      class="w-full h-48 object-cover">
                 <div class="p-4">

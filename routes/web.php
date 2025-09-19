@@ -9,6 +9,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TrackingController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', function () {
     return view('ssa.index');
@@ -16,6 +17,10 @@ Route::get('/', function () {
 Route::get('/products', function () {
     return view('products');
 })->name('products');
+// Search routes
+Route::get('/search', [SearchController::class, 'search'])->name('search');
+Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
+Route::get('/search/trending', [SearchController::class, 'trending'])->name('search.trending');
 Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/category/{category}', [ProductController::class, 'category'])->name('products.category');
 Route::get('/voice-search', function () {
@@ -39,14 +44,20 @@ Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
+Route::post('/cart/save-for-later/{rowId}', [CartController::class, 'saveForLater'])->name('cart.save-for-later');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
 
 // Authentication routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::get('/login', function () {
+    // Redirect so relative asset paths (e.g., style.css, images) resolve under /ssa
+    return redirect('/ssa/login.html');
+})->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::get('/register', function () {
+    return redirect('/ssa/register.html');
+})->name('register');
 Route::post('/register', [AuthController::class, 'register']);
 
 // Social Login Routes
@@ -59,6 +70,8 @@ Route::get('/auth/facebook/callback', [AuthController::class, 'handleFacebookCal
 Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 Route::middleware('auth')->group(function () {
     Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
+    Route::get('/order-confirmation/{order}', [CartController::class, 'orderConfirmation'])->name('order.confirmation');
+    Route::get('/api/similar-products/{order}', [CartController::class, 'getSimilarProducts'])->name('api.similar-products');
 });
 
 // Profile routes (protected by auth middleware)

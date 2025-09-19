@@ -23,7 +23,7 @@ class ProductSeeder extends Seeder
                 'price' => 1299.99,
                 'original_price' => 1499.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/4bc5ec/ffffff?text=Gaming+Laptop',
+                'image' => 'ssa/rtx.jpg',
                 'stock' => 25,
                 'average_rating' => 4.8,
                 'review_count' => 12
@@ -33,7 +33,7 @@ class ProductSeeder extends Seeder
                 'description' => 'High-precision gaming mouse with 25K DPI sensor, programmable buttons, RGB lighting, and ultra-fast response time.',
                 'price' => 69.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/94dcf4/353c61?text=Gaming+Mouse',
+                'image' => 'ssa/mouse.jpg',
                 'stock' => 60,
                 'average_rating' => 4.7,
                 'review_count' => 41
@@ -43,7 +43,7 @@ class ProductSeeder extends Seeder
                 'description' => 'RGB mechanical keyboard with Cherry MX switches, customizable lighting, and durable construction for gaming.',
                 'price' => 129.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/5c6c9c/ffffff?text=Mechanical+Keyboard',
+                'image' => 'ssa/keyboard.jpg',
                 'stock' => 45,
                 'average_rating' => 4.6,
                 'review_count' => 38
@@ -53,7 +53,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Premium gaming headset with 7.1 surround sound, noise cancellation, and comfortable memory foam ear cushions.',
                 'price' => 89.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/bdccdc/353c61?text=Gaming+Headset',
+                'image' => 'ssa/headset.jpg',
                 'stock' => 50,
                 'average_rating' => 4.5,
                 'review_count' => 28
@@ -63,7 +63,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Ergonomic gaming chair with lumbar support, adjustable height, and premium materials for long gaming sessions.',
                 'price' => 299.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/4bc5ec/ffffff?text=Gaming+Chair',
+                'image' => 'ssa/controller.jpg',
                 'stock' => 20,
                 'average_rating' => 4.7,
                 'review_count' => 15
@@ -73,7 +73,7 @@ class ProductSeeder extends Seeder
                 'description' => '27" 4K gaming monitor with 144Hz refresh rate, 1ms response time, and HDR support for immersive gaming.',
                 'price' => 399.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/94dcf4/353c61?text=Gaming+Monitor',
+                'image' => 'ssa/pc.webp',
                 'stock' => 30,
                 'average_rating' => 4.8,
                 'review_count' => 22
@@ -83,7 +83,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Wireless gaming controller with precision analog sticks, customizable buttons, and long battery life.',
                 'price' => 59.99,
                 'category' => 'gaming',
-                'image' => 'https://placehold.co/400x400/5c6c9c/ffffff?text=Gaming+Controller',
+                'image' => 'ssa/controller.jpg',
                 'stock' => 40,
                 'average_rating' => 4.4,
                 'review_count' => 35
@@ -105,7 +105,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Premium wireless earbuds with active noise cancellation, 30-hour battery life, and crystal clear sound quality.',
                 'price' => 149.99,
                 'category' => 'accessories',
-                'image' => 'https://placehold.co/400x400/4bc5ec/ffffff?text=Wireless+Earbuds',
+                'image' => 'ssa/earbuds.jpg',
                 'stock' => 75,
                 'average_rating' => 4.6,
                 'review_count' => 42
@@ -115,7 +115,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Advanced smartwatch with health monitoring, GPS, sleep tracking, and 7-day battery life. Water-resistant design.',
                 'price' => 399.99,
                 'category' => 'accessories',
-                'image' => 'https://placehold.co/400x400/94dcf4/353c61?text=Smart+Watch',
+                'image' => 'ssa/watch.jpg',
                 'stock' => 35,
                 'average_rating' => 4.7,
                 'review_count' => 45
@@ -145,7 +145,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Waterproof portable speaker with 360-degree sound, 20-hour battery life, and built-in microphone.',
                 'price' => 49.99,
                 'category' => 'accessories',
-                'image' => 'https://placehold.co/400x400/4bc5ec/ffffff?text=Bluetooth+Speaker',
+                'image' => 'ssa/jbl.jpg',
                 'stock' => 55,
                 'average_rating' => 4.4,
                 'review_count' => 29
@@ -187,7 +187,7 @@ class ProductSeeder extends Seeder
                 'description' => 'Premium quality denim jeans with perfect fit, comfortable stretch fabric, and classic blue wash.',
                 'price' => 59.99,
                 'category' => 'jeans',
-                'image' => 'https://placehold.co/400x400/4bc5ec/ffffff?text=Denim+Jeans',
+                'image' => 'ssa/clothes.webp',
                 'stock' => 100,
                 'average_rating' => 4.5,
                 'review_count' => 67

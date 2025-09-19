@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - iMarket</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-bg': '#94dcf4',
+                        'card-bg': '#bdccdc',
+                        'text-dark': '#353c61',
+                        'text-muted': '#2c3c8c',
+                        'accent-color': '#4bc5ec',
+                        'border-light': '#5c8c9c',
+                        'input-bg': '#ffffff',
+                        'btn-hover': '#2c3c8c',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="flex items-center justify-center min-h-screen p-4" style="background-color: #94dcf4; font-family: 'Inter', sans-serif;">
+
+    <div class="flex flex-col md:flex-row bg-card-bg rounded-3xl shadow-2xl w-full max-w-4xl mx-auto border border-border-light overflow-hidden">
+        <div class="relative flex-1 hidden md:flex items-center justify-center p-8">
+            <img src="lgo.png" alt="App Logo" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-text-dark opacity-60"></div>
+            <div class="relative z-10 text-center text-white">
+                <div class="text-5xl font-extrabold mb-2">iMarket</div>
+                <p class="text-lg opacity-90">Create your account</p>
+            </div>
+        </div>
+
+        <div class="flex-1 p-6 sm:p-8 w-full">
+            <div class="text-center">
+                <h1 class="text-3xl sm:text-4xl font-extrabold text-text-dark mb-2">Create Account</h1>
+                <p class="text-text-muted">Join iMarket in a few seconds.</p>
+            </div>
+
+            <form id="registerForm" class="mt-6" onsubmit="handleRegister(event)">
+                <div class="grid grid-cols-1 gap-5">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-text-dark mb-2">Full Name</label>
+                        <input id="name" name="name" type="text" required placeholder="Your name"
+                               class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition">
+                    </div>
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-text-dark mb-2">Email Address</label>
+                        <input id="email" name="email" type="email" required placeholder="you@example.com"
+                               class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition">
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label for="password" class="block text-sm font-medium text-text-dark mb-2">Password</label>
+                            <input id="password" name="password" type="password" minlength="8" required placeholder="At least 8 characters"
+                                   class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition">
+                        </div>
+                        <div>
+                            <label for="password_confirmation" class="block text-sm font-medium text-text-dark mb-2">Confirm Password</label>
+                            <input id="password_confirmation" name="password_confirmation" type="password" minlength="8" required placeholder="Repeat password"
+                                   class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition">
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="mt-6 w-full py-3 bg-accent-color text-card-bg font-bold rounded-xl shadow-md hover:bg-btn-hover transition focus:outline-none focus:ring-2 focus:ring-accent-color focus:ring-offset-2">Create Account</button>
+                <div id="msg" class="text-center text-sm font-medium pt-3 hidden"></div>
+            </form>
+
+            <div class="text-center text-sm text-text-muted mt-6">
+                Already have an account? <a href="/login" class="text-accent-color hover:text-btn-hover">Log in</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function handleRegister(e) {
+            e.preventDefault();
+            const form = document.getElementById('registerForm');
+            const msg = document.getElementById('msg');
+            const formData = new FormData(form);
+
+            const payload = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password'),
+                password_confirmation: formData.get('password_confirmation')
+            };
+
+            msg.classList.remove('hidden', 'text-red-600', 'text-green-600');
+            msg.textContent = 'Creating your account...';
+
+            try {
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    const message = (data && data.message) ? data.message : 'Registration failed';
+                    msg.classList.add('text-red-600');
+                    msg.textContent = message;
+                    return;
+                }
+
+                msg.classList.add('text-green-600');
+                msg.textContent = 'Account created! Redirecting to login...';
+                setTimeout(() => { window.location.href = '/login'; }, 1200);
+            } catch (err) {
+                msg.classList.add('text-red-600');
+                msg.textContent = 'Network error. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
+
+

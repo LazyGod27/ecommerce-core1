@@ -245,9 +245,29 @@
             </li>
         </ul>
         <div class="search-bar">
-            <form action="{{ route('products.search') }}" method="GET" class="flex flex-grow">
-                <input type="text" name="q" placeholder="Search for products, brands and more..." class="w-full px-3 text-base outline-none border-none" value="{{ request('q') }}" />
+            <form action="{{ route('search') }}" method="GET" class="flex flex-grow relative" id="searchForm">
+                <input type="text" 
+                       name="q" 
+                       id="searchInput"
+                       placeholder="Search for products, brands and more..." 
+                       class="w-full px-3 text-base outline-none border-none" 
+                       value="{{ request('q') }}" 
+                       autocomplete="off" />
                 <button type="submit" class="search-btn"><i class="ri-search-line"></i></button>
+                
+                <!-- Search Suggestions Dropdown -->
+                <div id="searchSuggestions" class="search-suggestions hidden" style="display: none;">
+                    <div class="suggestions-content">
+                        <div id="suggestionsList" class="suggestions-list"></div>
+                        <div id="trendingSuggestions" class="trending-suggestions">
+                            <div class="trending-header">
+                                <i class="ri-fire-line"></i>
+                                <span>Trending Searches</span>
+                            </div>
+                            <div id="trendingList" class="trending-list"></div>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
         <div class="icons">
@@ -812,11 +832,105 @@
                     border-color: #e74c3c;
                     color: #e74c3c;
                 }
-                .size-options input[type="radio"]:checked + .size-option {
-                    background: #e74c3c;
-                    color: white;
-                    border-color: #e74c3c;
-                }
+        .size-options input[type="radio"]:checked + .size-option {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+        }
+        
+        /* Search Suggestions Styles */
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .suggestions-content {
+            padding: 16px;
+        }
+        
+        .suggestions-list {
+            margin-bottom: 16px;
+        }
+        
+        .suggestion-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-bottom: 4px;
+        }
+        
+        .suggestion-item:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .suggestion-item i {
+            margin-right: 8px;
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .suggestion-text {
+            flex: 1;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .trending-suggestions {
+            border-top: 1px solid #e5e7eb;
+            padding-top: 16px;
+        }
+        
+        .trending-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .trending-header i {
+            margin-right: 6px;
+            color: #f59e0b;
+        }
+        
+        .trending-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .trending-item {
+            background: #f3f4f6;
+            color: #374151;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        
+        .trending-item:hover {
+            background: #e5e7eb;
+        }
+        
+        .search-suggestions.hidden {
+            display: none;
+        }
                 .quantity-controls {
                     display: flex;
                     align-items: center;
@@ -1116,6 +1230,163 @@
                 });
             }
         });
+        
+        // Search Suggestions Functionality
+        const searchInput = document.getElementById('searchInput');
+        const searchSuggestions = document.getElementById('searchSuggestions');
+        const suggestionsList = document.getElementById('suggestionsList');
+        const trendingList = document.getElementById('trendingList');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            const query = this.value.trim();
+            console.log('Input event triggered, query:', query);
+            
+            clearTimeout(searchTimeout);
+            
+            if (query.length < 2) {
+                console.log('Query too short, hiding suggestions');
+                hideSuggestions();
+                return;
+            }
+
+            console.log('Setting timeout for suggestions fetch');
+            searchTimeout = setTimeout(() => {
+                console.log('Timeout triggered, fetching suggestions');
+                fetchSuggestions(query);
+            }, 300);
+        });
+
+        searchInput.addEventListener('focus', function() {
+            const query = this.value.trim();
+            console.log('Focus event triggered, query:', query);
+            
+            if (query.length >= 2) {
+                // If there's already a query, fetch suggestions
+                console.log('Query exists, fetching suggestions');
+                fetchSuggestions(query);
+            } else {
+                // Only show trending searches when user focuses on empty search bar
+                console.log('No query, loading trending searches');
+                loadTrendingSearches();
+                showSuggestions();
+            }
+        });
+
+        searchInput.addEventListener('blur', function() {
+            // Hide suggestions after a short delay to allow clicking on suggestions
+            setTimeout(() => {
+                hideSuggestions();
+            }, 200);
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
+                hideSuggestions();
+            }
+        });
+
+        function showSuggestions() {
+            searchSuggestions.classList.remove('hidden');
+            searchSuggestions.style.display = 'block';
+        }
+
+        function hideSuggestions() {
+            searchSuggestions.classList.add('hidden');
+            searchSuggestions.style.display = 'none';
+        }
+
+        async function fetchSuggestions(query) {
+            try {
+                console.log('Fetching suggestions for:', query);
+                const response = await fetch(`/search/suggestions?q=${encodeURIComponent(query)}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received suggestions:', data);
+                
+                if (data.suggestions && data.suggestions.length > 0) {
+                    displaySuggestions(data.suggestions);
+                    showSuggestions();
+                } else {
+                    console.log('No suggestions received');
+                    hideSuggestions();
+                }
+            } catch (error) {
+                console.error('Error fetching suggestions:', error);
+                hideSuggestions();
+            }
+        }
+
+        async function loadTrendingSearches() {
+            try {
+                console.log('Loading trending searches...');
+                const response = await fetch('/search/trending');
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received trending searches:', data);
+                
+                if (data.trending && data.trending.length > 0) {
+                    displayTrendingSearches(data.trending);
+                } else {
+                    console.log('No trending searches received');
+                }
+            } catch (error) {
+                console.error('Error loading trending searches:', error);
+            }
+        }
+
+        function displaySuggestions(suggestions) {
+            suggestionsList.innerHTML = '';
+            
+            if (suggestions.length === 0) {
+                suggestionsList.innerHTML = '<div class="suggestion-item"><span class="suggestion-text">No suggestions found</span></div>';
+                return;
+            }
+
+            suggestions.forEach(suggestion => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `
+                    <i class="ri-search-line"></i>
+                    <span class="suggestion-text">${suggestion}</span>
+                `;
+                
+                item.addEventListener('click', () => {
+                    searchInput.value = suggestion;
+                    hideSuggestions();
+                    document.getElementById('searchForm').submit();
+                });
+                
+                suggestionsList.appendChild(item);
+            });
+        }
+
+        function displayTrendingSearches(trending) {
+            trendingList.innerHTML = '';
+            
+            trending.forEach(term => {
+                const item = document.createElement('div');
+                item.className = 'trending-item';
+                item.textContent = term;
+                
+                item.addEventListener('click', () => {
+                    searchInput.value = term;
+                    hideSuggestions();
+                    document.getElementById('searchForm').submit();
+                });
+                
+                trendingList.appendChild(item);
+            });
+        }
     </script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <script src="{{ asset('ssa/script.js') }}"></script>

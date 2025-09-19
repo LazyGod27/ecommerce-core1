@@ -49,9 +49,10 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    public function tracking(): HasMany
+    public function tracking()
     {
-        return $this->hasMany(Tracking::class);
+        // Each order has a single tracking record
+        return $this->hasOne(Tracking::class);
     }
 
     public function payments(): HasMany

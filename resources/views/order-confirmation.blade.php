@@ -17,6 +17,18 @@
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .confirmation-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #10b981, #3b82f6, #8b5cf6);
     }
     
     .success-icon {
@@ -182,6 +194,92 @@
     }
     
     .similar-products h3 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: var(--text-color);
+        font-size: 1.5rem;
+        font-weight: 600;
+    }
+    
+    .products-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+    }
+    
+    .product-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .product-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+    
+    .product-info {
+        padding: 20px;
+    }
+    
+    .product-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 8px;
+    }
+    
+    .product-price {
+        color: var(--main-color);
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
+    
+    .product-rating {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+    
+    .stars {
+        color: #fbbf24;
+    }
+    
+    .rating-text {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .add-to-cart-btn {
+        width: 100%;
+        padding: 12px;
+        background: var(--main-color);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    .add-to-cart-btn:hover {
+        background: #1e40af;
+        transform: translateY(-2px);
+    }
+    
+    .similar-products h3 {
         color: var(--text-color);
         margin-bottom: 20px;
         text-align: center;
@@ -334,7 +432,9 @@
             <h4><i class="ri-truck-line"></i> Tracking Information</h4>
             <p>Your order is being prepared for shipment. You can track your order using the tracking number below:</p>
             <p><strong>Tracking Number:</strong> <span class="tracking-number">{{ $order->tracking->tracking_number }}</span></p>
+            @if($order->tracking->estimated_delivery)
             <p><strong>Estimated Delivery:</strong> {{ $order->tracking->estimated_delivery->format('M d, Y') }}</p>
+            @endif
         </div>
         @endif
         
@@ -342,13 +442,13 @@
             <h3>Order Items</h3>
             @foreach($order->items as $item)
             <div class="order-item">
-                <img src="{{ str_starts_with($item->product->image ?? 'default.jpg', 'http') ? $item->product->image : asset('storage/' . ($item->product->image ?? 'default.jpg')) }}" 
+                <img src="{{ str_starts_with($item->product->image ?? 'ssa/default.jpg', 'http') ? $item->product->image : asset($item->product->image ?? 'ssa/default.jpg') }}" 
                      alt="{{ $item->product->name ?? 'Product' }}">
                 <div class="item-info">
                     <div class="item-name">{{ $item->product->name ?? 'Product' }}</div>
                     <div class="item-quantity">Quantity: {{ $item->quantity }}</div>
                 </div>
-                <div class="item-price">₱{{ number_format($item->total, 2) }}</div>
+                <div class="item-price">₱{{ number_format($item->quantity * ($item->price ?? $item->product->price ?? 0), 2) }}</div>
             </div>
             @endforeach
         </div>
@@ -367,28 +467,67 @@
     </div>
     
     <div class="similar-products">
-        <h3>You Might Also Like</h3>
-        <div class="product-grid">
-            <!-- Similar products will be loaded here -->
-            <div class="product-card" onclick="window.location.href='{{ route('home') }}'">
-                <img src="{{ asset('ssa/headphones.jpg') }}" alt="Wireless Headphones">
-                <h4>Wireless Headphones</h4>
-                <div class="price">₱1,299</div>
+        <h3><i class="ri-heart-line"></i> You Might Also Like</h3>
+        <div class="products-grid" id="similar-products-grid">
+            <!-- Similar products will be loaded dynamically -->
+            <div class="product-card" onclick="addToCart('Wireless Earbuds Pro', 149.99, '{{ asset('ssa/earbuds.jpg') }}')">
+                <img src="{{ asset('ssa/earbuds.jpg') }}" alt="Wireless Earbuds Pro">
+                <div class="product-info">
+                    <div class="product-name">Wireless Earbuds Pro</div>
+                    <div class="product-price">₱149.99</div>
+                    <div class="product-rating">
+                        <div class="stars">★★★★★</div>
+                        <span class="rating-text">(42 reviews)</span>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('Wireless Earbuds Pro', 149.99, '{{ asset('ssa/earbuds.jpg') }}')">
+                        <i class="ri-shopping-cart-line"></i> Add to Cart
+                    </button>
+                </div>
             </div>
-            <div class="product-card" onclick="window.location.href='{{ route('home') }}'">
-                <img src="{{ asset('ssa/smartwatch.jpg') }}" alt="Smart Watch">
-                <h4>Smart Watch</h4>
-                <div class="price">₱2,999</div>
+            
+            <div class="product-card" onclick="addToCart('Smart Watch Series 8', 399.99, '{{ asset('ssa/watch.jpg') }}')">
+                <img src="{{ asset('ssa/watch.jpg') }}" alt="Smart Watch Series 8">
+                <div class="product-info">
+                    <div class="product-name">Smart Watch Series 8</div>
+                    <div class="product-price">₱399.99</div>
+                    <div class="product-rating">
+                        <div class="stars">★★★★★</div>
+                        <span class="rating-text">(45 reviews)</span>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('Smart Watch Series 8', 399.99, '{{ asset('ssa/watch.jpg') }}')">
+                        <i class="ri-shopping-cart-line"></i> Add to Cart
+                    </button>
+                </div>
             </div>
-            <div class="product-card" onclick="window.location.href='{{ route('home') }}'">
-                <img src="{{ asset('ssa/laptop.jpg') }}" alt="Gaming Laptop">
-                <h4>Gaming Laptop</h4>
-                <div class="price">₱45,999</div>
+            
+            <div class="product-card" onclick="addToCart('Gaming Laptop RTX 4070', 1299.99, '{{ asset('ssa/rtx.jpg') }}')">
+                <img src="{{ asset('ssa/rtx.jpg') }}" alt="Gaming Laptop RTX 4070">
+                <div class="product-info">
+                    <div class="product-name">Gaming Laptop RTX 4070</div>
+                    <div class="product-price">₱1,299.99</div>
+                    <div class="product-rating">
+                        <div class="stars">★★★★★</div>
+                        <span class="rating-text">(12 reviews)</span>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('Gaming Laptop RTX 4070', 1299.99, '{{ asset('ssa/rtx.jpg') }}')">
+                        <i class="ri-shopping-cart-line"></i> Add to Cart
+                    </button>
+                </div>
             </div>
-            <div class="product-card" onclick="window.location.href='{{ route('home') }}'">
-                <img src="{{ asset('ssa/tablet.jpg') }}" alt="Tablet">
-                <h4>Tablet</h4>
-                <div class="price">₱8,999</div>
+            
+            <div class="product-card" onclick="addToCart('Bluetooth Speaker', 49.99, '{{ asset('ssa/jbl.jpg') }}')">
+                <img src="{{ asset('ssa/jbl.jpg') }}" alt="Bluetooth Speaker">
+                <div class="product-info">
+                    <div class="product-name">Bluetooth Speaker</div>
+                    <div class="product-price">₱49.99</div>
+                    <div class="product-rating">
+                        <div class="stars">★★★★☆</div>
+                        <span class="rating-text">(29 reviews)</span>
+                    </div>
+                    <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('Bluetooth Speaker', 49.99, '{{ asset('ssa/jbl.jpg') }}')">
+                        <i class="ri-shopping-cart-line"></i> Add to Cart
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -399,8 +538,151 @@
 <script>
     // Add any additional JavaScript functionality here
     document.addEventListener('DOMContentLoaded', function() {
-        // You can add animations or other interactive features
+        // Confetti animation for success
+        if (typeof confetti !== 'undefined') {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+        
+        // Load similar products dynamically
+        loadSimilarProducts();
+        
+        // Add smooth animations to product cards
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+        
         console.log('Order confirmation page loaded');
     });
+    
+    function addToCart(productName, price, image) {
+        // Create a form to add item to cart
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cart/add/${Date.now()}`; // Use timestamp as synthetic ID
+        
+        // Add CSRF token
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        form.appendChild(csrfToken);
+        
+        // Add product details
+        const nameInput = document.createElement('input');
+        nameInput.type = 'hidden';
+        nameInput.name = 'product_name';
+        nameInput.value = productName;
+        form.appendChild(nameInput);
+        
+        const priceInput = document.createElement('input');
+        priceInput.type = 'hidden';
+        priceInput.name = 'product_price';
+        priceInput.value = price;
+        form.appendChild(priceInput);
+        
+        const imageInput = document.createElement('input');
+        imageInput.type = 'hidden';
+        imageInput.name = 'product_image';
+        imageInput.value = image;
+        form.appendChild(imageInput);
+        
+        const quantityInput = document.createElement('input');
+        quantityInput.type = 'hidden';
+        quantityInput.name = 'quantity';
+        quantityInput.value = '1';
+        form.appendChild(quantityInput);
+        
+        // Add to DOM and submit
+        document.body.appendChild(form);
+        form.submit();
+    }
+    
+    // Add hover effects to product cards
+    document.querySelectorAll('.product-card').forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+    });
+    
+    async function loadSimilarProducts() {
+        try {
+            const orderId = window.location.pathname.split('/').pop();
+            const response = await fetch(`/api/similar-products/${orderId}`);
+            const data = await response.json();
+            
+            if (data.products && data.products.length > 0) {
+                const grid = document.getElementById('similar-products-grid');
+                grid.innerHTML = '';
+                
+                data.products.forEach((product, index) => {
+                    const productCard = createProductCard(product, index);
+                    grid.appendChild(productCard);
+                });
+            }
+        } catch (error) {
+            console.error('Error loading similar products:', error);
+        }
+    }
+    
+    function createProductCard(product, index) {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        
+        const stars = '★'.repeat(product.rating) + '☆'.repeat(5 - product.rating);
+        
+        card.innerHTML = `
+            <img src="${product.image}" alt="${product.name}">
+            <div class="product-info">
+                <div class="product-name">${product.name}</div>
+                <div class="product-price">₱${product.price.toFixed(2)}</div>
+                <div class="product-rating">
+                    <div class="stars">${stars}</div>
+                    <span class="rating-text">(${product.reviews_count} reviews)</span>
+                </div>
+                <button class="add-to-cart-btn" onclick="event.stopPropagation(); addToCart('${product.name}', ${product.price}, '${product.image}')">
+                    <i class="ri-shopping-cart-line"></i> Add to Cart
+                </button>
+            </div>
+        `;
+        
+        // Add click handler
+        card.onclick = () => addToCart(product.name, product.price, product.image);
+        
+        // Add hover effects
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+        });
+        
+        // Animate in
+        setTimeout(() => {
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+        
+        return card;
+    }
 </script>
 @endsection

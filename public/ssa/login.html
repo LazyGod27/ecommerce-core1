@@ -151,7 +151,7 @@
             <div id="messageArea" class="text-center text-sm font-medium pt-4 hidden"></div>
 
             <div class="text-center text-sm text-text-muted mt-6">
-                Don't have an account? <a href="#" onclick="showCreateAccountModal(event)" class="text-accent-color hover:text-btn-hover transition duration-200">Create an account</a>
+                Don't have an account? <a href="/register" class="text-accent-color hover:text-btn-hover transition duration-200">Create an account</a>
             </div>
             <div class="text-center text-xs text-text-muted mt-2">
                 By logging in, you agree to our <a href="#" onclick="showTermsAndConditions(event)" class="text-accent-color hover:text-btn-hover transition duration-200">Terms & Conditions</a>.
@@ -301,36 +301,7 @@
         </div>
     </div>
 
-    <!-- Create Account Modal -->
-    <div id="createAccountModal" class="fixed inset-0 bg-primary-bg bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-card-bg rounded-3xl shadow-2xl p-4 sm:p-8 w-full max-w-sm modal-card border border-border-light">
-            <h2 class="text-2xl font-bold text-text-dark mb-4">Create Account</h2>
-            <p class="text-sm text-text-muted mb-6">Fill out the form below to get started.</p>
-            <form id="createAccountForm" onsubmit="handleCreateAccountSubmit(event)">
-                <div class="mb-5">
-                    <label for="createEmail" class="block text-sm font-medium text-text-dark mb-2">Email Address</label>
-                    <input type="email" id="createEmail" name="createEmail" required placeholder="you@example.com"
-                           class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition duration-200">
-                </div>
-                <div class="mb-5">
-                    <label for="createPassword" class="block text-sm font-medium text-text-dark mb-2">Password</label>
-                    <input type="password" id="createPassword" name="createPassword" required placeholder="••••••••"
-                           class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition duration-200">
-                </div>
-                <div class="mb-6">
-                    <label for="confirmPassword" class="block text-sm font-medium text-text-dark mb-2">Confirm Password</label>
-                    <input type="password" id="confirmPassword" name="confirmPassword" required placeholder="••••••••"
-                           class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition duration-200">
-                </div>
-                <button type="submit" class="w-full py-3 bg-accent-color text-card-bg font-bold rounded-xl shadow-md hover:bg-btn-hover transition duration-200 focus:outline-none focus:ring-2 focus:ring-accent-color focus:ring-offset-2">
-                    Create Account
-                </button>
-            </form>
-            <button onclick="closeCreateAccountModal()" class="w-full mt-4 py-3 bg-border-light text-text-dark font-medium rounded-xl hover:bg-input-bg transition duration-200">
-                Cancel
-            </button>
-        </div>
-    </div>
+    <!-- Removed inline Create Account modal in favor of dedicated register page -->
 
     <script>
         // Placeholder JavaScript functions for handling form submission and navigation
@@ -349,14 +320,49 @@
             }
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
 
-            console.log("Login attempt with:", { email, password });
-            showMessage("Login successful! (This is a static example)", 'success');
-            document.getElementById('loginForm').reset();
+            showMessage('Signing you in...', 'success');
+
+            try {
+                // Ensure CSRF cookie is set
+                await fetch('/sanctum/csrf-cookie', { credentials: 'include' });
+
+                // Read XSRF-TOKEN cookie
+                const xsrfMatch = document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]+)/);
+                const xsrfToken = xsrfMatch ? decodeURIComponent(xsrfMatch[1]) : '';
+
+                const res = await fetch('/login', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json, text/html, */*',
+                        'X-XSRF-TOKEN': xsrfToken
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (res.ok) {
+                    // Logged in (session cookie set). Go to landing page.
+                    window.location.href = '/';
+                    return;
+                }
+
+                // Try to extract validation or auth error message
+                let message = 'Login failed. Please check your credentials.';
+                try {
+                    const data = await res.json();
+                    if (data && data.message) message = data.message;
+                    if (data && data.errors) message = Object.values(data.errors).flat().join(' ');
+                } catch (_) {}
+                showMessage(message, 'error');
+            } catch (err) {
+                showMessage('Network error. Please try again.', 'error');
+            }
         }
 
         function handleSocialLogin(provider) {

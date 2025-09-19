@@ -13,13 +13,12 @@ class Tracking extends Model
         'carrier',
         'status',
         'estimated_delivery',
-        'current_location',
-        'tracking_details'
+        'history'
     ];
 
     protected $casts = [
         'estimated_delivery' => 'datetime',
-        'tracking_details' => 'array'
+        'history' => 'array'
     ];
 
     public function order(): BelongsTo

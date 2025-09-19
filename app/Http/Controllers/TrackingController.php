@@ -107,8 +107,8 @@ class TrackingController extends Controller
         $tracking = Tracking::findOrFail($trackingId);
         
         // Add new tracking detail
-        $trackingDetails = $tracking->tracking_details ?? [];
-        $trackingDetails[] = [
+        $history = $tracking->history ?? [];
+        $history[] = [
             'status' => $request->status,
             'location' => $request->location,
             'timestamp' => now()->toISOString(),
@@ -117,8 +117,7 @@ class TrackingController extends Controller
 
         $tracking->update([
             'status' => $request->status,
-            'current_location' => $request->location,
-            'tracking_details' => $trackingDetails
+            'history' => $history
         ]);
 
         // Update order status if delivered

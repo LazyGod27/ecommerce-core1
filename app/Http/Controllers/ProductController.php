@@ -15,10 +15,21 @@ class ProductController extends Controller
             return view('products.search', ['products' => collect(), 'query' => '']);
         }
         
-        $products = Product::where('name', 'like', "%{$query}%")
-            ->orWhere('description', 'like', "%{$query}%")
-            ->orWhere('category', 'like', "%{$query}%")
+        // Enhanced search with category-based logic
+        $products = Product::where(function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%")
+                  ->orWhere('description', 'like', "%{$query}%")
+                  ->orWhere('category', 'like', "%{$query}%");
+            })
             ->with(['reviews'])
+            ->orderByRaw("
+                CASE 
+                    WHEN name LIKE ? THEN 1
+                    WHEN category LIKE ? THEN 2
+                    WHEN description LIKE ? THEN 3
+                    ELSE 4
+                END
+            ", ["%{$query}%", "%{$query}%", "%{$query}%"])
             ->orderBy('created_at', 'desc')
             ->paginate(12);
             
