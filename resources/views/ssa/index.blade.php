@@ -135,91 +135,6 @@
     </style>
 </head>
 <body>
-    <div class="login-modal" id="loginModal">
-        <div class="login-content">
-            <span class="close-btn" id="closeLogin">&times;</span>
-            <h2>Login</h2>
-            
-            @if ($errors->any())
-                <div class="error-message">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            @if (session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('login') }}">
-                @csrf
-                <label for="login_email">Email</label>
-                <input type="email" id="login_email" name="email" placeholder="Enter email" value="{{ old('email') }}" required>
-                <label for="login_password">Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="login_password" name="password" placeholder="Enter password" required>
-                    <i class="ri-eye-line" id="togglePassword"></i>
-                </div>
-                <button type="submit" class="login-btn">Login</button>
-            </form>
-            <p class="signup-text">Don't have an account yet? <a href="#" id="openSignup">Sign up here</a></p>
-        </div>
-    </div>
-
-    <div class="signup-modal" id="signupModal">
-        <div class="signup-content">
-            <span class="close-btn" id="closeSignup">&times;</span>
-            <h2>Sign Up</h2>
-            
-            @if ($errors->any())
-                <div class="error-message">
-                    <ul class="mb-0">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
-                </div>
-            @endif
-
-            @if (session('success'))
-                <div class="success-message">
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <form method="POST" action="{{ route('register') }}">
-                @csrf
-                <label for="register_name">Full Name</label>
-                <input type="text" id="register_name" name="name" placeholder="Enter full name" value="{{ old('name') }}" required>
-                <label for="register_email">Email</label>
-                <input type="email" id="register_email" name="email" placeholder="Enter email" value="{{ old('email') }}" required>
-                <label for="register_password">Password</label>
-                <div class="password-wrapper">
-                    <input type="password" id="register_password" name="password" placeholder="Enter password" required>
-                    <i class="ri-eye-line toggleSignupPassword"></i>
-                </div>
-                <label for="register_password_confirmation">Confirm Password</label>
-                <input type="password" id="register_password_confirmation" name="password_confirmation" placeholder="Confirm password" required>
-                <button type="submit" class="login-btn">Create Account</button>
-            </form>
-            <div class="divider"><span>OR</span></div>
-            <div class="social-login">
-                <a href="{{ route('auth.google') }}" class="google-btn">
-                    <img src="{{ asset('ssa/google.png') }}" alt="Google Logo">
-                    Sign up with Google
-                </a>
-                <a href="{{ route('auth.facebook') }}" class="facebook-btn">
-                    <i class="ri-facebook-fill"></i> Sign up with Facebook
-                </a>
-            </div>
-            <p class="signup-text">Already have an account? <a href="#" id="openLoginFromSignup">Login here</a></p>
-        </div>
-    </div>
 
     <header>
         <div class="logo">
@@ -232,15 +147,15 @@
             <li class="dropdown">
                 <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ route('products') }}"><i class="ri-fire-line"></i> Best Selling</a></li>
-                    <li><a href="{{ route('products') }}"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'electronics']) }}"><i class="ri-computer-line"></i> Electronics</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'fashion']) }}"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'home']) }}"><i class="ri-home-4-line"></i> Home & Living</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'beauty']) }}"><i class="ri-heart-line"></i> Beauty & Health</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'sports']) }}"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'toys']) }}"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
-                    <li><a href="{{ route('products.category', ['category' => 'groceries']) }}"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
+                    <li><a href="{{ route('categories.best') }}"><i class="ri-fire-line"></i> Best Selling</a></li>
+                    <li><a href="{{ route('categories.new') }}"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
+                    <li><a href="{{ route('categories.electronics') }}"><i class="ri-computer-line"></i> Electronics</a></li>
+                    <li><a href="{{ route('categories.fashion') }}"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
+                    <li><a href="{{ route('categories.home') }}"><i class="ri-home-4-line"></i> Home & Living</a></li>
+                    <li><a href="{{ route('categories.beauty') }}"><i class="ri-heart-line"></i> Beauty & Health</a></li>
+                    <li><a href="{{ route('categories.sports') }}"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
+                    <li><a href="{{ route('categories.toys') }}"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
+                    <li><a href="{{ route('categories.groceries') }}"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
                 </ul>
             </li>
         </ul>
@@ -282,7 +197,7 @@
                     <div class="user-dropdown-menu">
                         <a href="{{ route('profile.index') }}"><i class="ri-user-line"></i> My Profile</a>
                         <a href="{{ route('profile.orders') }}"><i class="ri-shopping-bag-line"></i> My Orders</a>
-                        <a href="{{ route('tracking') }}"><i class="ri-truck-line"></i> Track Orders</a>
+                        <a href="{{ route('track-order') }}"><i class="ri-truck-line"></i> Track Orders</a>
                         <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="ri-logout-box-line"></i> Logout</a>
                     </div>
                 </div>
@@ -290,13 +205,12 @@
                     @csrf
                 </form>
             @else
-                <a href="#" id="openLogin"><i class="ri-user-line"></i></a>
+                <a href="{{ route('login') }}"><i class="ri-user-line"></i></a>
             @endauth
             <div class="bx bx-menu" id="menu-icon"></div>
         </div>
     </header>
 
-    <div class="overlay" id="overlay"></div>
 
     <section class="hero">
         <div class="hero-slides">
@@ -1138,97 +1052,7 @@
         }else{voiceMicBtn.disabled=true;voiceMicBtn.textContent='Not Supported';voiceMicBtn.title='Your browser does not support the Web Speech API.';const fallbackMessage=document.createElement('div');fallbackMessage.className='voice-message voice-bot-message';fallbackMessage.textContent='Voice commands are not supported on this browser. Please use a modern browser like Chrome or Edge.';voiceChatBody.appendChild(fallbackMessage)}
         window.onload=()=>{startHeroSlider&&startHeroSlider()};
         document.addEventListener('DOMContentLoaded',()=>{
-            // Login modal functionality
-            const loginModal = document.getElementById('loginModal');
-            const signupModal = document.getElementById('signupModal');
-            const openLoginBtn = document.getElementById('openLogin');
-            const openSignupBtn = document.getElementById('openSignup');
-            const openLoginFromSignupBtn = document.getElementById('openLoginFromSignup');
-            const closeLoginBtn = document.getElementById('closeLogin');
-            const closeSignupBtn = document.getElementById('closeSignup');
-            const overlay = document.getElementById('overlay');
-
-            // Open login modal
-            if (openLoginBtn) {
-                openLoginBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    loginModal.style.display = 'flex';
-                    setTimeout(() => loginModal.classList.add('show'), 10);
-                });
-            }
-
-            // Open signup modal
-            if (openSignupBtn) {
-                openSignupBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    signupModal.style.display = 'flex';
-                    setTimeout(() => signupModal.classList.add('show'), 10);
-                });
-            }
-
-            // Switch from signup to login
-            if (openLoginFromSignupBtn) {
-                openLoginFromSignupBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    signupModal.classList.remove('show');
-                    setTimeout(() => {
-                        signupModal.style.display = 'none';
-                        loginModal.style.display = 'flex';
-                        setTimeout(() => loginModal.classList.add('show'), 10);
-                    }, 400);
-                });
-            }
-
-            // Close modals
-            if (closeLoginBtn) {
-                closeLoginBtn.addEventListener('click', () => {
-                    loginModal.classList.remove('show');
-                    setTimeout(() => loginModal.style.display = 'none', 400);
-                });
-            }
-
-            if (closeSignupBtn) {
-                closeSignupBtn.addEventListener('click', () => {
-                    signupModal.classList.remove('show');
-                    setTimeout(() => signupModal.style.display = 'none', 400);
-                });
-            }
-
-            // Close on overlay click
-            if (overlay) {
-                overlay.addEventListener('click', () => {
-                    loginModal.classList.remove('show');
-                    signupModal.classList.remove('show');
-                    setTimeout(() => {
-                        loginModal.style.display = 'none';
-                        signupModal.style.display = 'none';
-                    }, 400);
-                });
-            }
-
-            // Password toggle functionality
-            const togglePassword = document.getElementById('togglePassword');
-            const toggleSignupPassword = document.querySelector('.toggleSignupPassword');
-            const loginPassword = document.getElementById('login_password');
-            const signupPassword = document.getElementById('register_password');
-
-            if (togglePassword && loginPassword) {
-                togglePassword.addEventListener('click', () => {
-                    const type = loginPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-                    loginPassword.setAttribute('type', type);
-                    togglePassword.classList.toggle('ri-eye-line');
-                    togglePassword.classList.toggle('ri-eye-off-line');
-                });
-            }
-
-            if (toggleSignupPassword && signupPassword) {
-                toggleSignupPassword.addEventListener('click', () => {
-                    const type = signupPassword.getAttribute('type') === 'password' ? 'text' : 'password';
-                    signupPassword.setAttribute('type', type);
-                    toggleSignupPassword.classList.toggle('ri-eye-line');
-                    toggleSignupPassword.classList.toggle('ri-eye-off-line');
-                });
-            }
+            // Modal functionality removed - using dedicated HTML pages instead
         });
         
         // Search Suggestions Functionality

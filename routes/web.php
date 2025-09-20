@@ -17,6 +17,63 @@ Route::get('/', function () {
 Route::get('/products', function () {
     return view('products');
 })->name('products');
+
+// Category routes
+Route::get('/categories/best', function () {
+    return view('ssa.categories.best');
+})->name('categories.best');
+
+Route::get('/categories/new', function () {
+    return view('ssa.categories.new');
+})->name('categories.new');
+
+Route::get('/categories/electronics', function () {
+    return view('ssa.categories.electronics');
+})->name('categories.electronics');
+
+Route::get('/categories/fashion', function () {
+    return view('ssa.categories.fashion');
+})->name('categories.fashion');
+
+Route::get('/categories/home', function () {
+    return view('ssa.categories.home');
+})->name('categories.home');
+
+Route::get('/categories/beauty', function () {
+    return view('ssa.categories.beauty');
+})->name('categories.beauty');
+
+Route::get('/categories/sports', function () {
+    return view('ssa.categories.sports');
+})->name('categories.sports');
+
+Route::get('/categories/toys', function () {
+    return view('ssa.categories.toys');
+})->name('categories.toys');
+
+Route::get('/categories/groceries', function () {
+    return view('ssa.categories.groceries');
+})->name('categories.groceries');
+
+// Customer Service route
+Route::get('/customer-service', function () {
+    return view('ssa.customer-service');
+})->name('customer-service');
+
+// Order Tracking route
+Route::get('/track-order', function () {
+    $orderId = request('order');
+    $order = null;
+    
+    if ($orderId) {
+        $order = \App\Models\Order::with(['items.product'])
+            ->where('id', $orderId)
+            ->where('user_id', auth()->id())
+            ->first();
+    }
+    
+    return view('ssa.track-order', compact('order'));
+})->name('track-order');
 // Search routes
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
@@ -50,8 +107,7 @@ Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.c
 
 // Authentication routes
 Route::get('/login', function () {
-    // Redirect so relative asset paths (e.g., style.css, images) resolve under /ssa
-    return redirect('/ssa/login.html');
+    return view('ssa.login');
 })->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -135,9 +191,6 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 // Customer service route
-Route::get('/customer-service', function () {
-    return view('customer-service');
-})->name('customer-service');
 
 // API routes for AJAX requests
 Route::get('/api/payment-methods', [PaymentController::class, 'getPaymentMethods'])->name('api.payment.methods');

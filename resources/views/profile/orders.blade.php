@@ -114,30 +114,48 @@
 
     .item-row {
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        padding: 10px 0;
+        padding: 15px 0;
         border-bottom: 1px solid #f0f0f0;
+        gap: 15px;
     }
 
     .item-row:last-child {
         border-bottom: none;
     }
 
-    .item-name {
-        font-weight: 500;
-        color: #333;
+    .item-image {
+        flex-shrink: 0;
+    }
+
+    .item-details {
         flex: 1;
     }
 
-    .item-price {
+    .item-name {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 4px;
+    }
+
+    .item-description {
         color: #666;
-        font-weight: 500;
+        line-height: 1.4;
+        font-size: 0.875rem;
     }
 
     .item-quantity {
         color: #666;
-        margin: 0 15px;
+        font-weight: 500;
+        min-width: 60px;
+        text-align: center;
+    }
+
+    .item-price {
+        color: #4bc5ec;
+        font-weight: 600;
+        min-width: 80px;
+        text-align: right;
     }
 
     .order-total {
@@ -239,6 +257,100 @@
             flex-direction: column;
         }
     }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        max-width: 500px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        margin: 0;
+    }
+
+    .modal-body p {
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+
+    .reason-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .reason-item input[type="radio"] {
+        accent-color: #ef4444;
+    }
+
+    .reason-item label {
+        cursor: pointer;
+        color: #374151;
+    }
+
+    .modal-body textarea {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0.75rem;
+        width: 100%;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    .modal-body button {
+        padding: 0.75rem 1.5rem;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .modal-body button[type="button"] {
+        background: #d1d5db;
+        color: #374151;
+        border: none;
+        margin-right: 0.5rem;
+    }
+
+    .modal-body button[type="submit"] {
+        background: #ef4444;
+        color: white;
+        border: none;
+    }
+
+    .modal-body button:hover {
+        opacity: 0.9;
+    }
 </style>
 @endsection
 
@@ -272,7 +384,7 @@
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Total Amount</div>
-                                    <div class="detail-value">₱{{ number_format($order->total_amount ?? 0, 2) }}</div>
+                                    <div class="detail-value">₱{{ number_format($order->total ?? 0, 2) }}</div>
                                 </div>
                                 <div class="detail-item">
                                     <div class="detail-label">Payment Method</div>
@@ -284,27 +396,47 @@
                                 </div>
                             </div>
 
-                            @if($order->orderItems && $order->orderItems->count() > 0)
+                            @if($order->items && $order->items->count() > 0)
                                 <div class="order-items">
                                     <h4 class="text-lg font-semibold text-gray-700 mb-3">Order Items</h4>
-                                    @foreach($order->orderItems as $item)
+                                    @foreach($order->items as $item)
                                         <div class="item-row">
-                                            <div class="item-name">{{ $item->product_name ?? 'Product' }}</div>
+                                            <div class="item-image">
+                                                @if($item->product && $item->product->image)
+                                                    <img src="{{ asset('storage/' . $item->product->image) }}" alt="{{ $item->product->name }}" class="w-12 h-12 object-cover rounded">
+                                                @else
+                                                    <div class="w-12 h-12 bg-gray-200 rounded flex items-center justify-center">
+                                                        <i class="fas fa-image text-gray-400"></i>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="item-details">
+                                                <div class="item-name">{{ $item->product->name ?? 'Product' }}</div>
+                                                @if($item->product && $item->product->description)
+                                                    <div class="item-description text-sm text-gray-500">{{ Str::limit($item->product->description, 50) }}</div>
+                                                @endif
+                                            </div>
                                             <div class="item-quantity">Qty: {{ $item->quantity }}</div>
                                             <div class="item-price">₱{{ number_format($item->price ?? 0, 2) }}</div>
                                         </div>
                                     @endforeach
                                     <div class="order-total">
-                                        Total: ₱{{ number_format($order->total_amount ?? 0, 2) }}
+                                        Total: ₱{{ number_format($order->total ?? 0, 2) }}
                                     </div>
                                 </div>
                             @endif
 
                             <div class="btn-container">
-                                <a href="{{ route('tracking') }}?order={{ $order->id }}" class="btn btn-secondary">
+                                <a href="{{ route('track-order') }}?order={{ $order->id }}" class="btn btn-secondary">
                                     <i class="fas fa-truck mr-2"></i>
                                     Track Order
                                 </a>
+                                @if($order->status !== 'cancelled' && $order->status !== 'delivered')
+                                    <a href="#" class="btn btn-danger ml-2" onclick="cancelOrder({{ $order->id }})">
+                                        <i class="fas fa-times mr-2"></i>
+                                        Cancel Order
+                                    </a>
+                                @endif
                             </div>
                         </div>
                     @endforeach
@@ -316,28 +448,91 @@
                         </div>
                     @endif
                 @else
-                    <div class="empty-state">
-                        <div class="empty-icon">
+                    <div class="text-center py-12">
+                        <div class="text-gray-400 text-6xl mb-4">
                             <i class="fas fa-shopping-bag"></i>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-700 mb-2">No Orders Yet</h3>
-                        <p class="text-gray-600 mb-6">You haven't placed any orders yet. Start shopping to see your order history here!</p>
-                        <a href="{{ route('home') }}" class="btn btn-secondary">
+                        <h3 class="text-xl font-semibold text-gray-600 mb-2">No Orders Found</h3>
+                        <p class="text-gray-500 mb-6">You haven't placed any orders yet.</p>
+                        <a href="{{ route('products') }}" class="btn btn-primary">
                             <i class="fas fa-shopping-cart mr-2"></i>
                             Start Shopping
                         </a>
                     </div>
                 @endif
-
-                <div class="btn-container">
-                    <a href="{{ route('profile.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left mr-2"></i>
-                        Back to Profile
-                    </a>
-                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Order Cancellation Modal -->
+<div id="cancellation-modal" class="modal-overlay" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="text-lg font-semibold">Cancel Order</h3>
+            <button id="close-modal-btn" class="text-gray-500 hover:text-gray-800">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p class="mb-4">Please select the reason for canceling your order:</p>
+            <form id="cancellation-form">
+                @csrf
+                <div class="reason-item">
+                    <input type="radio" id="reason1" name="cancel-reason" value="I no longer want the product">
+                    <label for="reason1">I no longer want the product</label>
+                </div>
+                <div class="reason-item">
+                    <input type="radio" id="reason2" name="cancel-reason" value="Ordered by mistake">
+                    <label for="reason2">Ordered by mistake</label>
+                </div>
+                <div class="reason-item">
+                    <input type="radio" id="reason3" name="cancel-reason" value="Found a cheaper price elsewhere">
+                    <label for="reason3">Found a cheaper price elsewhere</label>
+                </div>
+                <div class="reason-item">
+                    <input type="radio" id="reason4" name="cancel-reason" value="Others">
+                    <label for="reason4">Others</label>
+                </div>
+                <textarea class="mt-4 p-2 w-full border rounded-md" rows="3" placeholder="You may provide additional details..."></textarea>
+                <div class="flex justify-end mt-4">
+                    <button type="button" class="bg-gray-300 text-gray-800 px-4 py-2 rounded-md mr-2" id="cancel-modal-btn">Cancel</button>
+                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-md">Submit Cancellation</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentOrderId = null;
+
+    function cancelOrder(orderId) {
+        currentOrderId = orderId;
+        document.getElementById('cancellation-modal').style.display = 'flex';
+    }
+
+    // Modal handling
+    document.getElementById('close-modal-btn').addEventListener('click', function() {
+        document.getElementById('cancellation-modal').style.display = 'none';
+    });
+
+    document.getElementById('cancel-modal-btn').addEventListener('click', function() {
+        document.getElementById('cancellation-modal').style.display = 'none';
+    });
+
+    document.getElementById('cancellation-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Here you would typically send the cancellation request to the server
+        alert('Order cancellation request submitted successfully!');
+        document.getElementById('cancellation-modal').style.display = 'none';
+        
+        // Reload the page to update the order status
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    });
+</script>
 @endsection
 

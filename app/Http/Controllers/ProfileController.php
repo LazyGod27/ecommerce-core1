@@ -90,7 +90,7 @@ class ProfileController extends Controller
     public function orders()
     {
         $user = Auth::user();
-        $orders = $user->orders()->latest()->paginate(10);
+        $orders = $user->orders()->with(['items.product'])->latest()->paginate(10);
         return view('profile.orders', compact('orders'));
     }
 

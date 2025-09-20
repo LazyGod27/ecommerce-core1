@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Login & Account Page</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,7 +33,6 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-
             overflow-x: hidden;
         }
 
@@ -48,7 +47,6 @@
             }
         }
         
-
         @keyframes slideInFromTop {
             from {
                 transform: translateY(-50px);
@@ -93,7 +91,7 @@
     <div class="flex flex-col md:flex-row bg-card-bg rounded-3xl shadow-2xl w-full max-w-4xl mx-auto border border-border-light overflow-hidden animate-[fadeInScale_0.6s_ease-out_forwards]">
 
         <div class="relative flex-1 flex flex-col items-center justify-center p-8 text-card-bg rounded-b-3xl md:rounded-r-none md:rounded-l-3xl">
-            <img src="lgo.png" alt="App Logo" class="absolute inset-0 w-full h-full object-cover rounded-b-3xl md:rounded-r-none md:rounded-l-3xl">
+            <img src="{{ asset('ssa/lgo.png') }}" alt="App Logo" class="absolute inset-0 w-full h-full object-cover rounded-b-3xl md:rounded-r-none md:rounded-l-3xl">
         
             <div class="absolute inset-0 bg-text-dark opacity-60 rounded-b-3xl md:rounded-r-none md:rounded-l-3xl"></div>
 
@@ -111,10 +109,27 @@
                 <p class="text-lg text-text-muted mb-8">Sign in to your account.</p>
             </div>
 
-            <form id="loginForm" onsubmit="handleLogin(event)">
+            @if ($errors->any())
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            @if (session('success'))
+                <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
                 <div class="mb-5">
                     <label for="email" class="block text-sm font-medium text-text-dark mb-2">Email Address</label>
-                    <input type="email" id="email" name="email" required placeholder="Email"
+                    <input type="email" id="email" name="email" required placeholder="Email" value="{{ old('email') }}"
                            class="w-full px-4 py-3 bg-input-bg border-b border-border-light text-text-dark rounded-t-xl focus:outline-none focus:ring-1 focus:ring-accent-color focus:border-accent-color transition duration-200">
                 </div>
                 <div class="mb-3">
@@ -125,7 +140,7 @@
 
                 <div class="flex justify-between items-center mb-6">
                     <div class="flex items-center">
-                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-accent-color bg-input-bg border-border-light rounded focus:ring-accent-color">
+                        <input id="remember-me" name="remember" type="checkbox" class="h-4 w-4 text-accent-color bg-input-bg border-border-light rounded focus:ring-accent-color">
                         <label for="remember-me" class="ml-2 block text-sm text-text-muted">Remember me</label>
                     </div>
                     <a href="#" onclick="showForgotPasswordModal(event)" class="text-sm font-medium text-accent-color hover:text-btn-hover transition duration-200">Forgot Password?</a>
@@ -139,20 +154,18 @@
             <div class="separator my-8 text-sm text-text-muted">or continue with</div>
             
             <div class="grid grid-cols-2 gap-4">
-                <button type="button" class="flex items-center justify-center px-4 py-3 bg-input-bg border border-border-light rounded-xl text-text-dark font-medium hover:bg-border-light transition duration-200" onclick="handleSocialLogin('Facebook')">
+                <a href="{{ route('auth.facebook') }}" class="flex items-center justify-center px-4 py-3 bg-input-bg border border-border-light rounded-xl text-text-dark font-medium hover:bg-border-light transition duration-200">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/facebook.svg" alt="Facebook logo" class="w-5 h-5 mr-3 invert-[.8]">
                     Facebook
-                </button>
-                <button type="button" class="flex items-center justify-center px-4 py-3 bg-input-bg border border-border-light rounded-xl text-text-dark font-medium hover:bg-border-light transition duration-200" onclick="handleSocialLogin('Google')">
+                </a>
+                <a href="{{ route('auth.google') }}" class="flex items-center justify-center px-4 py-3 bg-input-bg border border-border-light rounded-xl text-text-dark font-medium hover:bg-border-light transition duration-200">
                     <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" class="w-5 h-5 mr-3 invert-[.8]">
                     Google
-                </button>
+                </a>
             </div>
 
-            <div id="messageArea" class="text-center text-sm font-medium pt-4 hidden"></div>
-
             <div class="text-center text-sm text-text-muted mt-6">
-                Don't have an account? <a href="/register" class="text-accent-color hover:text-btn-hover transition duration-200">Create an account</a>
+                Don't have an account? <a href="/ssa/register.html" class="text-accent-color hover:text-btn-hover transition duration-200">Create an account</a>
             </div>
             <div class="text-center text-xs text-text-muted mt-2">
                 By logging in, you agree to our <a href="#" onclick="showTermsAndConditions(event)" class="text-accent-color hover:text-btn-hover transition duration-200">Terms & Conditions</a>.
@@ -160,7 +173,6 @@
         </div>
     </div>
 
-    <!-- Modals -->
     <!-- Terms & Conditions Modal -->
     <div id="termsModal" class="fixed inset-0 bg-primary-bg bg-opacity-70 flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-card-bg rounded-3xl shadow-2xl p-4 sm:p-8 w-full max-w-2xl modal-card border border-border-light">
@@ -248,7 +260,7 @@
                         <p>You agree not to:</p>
                         <ul>
                             <li>Engage in fraudulent transactions.</li>
-                            <li>Reverse-engineer or tamper with IMARKET’s AI systems.</li>
+                            <li>Reverse-engineer or tamper with IMARKET's AI systems.</li>
                             <li>Upload viruses, spam, or malicious code.</li>
                             <li>Violate applicable laws, regulations, or third-party rights.</li>
                         </ul>
@@ -256,7 +268,7 @@
                     <li class="mt-4">
                         <strong class="text-text-dark">Limitations of Liability</strong>
                         <ul>
-                            <li>IMARKET provides services “as is” without warranties of any kind.</li>
+                            <li>IMARKET provides services "as is" without warranties of any kind.</li>
                             <li>The company shall not be held liable for losses, damages, or disputes arising from use of the platform, AI recommendations, or third-party transactions.</li>
                         </ul>
                     </li>
@@ -302,81 +314,14 @@
         </div>
     </div>
 
-    <!-- Removed inline Create Account modal in favor of dedicated register page -->
-
     <script>
-        // Placeholder JavaScript functions for handling form submission and navigation
-        const messageArea = document.getElementById('messageArea');
-        const termsModal = document.getElementById('termsModal');
-        const forgotPasswordModal = document.getElementById('forgotPasswordModal');
-        const createAccountModal = document.getElementById('createAccountModal');
-
-        function showMessage(message, type) {
-            messageArea.textContent = message;
-            messageArea.classList.remove('hidden', 'text-green-500', 'text-red-500');
-            if (type === 'success') {
-                messageArea.classList.add('text-green-500');
-            } else {
-                messageArea.classList.add('text-red-500');
-            }
-        }
-
-        async function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-
-            showMessage('Signing you in...', 'success');
-
-            try {
-                // Get CSRF token from meta tag or cookie
-                const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || 
-                                 document.cookie.match(/(?:^|; )XSRF-TOKEN=([^;]+)/)?.[1]?.replace(/%3D/g, '=');
-
-                // Create form data
-                const formData = new FormData();
-                formData.append('email', email);
-                formData.append('password', password);
-                formData.append('_token', csrfToken);
-
-                const res = await fetch('/login', {
-                    method: 'POST',
-                    credentials: 'include',
-                    headers: {
-                        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                });
-
-                if (res.ok) {
-                    // Check if we got redirected (successful login)
-                    if (res.url.includes('/') && !res.url.includes('/login')) {
-                        window.location.href = '/';
-                        return;
-                    }
-                }
-
-                // If we get here, login failed
-                showMessage('Login failed. Please check your credentials.', 'error');
-            } catch (err) {
-                console.error('Login error:', err);
-                showMessage('Network error. Please try again.', 'error');
-            }
-        }
-
-        function handleSocialLogin(provider) {
-            console.log("Attempting social login with:", provider);
-            showMessage(`Login with ${provider} initiated. (Static example)`, 'success');
-        }
-
         function showForgotPasswordModal(event) {
             event.preventDefault();
-            forgotPasswordModal.classList.remove('hidden');
+            document.getElementById('forgotPasswordModal').classList.remove('hidden');
         }
 
         function closeForgotPasswordModal() {
-            forgotPasswordModal.classList.add('hidden');
+            document.getElementById('forgotPasswordModal').classList.add('hidden');
         }
 
         function handleSendResetLink(event) {
@@ -384,41 +329,16 @@
             const resetEmail = document.getElementById('resetEmail').value;
             console.log("Password reset link requested for:", resetEmail);
             closeForgotPasswordModal();
-            showMessage(`A password reset link has been sent to ${resetEmail}. (Static example)`, 'success');
-        }
-
-        function showCreateAccountModal(event) {
-            event.preventDefault();
-            createAccountModal.classList.remove('hidden');
-        }
-
-        function closeCreateAccountModal() {
-            createAccountModal.classList.add('hidden');
-        }
-
-        function handleCreateAccountSubmit(event) {
-            event.preventDefault();
-            const email = document.getElementById('createEmail').value;
-            const password = document.getElementById('createPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (password !== confirmPassword) {
-                showMessage("Passwords do not match.", 'error');
-                return;
-            }
-
-            console.log("Account creation attempt with:", { email, password });
-            closeCreateAccountModal();
-            showMessage("Account created successfully! (Static example)", 'success');
+            alert(`A password reset link has been sent to ${resetEmail}. (Static example)`);
         }
 
         function showTermsAndConditions(event) {
             event.preventDefault();
-            termsModal.classList.remove('hidden');
+            document.getElementById('termsModal').classList.remove('hidden');
         }
 
         function closeTermsModal() {
-            termsModal.classList.add('hidden');
+            document.getElementById('termsModal').classList.add('hidden');
         }
     </script>
 </body>
