@@ -56,17 +56,23 @@
     }
     
     .hero-content {
-        position: relative;
-        z-index: 2;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
         text-align: center;
         color: white;
+        width: 100%;
+        pointer-events: none;
     }
     
     .hero-content h1 {
         font-size: 4rem;
         font-weight: 700;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        margin-bottom: 20px;
+        margin: 0;
+        padding: 0;
     }
     
     .hero-dots {
@@ -117,7 +123,53 @@
     .product-card:hover {
         transform: translateY(-10px);
         box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        animation: rumble 0.3s ease-in-out;
     }
+    
+    @keyframes rumble {
+        0% { transform: translateY(-10px) rotate(0deg); }
+        25% { transform: translateY(-10px) rotate(1deg); }
+        50% { transform: translateY(-10px) rotate(0deg); }
+        75% { transform: translateY(-10px) rotate(-1deg); }
+        100% { transform: translateY(-10px) rotate(0deg); }
+    }
+    
+    .product-card {
+        animation: subtleFloat 3s ease-in-out infinite;
+    }
+    
+    @keyframes subtleFloat {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-2px); }
+    }
+    
+    .product-card:nth-child(odd) {
+        animation-delay: 0.5s;
+    }
+    
+    .product-card:nth-child(even) {
+        animation-delay: 1s;
+    }
+    
+    .product-card:nth-child(3n) {
+        animation-delay: 1.5s;
+    }
+    
+    .product-card:hover .product-img img {
+        transform: scale(1.05) rotate(2deg);
+        transition: transform 0.3s ease;
+    }
+    
+    .product-card:active {
+        animation: clickRumble 0.2s ease-in-out;
+    }
+    
+    @keyframes clickRumble {
+        0% { transform: scale(1); }
+        50% { transform: scale(0.95) rotate(1deg); }
+        100% { transform: scale(1); }
+    }
+    
     
     .product-img {
         position: relative;
@@ -352,6 +404,10 @@
             font-size: 2.5rem;
         }
         
+        .hero {
+            height: 50vh;
+        }
+        
         .modal-content {
             flex-direction: column;
             width: 95%;
@@ -372,138 +428,125 @@
 
 @section('content')
 <div class="main-container">
-    <section class="hero">
+    <section class="feature">
+        <!-- Hero Section at top of products -->
+        <div class="hero" style="margin-bottom: 40px;">
         <div class="hero-slides">
+                @forelse($heroProducts as $index => $product)
+                    <img class="slide {{ $index === 0 ? 'active' : '' }}" 
+                         src="{{ $product->image }}" 
+                         alt="{{ $product->name }}"
+                         onerror="this.src='{{ asset('ssa/logo.png') }}'">
+                @empty
+                    <!-- Fallback images if no products -->
             <img class="slide active" src="https://i.pinimg.com/736x/a2/4a/b5/a24ab53b4bf89b079978fad2e813e6d8.jpg" alt="Slide 1">
             <img class="slide" src="https://i.pinimg.com/1200x/95/62/40/9562401b17aa8803c45564fa87a7523a.jpg" alt="Slide 2">
             <img class="slide" src="https://i.pinimg.com/1200x/3f/29/e2/3f29e2a0f203313db21fa45734f73b29.jpg" alt="Slide 3">
             <img class="slide" src="https://i.pinimg.com/736x/fd/a6/8c/fda68c5189f7cd37f044e201a77acc1e.jpg" alt="Slide 4">
             <img class="slide" src="https://i.pinimg.com/736x/5c/b4/98/5cb49830b398136f9c2aa341f847958d.jpg" alt="Slide 5">
+                @endforelse
         </div>
         <div class="hero-content">
-            <h1>SHOP</h1>
+                <h1>SHOP ALL PRODUCTS</h1>
         </div>
         <div class="hero-dots">
+                @forelse($heroProducts as $index => $product)
+                    <span class="dot {{ $index === 0 ? 'active' : '' }}" data-index="{{ $index }}"></span>
+                @empty
+                    <!-- Fallback dots -->
             <span class="dot active" data-index="0"></span>
             <span class="dot" data-index="1"></span>
             <span class="dot" data-index="2"></span>
             <span class="dot" data-index="3"></span>
             <span class="dot" data-index="4"></span>
-        </div>
-    </section>
-
-    <section class="feature">
-        <div class="feature-content">
-            <div class="product-card" 
-                data-name="Family Adventure Board Game" 
-                data-sizes="Standard" 
-                data-colors="Multi-Color" 
-                data-price="950" 
-                data-orig-price="1200" 
-                data-img-red="https://m.media-amazon.com/images/I/91+0y-6N+KL.jpg">
-                <div class="product-img">
-                    <img src="https://m.media-amazon.com/images/I/91+0y-6N+KL.jpg" alt="Family Adventure Board Game">
-                    <span class="discount">-21%</span>
-                </div>
-                <div class="product-info">
-                    <h6>Family Adventure Board Game</h6>
-                    <h3>₱950 <del>₱1,200</del></h3>
-                    <p class="buyers"><i class="fas fa-user-check"></i> 1,500 sold</p>
+                @endforelse
                 </div>
             </div>
-
+        <div class="feature-content" id="productsContainer">
+            @forelse($products as $product)
+                @php
+                    $discount = $product->original_price ? round((($product->original_price - $product->price) / $product->original_price) * 100) : 0;
+                    $soldCount = $product->review_count ? $product->review_count * 10 : rand(50, 2000);
+                @endphp
             <div class="product-card" 
-                data-name="Galactic Starship LEGO Set" 
-                data-sizes="Large" 
-                data-colors="Blue, Gray" 
-                data-price="1750" 
-                data-orig-price="2200"
-                data-img-red="https://www.lego.com/cdn/product-assets/product.img.toy.bricks.jpeg/40555.jpeg">
+                    data-name="{{ $product->name }}" 
+                    data-id="{{ $product->id }}"
+                    data-sizes="Standard, Large" 
+                    data-colors="Multi-Color" 
+                    data-price="{{ $product->price }}" 
+                    data-orig-price="{{ $product->original_price ?? $product->price }}"
+                    data-img-red="{{ $product->image }}"
+                    data-category="{{ $product->category }}">
                 <div class="product-img">
-                    <img src="https://www.lego.com/cdn/product-assets/product.img.toy.bricks.jpeg/40555.jpeg" alt="Galactic Starship LEGO Set">
-                    <span class="discount">-21%</span>
+                        <img src="{{ $product->image }}" alt="{{ $product->name }}" onerror="this.src='{{ asset('ssa/logo.png') }}'">
+                        @if($discount > 0)
+                            <span class="discount">-{{ $discount }}%</span>
+                        @endif
                 </div>
                 <div class="product-info">
-                    <h6>Galactic Starship LEGO Set</h6>
-                    <h3>₱1,750 <del>₱2,200</del></h3>
-                    <p class="buyers"><i class="fas fa-user-check"></i> 800 sold</p>
+                        <h6>{{ $product->name }}</h6>
+                        <h3>₱{{ number_format($product->price, 2) }} 
+                            @if($product->original_price && $product->original_price > $product->price)
+                                <del>₱{{ number_format($product->original_price, 2) }}</del>
+                            @endif
+                        </h3>
+                        <p class="buyers">
+                            <i class="fas fa-user-check"></i> {{ $soldCount }} sold
+                            @if($product->average_rating)
+                                | <i class="fas fa-star" style="color: #ffc107;"></i> {{ $product->average_rating }}
+                            @endif
+                        </p>
+                        @php
+                            $categoryColors = [
+                                'electronics' => '#e74c3c',
+                                'fashion' => '#9b59b6', 
+                                'beauty' => '#e91e63',
+                                'sports' => '#27ae60',
+                                'toys' => '#f39c12',
+                                'home' => '#3498db',
+                                'groceries' => '#2ecc71',
+                                'new' => '#e67e22'
+                            ];
+                            $categoryIcons = [
+                                'electronics' => '⚡',
+                                'fashion' => '👕',
+                                'beauty' => '💄',
+                                'sports' => '⚽',
+                                'toys' => '🎮',
+                                'home' => '🏠',
+                                'groceries' => '🛒',
+                                'new' => '✨'
+                            ];
+                            $color = $categoryColors[$product->category] ?? '#95a5a6';
+                            $icon = $categoryIcons[$product->category] ?? '🏷️';
+                        @endphp
+                        <p class="category-badge" style="font-size: 0.8rem; color: {{ $color }}; margin-top: 5px; font-weight: 600; background: {{ $color }}20; padding: 4px 8px; border-radius: 12px; display: inline-block;">
+                            {{ $icon }} {{ ucfirst($product->category) }}
+                        </p>
+                        
+                        <!-- Direct Add to Cart Button -->
+                        <div style="margin-top: 15px;">
+                            <form action="{{ route('cart.add', $product) }}" method="POST" style="display: inline-block;">
+                                @csrf
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" style="background: #3498db; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: background 0.3s ease; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                            </form>
+                        </div>
                 </div>
             </div>
-
-            <div class="product-card" 
-                data-name="Compact RC Racing Drone" 
-                data-sizes="Small, Medium" 
-                data-colors="Black, White, Red" 
-                data-price="4000" 
-                data-orig-price="6500"
-                data-img-black="https://i.pinimg.com/originals/e8/34/00/e83400a40236a282f6f36599f57424ed.jpg">
-                <div class="product-img">
-                    <img src="https://i.pinimg.com/originals/e8/34/00/e83400a40236a282f6f36599f57424ed.jpg" alt="Compact RC Racing Drone">
-                    <span class="discount">-38%</span>
+            @empty
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px;">
+                    <h3 style="color: #666; margin-bottom: 20px;">No products available</h3>
+                    <p style="color: #999;">Please run the database seeder to populate products.</p>
+                    <a href="{{ route('home') }}" style="display: inline-block; margin-top: 20px; padding: 12px 24px; background: #2c3c8c; color: white; text-decoration: none; border-radius: 8px;">Go Home</a>
                 </div>
-                <div class="product-info">
-                    <h6>Compact RC Racing Drone</h6>
-                    <h3>₱4,000 <del>₱6,500</del></h3>
-                    <p class="buyers"><i class="fas fa-user-check"></i> 650 sold</p>
-                </div>
-            </div>
-
-            <div class="product-card" 
-                data-name="Superhero Action Figure" 
-                data-sizes="6 inch, 12 inch" 
-                data-colors="Blue, Red, Black" 
-                data-price="1890" 
-                data-orig-price="2100"
-                data-img-black="https://m.media-amazon.com/images/I/81M+2dI9YhL._AC_UF890,1000_QL80_.jpg">
-                <div class="product-img">
-                    <img src="https://m.media-amazon.com/images/I/81M+2dI9YhL._AC_UF890,1000_QL80_.jpg" alt="Superhero Action Figure">
-                    <span class="discount">-10%</span>
-                </div>
-                <div class="product-info">
-                    <h6>Superhero Action Figure</h6>
-                    <h3>₱1,890 <del>₱2,100</del></h3>
-                    <p class="buyers"><i class="fas fa-user-check"></i> 300 sold</p>
-                </div>
-            </div>
-
-            <div class="product-card" 
-                data-name="1000-Piece Landscape Puzzle" 
-                data-sizes="Standard" 
-                data-colors="Nature, City, Ocean" 
-                data-price="395" 
-                data-orig-price="465"
-                data-img-black="https://m.media-amazon.com/images/I/91eKz+72SjL._AC_SX425_.jpg">
-                <div class="product-img">
-                    <img src="https://m.media-amazon.com/images/I/91eKz+72SjL._AC_SX425_.jpg" alt="1000-Piece Landscape Puzzle">
-                    <span class="discount">-15%</span>
-                </div>
-                <div class="product-info">
-                    <h6>1000-Piece Landscape Puzzle</h6>
-                    <h3>₱395 <del>₱465</del></h3>
-                    <p class="buyers"><i class="fas fa-user-check"></i> 900 sold</p>
-                </div>
-            </div>
-
-            <div class="product-card" 
-                data-name="Creative Clay Set" 
-                data-sizes="Small, Large" 
-                data-colors="Red, Blue, Yellow, Green" 
-                data-price="180" 
-                data-orig-price="240"
-                data-img-gray="https://images.thdstatic.com/productImages/ecb1814e-913a-446a-93be-6d9b9a528c11/svn/play-doh-play-doh-sets-a1780f01-64_600.jpg">
-                <div class="product-img">
-                    <img src="https://images.thdstatic.com/productImages/ecb1814e-913a-446a-93be-6d9b9a528c11/svn/play-doh-play-doh-sets-a1780f01-64_600.jpg" alt="Creative Clay Set">
-                    <span class="discount">-25%</span>
-                </div>
-                <div class="product-info">
-                    <h6>Creative Clay Set</h6>
-                    <h3>₱180 <del>₱240</del></h3>
-                    <p class="buyers"><i class="fas fa-user-check"></i> 1,100 sold</p>
-                </div>
-            </div>
+            @endforelse
         </div>
     </section>
 </div>
+
 
 <!-- Product Modal -->
 <div class="product-modal" id="productModal">
@@ -554,8 +597,8 @@
             showSlide(currentSlide);
         }
 
-        // Auto-advance slides
-        setInterval(nextSlide, 5000);
+        // Auto-advance slides every 4 seconds
+        setInterval(nextSlide, 4000);
 
         // Dot navigation
         dots.forEach((dot, index) => {
@@ -646,8 +689,14 @@
         };
 
         productCards.forEach(card => {
-            card.addEventListener('click', () => {
+            card.addEventListener('click', (e) => {
+                // Don't open modal if clicking on the Add to Cart button
+                if (e.target.closest('form') || e.target.closest('button')) {
+                    return;
+                }
+                
                 const productData = {
+                    id: card.getAttribute('data-id'),
                     name: card.getAttribute('data-name'),
                     sizes: card.getAttribute('data-sizes'),
                     colors: card.getAttribute('data-colors'),
@@ -711,22 +760,117 @@
         
         addToCartBtn.addEventListener('click', () => {
             const productName = modalName.textContent;
-            if (selectedSize && selectedColor) {
-                alert(`Added ${productName} (Size: ${selectedSize}, Color: ${selectedColor}) to cart!`);
-                closeModal();
-            } else {
-                alert('Please select a size and color.');
+            const productPrice = parseFloat(modalPrice.textContent.replace('₱', '').replace(/,/g, ''));
+            
+            // Create a form to submit to cart
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/add/${currentProductData.id || 'demo'}`;
+            
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.appendChild(csrfToken);
+            
+            // Add quantity
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = 'quantity';
+            quantityInput.value = '1';
+            form.appendChild(quantityInput);
+            
+            // Add product details for demo products
+            if (!currentProductData.id || currentProductData.id === 'demo') {
+                const productNameInput = document.createElement('input');
+                productNameInput.type = 'hidden';
+                productNameInput.name = 'product_name';
+                productNameInput.value = productName;
+                form.appendChild(productNameInput);
+                
+                const productPriceInput = document.createElement('input');
+                productPriceInput.type = 'hidden';
+                productPriceInput.name = 'product_price';
+                productPriceInput.value = productPrice;
+                form.appendChild(productPriceInput);
+                
+                const productImageInput = document.createElement('input');
+                productImageInput.type = 'hidden';
+                productImageInput.name = 'product_image';
+                productImageInput.value = modalImg.src;
+                form.appendChild(productImageInput);
             }
+            
+            document.body.appendChild(form);
+            form.submit();
         });
 
         checkoutBtn.addEventListener('click', () => {
             const productName = modalName.textContent;
-            if (selectedSize && selectedColor) {
-                alert(`Proceeding to checkout for ${productName} (Size: ${selectedSize}, Color: ${selectedColor}).`);
-                closeModal();
-            } else {
-                alert('Please select a size and color before checking out.');
+            const productPrice = parseFloat(modalPrice.textContent.replace('₱', '').replace(/,/g, ''));
+            
+            // First add to cart, then redirect to checkout
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `/cart/add/${currentProductData.id || 'demo'}`;
+            
+            // Add CSRF token
+            const csrfToken = document.createElement('input');
+            csrfToken.type = 'hidden';
+            csrfToken.name = '_token';
+            csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            form.appendChild(csrfToken);
+            
+            // Add quantity
+            const quantityInput = document.createElement('input');
+            quantityInput.type = 'hidden';
+            quantityInput.name = 'quantity';
+            quantityInput.value = '1';
+            form.appendChild(quantityInput);
+            
+            // Add product details for demo products
+            if (!currentProductData.id || currentProductData.id === 'demo') {
+                const productNameInput = document.createElement('input');
+                productNameInput.type = 'hidden';
+                productNameInput.name = 'product_name';
+                productNameInput.value = productName;
+                form.appendChild(productNameInput);
+                
+                const productPriceInput = document.createElement('input');
+                productPriceInput.type = 'hidden';
+                productPriceInput.name = 'product_price';
+                productPriceInput.value = productPrice;
+                form.appendChild(productPriceInput);
+                
+                const productImageInput = document.createElement('input');
+                productImageInput.type = 'hidden';
+                productImageInput.name = 'product_image';
+                productImageInput.value = modalImg.src;
+                form.appendChild(productImageInput);
             }
+            
+            // Add redirect parameter
+            const redirectInput = document.createElement('input');
+            redirectInput.type = 'hidden';
+            redirectInput.name = 'redirect_to_checkout';
+            redirectInput.value = '1';
+            form.appendChild(redirectInput);
+            
+            document.body.appendChild(form);
+            form.submit();
+        });
+
+        // Enhanced rumble effect on product card click
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            card.addEventListener('click', () => {
+                // Add extra rumble effect
+                card.style.animation = 'clickRumble 0.3s ease-in-out';
+                setTimeout(() => {
+                    card.style.animation = 'subtleFloat 3s ease-in-out infinite';
+                }, 300);
+            });
         });
     });
 </script>

@@ -21,7 +21,24 @@ class Product extends Model
         'average_rating',
         'review_count',
         'positive_review_count',
-        'negative_review_count'
+        'negative_review_count',
+        'seller_id',
+        'shop_id',
+        'sku',
+        'barcode',
+        'weight',
+        'dimensions',
+        'brand',
+        'model',
+        'condition',
+        'status',
+        'is_featured',
+        'is_digital',
+        'download_link',
+        'tags',
+        'meta_title',
+        'meta_description',
+        'seo_keywords'
     ];
 
     protected $casts = [
@@ -31,7 +48,12 @@ class Product extends Model
         'review_count' => 'integer',
         'positive_review_count' => 'integer',
         'negative_review_count' => 'integer',
-        'review_summary_updated_at' => 'datetime'
+        'review_summary_updated_at' => 'datetime',
+        'weight' => 'decimal:2',
+        'dimensions' => 'array',
+        'is_featured' => 'boolean',
+        'is_digital' => 'boolean',
+        'tags' => 'array'
     ];
 
     protected $appends = [
@@ -42,6 +64,21 @@ class Product extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    public function seller(): BelongsTo
+    {
+        return $this->belongsTo(Seller::class);
+    }
+
+    public function shop(): BelongsTo
+    {
+        return $this->belongsTo(Shop::class);
+    }
+
+    public function earnings(): HasMany
+    {
+        return $this->hasMany(Earning::class);
     }
 
     public function updateSummary(): void

@@ -14,6 +14,12 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('tracking:update')->hourly();
         $schedule->command('reviews:summarize')->dailyAt('3:00');
+        
+        // Auto-complete orders that have passed their confirmation deadline
+        $schedule->command('orders:auto-complete')->hourly();
+        
+        // Send expiration reminders for orders expiring soon (daily at 9 AM)
+        $schedule->command('orders:auto-complete --reminders')->dailyAt('9:00');
     }
 
     /**

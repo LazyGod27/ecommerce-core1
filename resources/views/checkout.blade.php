@@ -492,6 +492,11 @@
                     </div>
                     
                     <div class="form-group">
+                        <label for="shipping_email">Email Address *</label>
+                        <input type="email" id="shipping_email" name="shipping_email" value="{{ $user->email ?? '' }}" required>
+                    </div>
+                    
+                    <div class="form-group">
                         <label for="shipping_address">Shipping Address *</label>
                         <textarea id="shipping_address" name="shipping_address" rows="3" required>{{ $user->address_line1 ?? '' }}</textarea>
                         <input type="hidden" id="shipping_lat" name="shipping_lat">

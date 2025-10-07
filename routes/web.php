@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
@@ -15,8 +16,21 @@ Route::get('/', function () {
     return view('ssa.index');
 })->name('home');
 Route::get('/products', function () {
-    return view('products');
+    // Get products from all categories and shuffle them to create a "rumble" effect
+    $products = \App\Models\Product::with(['reviews'])->inRandomOrder()->get();
+    // Get some featured products for hero section
+    $heroProducts = \App\Models\Product::inRandomOrder()->take(5)->get();
+    return view('products', compact('products', 'heroProducts'));
 })->name('products');
+
+// Store routes
+Route::get('/store', function () {
+    return view('store');
+})->name('store');
+
+Route::get('/product/{id}', function ($id) {
+    return view('product-detail', compact('id'));
+})->name('product.detail');
 
 // Category routes
 Route::get('/categories/best', function () {
@@ -60,24 +74,27 @@ Route::get('/customer-service', function () {
     return view('ssa.customer-service');
 })->name('customer-service');
 
-// Order Tracking route
-Route::get('/track-order', function () {
-    $orderId = request('order');
-    $order = null;
-    
-    if ($orderId) {
-        $order = \App\Models\Order::with(['items.product'])
-            ->where('id', $orderId)
-            ->where('user_id', auth()->id())
-            ->first();
-    }
-    
-    return view('ssa.track-order', compact('order'));
-})->name('track-order');
+// Order Tracking route (protected by auth middleware)
+Route::middleware('auth')->group(function () {
+    Route::get('/track-order', function () {
+        $orderId = request('order');
+        $order = null;
+        
+        if ($orderId) {
+            $order = \App\Models\Order::with(['items.product', 'tracking'])
+                ->where('id', $orderId)
+                ->where('user_id', auth()->id())
+                ->first();
+        }
+        
+        return view('ssa.track-order', compact('order'));
+    })->name('track-order');
+});
 // Search routes
 Route::get('/search', [SearchController::class, 'search'])->name('search');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions'])->name('search.suggestions');
 Route::get('/search/trending', [SearchController::class, 'trending'])->name('search.trending');
+Route::get('/search/popular', [SearchController::class, 'popular'])->name('search.popular');
 Route::get('/products/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/products/category/{category}', [ProductController::class, 'category'])->name('products.category');
 Route::get('/voice-search', function () {
@@ -96,14 +113,18 @@ Route::get('/debug', function () {
     return view('debug');
 })->name('debug');
 
-// Cart routes
+// Cart routes (available for both guests and authenticated users)
 Route::get('/cart', [CartController::class, 'index'])->name('cart');
 Route::post('/cart/add/{product}', [CartController::class, 'add'])->name('cart.add');
 Route::post('/cart/remove/{rowId}', [CartController::class, 'remove'])->name('cart.remove');
 Route::post('/cart/update/{rowId}', [CartController::class, 'update'])->name('cart.update');
-Route::post('/cart/save-for-later/{rowId}', [CartController::class, 'saveForLater'])->name('cart.save-for-later');
 Route::post('/cart/clear', [CartController::class, 'clear'])->name('cart.clear');
 Route::get('/cart/count', [CartController::class, 'getCartCount'])->name('cart.count');
+
+Route::middleware('auth')->group(function () {
+    Route::post('/cart/save-for-later/{rowId}', [CartController::class, 'saveForLater'])->name('cart.save-for-later');
+    Route::post('/checkout/direct', [CartController::class, 'directCheckout'])->name('checkout.direct');
+});
 
 // Authentication routes
 Route::get('/login', function () {
@@ -126,7 +147,7 @@ Route::get('/auth/facebook/callback', [AuthController::class, 'handleFacebookCal
 Route::get('/checkout', [CartController::class, 'checkout'])->name('checkout');
 Route::middleware('auth')->group(function () {
     Route::post('/checkout/process', [CartController::class, 'processCheckout'])->name('checkout.process');
-    Route::get('/order-confirmation/{order}', [CartController::class, 'orderConfirmation'])->name('order.confirmation');
+    // Removed duplicate route - using OrderController::confirmation instead
     Route::get('/api/similar-products/{order}', [CartController::class, 'getSimilarProducts'])->name('api.similar-products');
 });
 
@@ -183,6 +204,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/order/confirmation/{orderId}', [OrderController::class, 'confirmation'])->name('order.confirmation');
     Route::post('/order/cancel/{orderId}', [OrderController::class, 'cancel'])->name('order.cancel');
     Route::put('/order/edit/{orderId}', [OrderController::class, 'edit'])->name('order.edit');
+    
+    // Order response routes
+    Route::get('/orders-waiting-response', [App\Http\Controllers\CustomerOrderController::class, 'waitingForResponse'])->name('orders.waiting-response');
+    Route::get('/orders/{order}/response', [App\Http\Controllers\CustomerOrderController::class, 'showResponseForm'])->name('orders.response-form');
+    Route::post('/orders/{order}/confirm-received', [App\Http\Controllers\CustomerOrderController::class, 'confirmReceived'])->name('orders.confirm-received');
+    Route::get('/orders/{order}/request-return', [App\Http\Controllers\CustomerOrderController::class, 'showReturnForm'])->name('orders.request-return');
+    Route::post('/orders/{order}/request-return', [App\Http\Controllers\CustomerOrderController::class, 'requestReturn'])->name('orders.request-return.submit');
+    Route::get('/orders-return-requests', [App\Http\Controllers\CustomerOrderController::class, 'returnRequests'])->name('orders.return-requests');
+    Route::get('/orders/{order}/status', [App\Http\Controllers\CustomerOrderController::class, 'getOrderStatus'])->name('orders.status');
+    Route::get('/orders/{order}/return-details', [App\Http\Controllers\CustomerOrderController::class, 'getReturnDetails'])->name('orders.return-details');
 });
 
 // Admin tracking management (protected)
@@ -194,3 +225,9 @@ Route::middleware(['auth', 'admin'])->group(function () {
 
 // API routes for AJAX requests
 Route::get('/api/payment-methods', [PaymentController::class, 'getPaymentMethods'])->name('api.payment.methods');
+Route::get('/api/user', function () {
+    if (Auth::check()) {
+        return response()->json(['authenticated' => true, 'user' => Auth::user()]);
+    }
+    return response()->json(['authenticated' => false], 401);
+})->name('api.user');

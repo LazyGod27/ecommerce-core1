@@ -413,12 +413,12 @@
             
             <div class="detail-row">
                 <span class="detail-label">Contact Number:</span>
-                <span class="detail-value">{{ $order->contact_number }}</span>
+                <span class="detail-value">{{ $order->contact_number ?? $order->user->phone ?? 'Not provided' }}</span>
             </div>
             
             <div class="detail-row">
                 <span class="detail-label">Email:</span>
-                <span class="detail-value">{{ $order->email }}</span>
+                <span class="detail-value">{{ $order->email ?? $order->user->email ?? 'Not provided' }}</span>
             </div>
             
             <div class="detail-row">
@@ -454,7 +454,7 @@
         </div>
         
         <div class="action-buttons">
-            <a href="{{ route('tracking', $order->id) }}" class="btn btn-primary">
+            <a href="{{ route('tracking.show', $order->id) }}" class="btn btn-primary">
                 <i class="ri-truck-line"></i> Track Order
             </a>
             <a href="{{ route('profile.orders') }}" class="btn btn-outline">
@@ -535,6 +535,7 @@
 @endsection
 
 @section('scripts')
+<script src="{{ asset('js/cart-auth.js') }}"></script>
 <script>
     // Add any additional JavaScript functionality here
     document.addEventListener('DOMContentLoaded', function() {
@@ -566,48 +567,7 @@
         console.log('Order confirmation page loaded');
     });
     
-    function addToCart(productName, price, image) {
-        // Create a form to add item to cart
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = `/cart/add/${Date.now()}`; // Use timestamp as synthetic ID
-        
-        // Add CSRF token
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        form.appendChild(csrfToken);
-        
-        // Add product details
-        const nameInput = document.createElement('input');
-        nameInput.type = 'hidden';
-        nameInput.name = 'product_name';
-        nameInput.value = productName;
-        form.appendChild(nameInput);
-        
-        const priceInput = document.createElement('input');
-        priceInput.type = 'hidden';
-        priceInput.name = 'product_price';
-        priceInput.value = price;
-        form.appendChild(priceInput);
-        
-        const imageInput = document.createElement('input');
-        imageInput.type = 'hidden';
-        imageInput.name = 'product_image';
-        imageInput.value = image;
-        form.appendChild(imageInput);
-        
-        const quantityInput = document.createElement('input');
-        quantityInput.type = 'hidden';
-        quantityInput.name = 'quantity';
-        quantityInput.value = '1';
-        form.appendChild(quantityInput);
-        
-        // Add to DOM and submit
-        document.body.appendChild(form);
-        form.submit();
-    }
+    // addToCart function is now loaded from cart-auth.js
     
     // Add hover effects to product cards
     document.querySelectorAll('.product-card').forEach(card => {

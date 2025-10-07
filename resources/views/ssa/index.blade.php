@@ -138,7 +138,9 @@
 
     <header>
         <div class="logo">
-            <img src="{{ asset('ssa/logo.png') }}" alt="IMARKET PH Logo">
+            <a href="{{ route('home') }}">
+                <img src="{{ asset('ssa/logo.png') }}" alt="IMARKET PH Logo">
+            </a>
         </div>
         <ul class="navbar" id="navbar">
             <li><a href="#" class="active"><i class="ri-home-line"></i> Home</a></li>
@@ -159,37 +161,12 @@
                 </ul>
             </li>
         </ul>
-        <div class="search-bar">
-            <form action="{{ route('search') }}" method="GET" class="flex flex-grow relative" id="searchForm">
-                <input type="text" 
-                       name="q" 
-                       id="searchInput"
-                       placeholder="Search for products, brands and more..." 
-                       class="w-full px-3 text-base outline-none border-none" 
-                       value="{{ request('q') }}" 
-                       autocomplete="off" />
-                <button type="submit" class="search-btn"><i class="ri-search-line"></i></button>
-                
-                <!-- Search Suggestions Dropdown -->
-                <div id="searchSuggestions" class="search-suggestions hidden" style="display: none;">
-                    <div class="suggestions-content">
-                        <div id="suggestionsList" class="suggestions-list"></div>
-                        <div id="trendingSuggestions" class="trending-suggestions">
-                            <div class="trending-header">
-                                <i class="ri-fire-line"></i>
-                                <span>Trending Searches</span>
-                            </div>
-                            <div id="trendingList" class="trending-list"></div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
+        @include('components.search-bar')
         <div class="icons">
-            <a href="{{ route('cart') }}"><i class="ri-shopping-cart-line"></i></a>
+            <a href="#" onclick="goToCart()"><i class="ri-shopping-cart-line"></i></a>
             @auth
                 <div class="user-dropdown">
-                    <a href="#" class="user-link">
+                    <a href="{{ route('profile.index') }}" class="user-link">
                         <i class="ri-user-line"></i>
                         <span class="user-name">{{ auth()->user()->name }}</span>
                         <i class="ri-arrow-down-s-line"></i>
@@ -549,21 +526,8 @@
     </button>
 
     <form id="add-to-cart-form" method="POST" style="display:none;"></form>
+    <script src="{{ asset('js/cart-auth.js') }}"></script>
     <script>
-        function addToCart(productName, price, image) {
-            const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            const form = document.getElementById('add-to-cart-form');
-            const syntheticId = Date.now();
-            form.setAttribute('action', `${'{{ url('/') }}'}/cart/add/${syntheticId}`);
-            form.innerHTML = `
-                <input type="hidden" name="_token" value="${csrf}">
-                <input type="hidden" name="product_name" value="${productName}">
-                <input type="hidden" name="product_price" value="${price}">
-                <input type="hidden" name="product_image" value="${image}">
-                <input type="hidden" name="quantity" value="1">
-            `;
-            form.submit();
-        }
 
         function viewProduct(productName, price, image, description) {
             // Create and show product detail modal
@@ -752,99 +716,49 @@
             border-color: #e74c3c;
         }
         
-        /* Search Suggestions Styles */
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
+        /* Search Bar Styles */
+        .search-bar {
+            position: relative;
+            display: flex;
+            align-items: center;
             background: white;
-            border: 1px solid #e5e7eb;
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            z-index: 1000;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .suggestions-content {
-            padding: 16px;
-        }
-        
-        .suggestions-list {
-            margin-bottom: 16px;
-        }
-        
-        .suggestion-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-bottom: 4px;
-        }
-        
-        .suggestion-item:hover {
-            background-color: #f3f4f6;
-        }
-        
-        .suggestion-item i {
-            margin-right: 8px;
-            color: #6b7280;
-            font-size: 16px;
-        }
-        
-        .suggestion-text {
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             flex: 1;
-            color: #374151;
-            font-size: 14px;
+            max-width: 600px;
+            margin: 0 20px;
         }
         
-        .trending-suggestions {
-            border-top: 1px solid #e5e7eb;
-            padding-top: 16px;
+        .search-bar input {
+            flex: 1;
+            border: none;
+            outline: none;
+            padding: 12px 16px;
+            font-size: 16px;
+            background: transparent;
         }
         
-        .trending-header {
+        .search-btn {
+            background: #2c3c8c;
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
             display: flex;
             align-items: center;
-            margin-bottom: 8px;
-            color: #6b7280;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            justify-content: center;
         }
         
-        .trending-header i {
-            margin-right: 6px;
-            color: #f59e0b;
+        .search-btn:hover {
+            background: #1e40af;
         }
         
-        .trending-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
+        .search-btn i {
+            font-size: 18px;
         }
         
-        .trending-item {
-            background: #f3f4f6;
-            color: #374151;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        
-        .trending-item:hover {
-            background: #e5e7eb;
-        }
-        
-        .search-suggestions.hidden {
-            display: none;
-        }
                 .quantity-controls {
                     display: flex;
                     align-items: center;
@@ -1012,26 +926,7 @@
             form.submit();
         }
 
-        function buyNowWithOptions(productName, price, image) {
-            const size = getSelectedSize();
-            const quantity = getSelectedQuantity();
-            
-            // Add to cart with options and redirect to checkout
-            addToCartWithOptions(productName, price, image);
-            // Redirect to checkout after a short delay
-            setTimeout(() => {
-                window.location.href = '{{ route("checkout") }}';
-            }, 500);
-        }
-
-        function buyNow(productName, price, image) {
-            // Add to cart and redirect to checkout
-            addToCart(productName, price, image);
-            // Redirect to checkout after a short delay
-            setTimeout(() => {
-                window.location.href = '{{ route("checkout") }}';
-            }, 500);
-        }
+        // buyNow and buyNowWithOptions functions are now loaded from cart-auth.js
 
         const voiceToggleBtn=document.getElementById('voice-toggle-btn');
         const voiceChatContainer=document.getElementById('voice-chat-container');
@@ -1055,162 +950,6 @@
             // Modal functionality removed - using dedicated HTML pages instead
         });
         
-        // Search Suggestions Functionality
-        const searchInput = document.getElementById('searchInput');
-        const searchSuggestions = document.getElementById('searchSuggestions');
-        const suggestionsList = document.getElementById('suggestionsList');
-        const trendingList = document.getElementById('trendingList');
-        let searchTimeout;
-
-        searchInput.addEventListener('input', function() {
-            const query = this.value.trim();
-            console.log('Input event triggered, query:', query);
-            
-            clearTimeout(searchTimeout);
-            
-            if (query.length < 2) {
-                console.log('Query too short, hiding suggestions');
-                hideSuggestions();
-                return;
-            }
-
-            console.log('Setting timeout for suggestions fetch');
-            searchTimeout = setTimeout(() => {
-                console.log('Timeout triggered, fetching suggestions');
-                fetchSuggestions(query);
-            }, 300);
-        });
-
-        searchInput.addEventListener('focus', function() {
-            const query = this.value.trim();
-            console.log('Focus event triggered, query:', query);
-            
-            if (query.length >= 2) {
-                // If there's already a query, fetch suggestions
-                console.log('Query exists, fetching suggestions');
-                fetchSuggestions(query);
-            } else {
-                // Only show trending searches when user focuses on empty search bar
-                console.log('No query, loading trending searches');
-                loadTrendingSearches();
-                showSuggestions();
-            }
-        });
-
-        searchInput.addEventListener('blur', function() {
-            // Hide suggestions after a short delay to allow clicking on suggestions
-            setTimeout(() => {
-                hideSuggestions();
-            }, 200);
-        });
-
-        // Hide suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
-                hideSuggestions();
-            }
-        });
-
-        function showSuggestions() {
-            searchSuggestions.classList.remove('hidden');
-            searchSuggestions.style.display = 'block';
-        }
-
-        function hideSuggestions() {
-            searchSuggestions.classList.add('hidden');
-            searchSuggestions.style.display = 'none';
-        }
-
-        async function fetchSuggestions(query) {
-            try {
-                console.log('Fetching suggestions for:', query);
-                const response = await fetch(`/search/suggestions?q=${encodeURIComponent(query)}`);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Received suggestions:', data);
-                
-                if (data.suggestions && data.suggestions.length > 0) {
-                    displaySuggestions(data.suggestions);
-                    showSuggestions();
-                } else {
-                    console.log('No suggestions received');
-                    hideSuggestions();
-                }
-            } catch (error) {
-                console.error('Error fetching suggestions:', error);
-                hideSuggestions();
-            }
-        }
-
-        async function loadTrendingSearches() {
-            try {
-                console.log('Loading trending searches...');
-                const response = await fetch('/search/trending');
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('Received trending searches:', data);
-                
-                if (data.trending && data.trending.length > 0) {
-                    displayTrendingSearches(data.trending);
-                } else {
-                    console.log('No trending searches received');
-                }
-            } catch (error) {
-                console.error('Error loading trending searches:', error);
-            }
-        }
-
-        function displaySuggestions(suggestions) {
-            suggestionsList.innerHTML = '';
-            
-            if (suggestions.length === 0) {
-                suggestionsList.innerHTML = '<div class="suggestion-item"><span class="suggestion-text">No suggestions found</span></div>';
-                return;
-            }
-
-            suggestions.forEach(suggestion => {
-                const item = document.createElement('div');
-                item.className = 'suggestion-item';
-                item.innerHTML = `
-                    <i class="ri-search-line"></i>
-                    <span class="suggestion-text">${suggestion}</span>
-                `;
-                
-                item.addEventListener('click', () => {
-                    searchInput.value = suggestion;
-                    hideSuggestions();
-                    document.getElementById('searchForm').submit();
-                });
-                
-                suggestionsList.appendChild(item);
-            });
-        }
-
-        function displayTrendingSearches(trending) {
-            trendingList.innerHTML = '';
-            
-            trending.forEach(term => {
-                const item = document.createElement('div');
-                item.className = 'trending-item';
-                item.textContent = term;
-                
-                item.addEventListener('click', () => {
-                    searchInput.value = term;
-                    hideSuggestions();
-                    document.getElementById('searchForm').submit();
-                });
-                
-                trendingList.appendChild(item);
-            });
-        }
     </script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <script src="{{ asset('ssa/script.js') }}"></script>

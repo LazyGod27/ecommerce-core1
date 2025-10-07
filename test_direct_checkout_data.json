@@ -1,0 +1,6 @@
+{
+    "product_name": "Test Product for Direct Checkout",
+    "product_price": 99.99,
+    "product_image": "test-image.jpg",
+    "quantity": 1
+}

@@ -237,68 +237,31 @@
             transform: translateY(-2px);
         }
     </style>
+    
+    <!-- Aggressive JavaScript to force logo size -->
+    <script>
+        function forceLogoSize() {
+            const logos = document.querySelectorAll('.logo img, header .logo img, img[alt="IMARKET PH Logo"], img[src*="logo.png"], img[alt*="IMARKET"], img[alt*="iMarket"]');
+            logos.forEach(function(logo) {
+                logo.style.setProperty('max-height', '80px', 'important');
+                logo.style.setProperty('height', 'auto', 'important');
+                logo.style.setProperty('width', 'auto', 'important');
+                logo.style.setProperty('display', 'block', 'important');
+                logo.style.setProperty('margin-top', '6px', 'important');
+                logo.style.setProperty('margin-left', '-30px', 'important');
+            });
+        }
+        
+        forceLogoSize();
+        document.addEventListener('DOMContentLoaded', forceLogoSize);
+        setTimeout(forceLogoSize, 100);
+        setTimeout(forceLogoSize, 500);
+        setTimeout(forceLogoSize, 1000);
+        window.addEventListener('load', forceLogoSize);
+    </script>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="{{ asset('ssa/logo.png') }}" alt="IMARKET PH Logo">
-        </div>
-        <ul class="navbar" id="navbar">
-            <li><a href="{{ route('home') }}"><i class="ri-home-line"></i> Home</a></li>
-            <li><a href="#"><i class="ri-store-line"></i> Mall</a></li>
-            <li><a href="#"><i class="ri-percent-line"></i> Flash Deals</a></li>
-            <li class="dropdown">
-                <a href="#"><i class="ri-list-unordered"></i> Categories <i class="ri-arrow-down-s-line"></i></a>
-                <ul class="dropdown-menu">
-                    <li><a href="{{ route('categories.best') }}"><i class="ri-fire-line"></i> Best Selling</a></li>
-                    <li><a href="{{ route('categories.new') }}"><i class="ri-star-smile-line"></i> New Arrivals</a></li>
-                    <li><a href="{{ route('categories.electronics') }}"><i class="ri-computer-line"></i> Electronics</a></li>
-                    <li><a href="{{ route('categories.fashion') }}"><i class="ri-t-shirt-line"></i> Fashion & Apparel</a></li>
-                    <li><a href="{{ route('categories.home') }}"><i class="ri-home-4-line"></i> Home & Living</a></li>
-                    <li><a href="{{ route('categories.beauty') }}"><i class="ri-heart-line"></i> Beauty & Health</a></li>
-                    <li><a href="{{ route('categories.sports') }}"><i class="ri-football-line"></i> Sports & Outdoor</a></li>
-                    <li><a href="{{ route('categories.toys') }}"><i class="ri-gamepad-line"></i> Toys & Games</a></li>
-                    <li><a href="{{ route('categories.groceries') }}"><i class="ri-shopping-basket-line"></i> Groceries</a></li>
-                </ul>
-            </li>
-        </ul>
-        <div class="search-bar">
-            <form action="{{ route('search') }}" method="GET" class="flex flex-grow relative" id="searchForm">
-                <input type="text" 
-                       name="q" 
-                       id="searchInput"
-                       placeholder="Search for products, brands and more..." 
-                       class="w-full px-3 text-base outline-none border-none" 
-                       value="{{ request('q') }}" 
-                       autocomplete="off" />
-                <button type="submit" class="search-btn"><i class="ri-search-line"></i></button>
-            </form>
-        </div>
-        <div class="icons">
-            <a href="{{ route('cart') }}"><i class="ri-shopping-cart-line"></i></a>
-            @auth
-                <div class="user-dropdown">
-                    <a href="#" class="user-link">
-                        <i class="ri-user-line"></i>
-                        <span class="user-name">{{ auth()->user()->name }}</span>
-                        <i class="ri-arrow-down-s-line"></i>
-                    </a>
-                    <div class="user-dropdown-menu">
-                        <a href="{{ route('profile.index') }}"><i class="ri-user-line"></i> My Profile</a>
-                        <a href="{{ route('profile.orders') }}"><i class="ri-shopping-bag-line"></i> My Orders</a>
-                        <a href="{{ route('track-order') }}"><i class="ri-truck-line"></i> Track Orders</a>
-                        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"><i class="ri-logout-box-line"></i> Logout</a>
-                    </div>
-                </div>
-                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                    @csrf
-                </form>
-            @else
-                <a href="{{ route('login') }}"><i class="ri-user-line"></i></a>
-            @endauth
-            <div class="bx bx-menu" id="menu-icon"></div>
-        </div>
-    </header>
+    @include('components.homepage-header')
 
     @yield('content')
     
@@ -411,6 +374,7 @@
 
     <form id="add-to-cart-form" method="POST" style="display:none;"></form>
     
+    <script src="{{ asset('js/cart-auth.js') }}"></script>
     @yield('scripts')
     
     <script src="https://unpkg.com/scrollreveal"></script>

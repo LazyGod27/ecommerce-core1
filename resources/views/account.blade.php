@@ -35,7 +35,7 @@
                         <i class="fas fa-truck mr-2"></i>
                         Track My Orders
                     </a>
-                    <a href="{{ route('cart') }}" class="block w-full text-left p-3 bg-green-50 text-green-700 rounded-md hover:bg-green-100 transition-colors duration-200">
+                    <a href="#" onclick="goToCart()" class="block w-full text-left p-3 bg-green-50 text-green-700 rounded-md hover:bg-green-100 transition-colors duration-200">
                         <i class="fas fa-shopping-cart mr-2"></i>
                         View Cart
                     </a>

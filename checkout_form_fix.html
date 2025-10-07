@@ -1,0 +1,42 @@
+<!-- Add this to your checkout.blade.php form -->
+<form method="POST" action="{{ route("checkout.process") }}" id="checkout-form">
+    @csrf
+    <input type="hidden" name="payment_method" id="payment_method">
+    <input type="hidden" name="selected_items" id="selected_items" value="{{ json_encode(array_keys($selectedCart)) }}">
+    
+    <!-- Add debugging information -->
+    <input type="hidden" name="debug_cart" value="{{ json_encode($selectedCart) }}">
+    <input type="hidden" name="debug_session_id" value="{{ session()->getId() }}">
+    
+    <!-- Rest of your form fields -->
+</form>
+
+<script>
+// Enhanced form submission with debugging
+document.getElementById("checkout-form").addEventListener("submit", function(e) {
+    console.log("=== CHECKOUT FORM DEBUG ===");
+    console.log("Form submission started");
+    console.log("Payment method:", document.getElementById("payment_method").value);
+    console.log("Selected items:", document.getElementById("selected_items").value);
+    console.log("Debug cart:", document.querySelector("[name=debug_cart]").value);
+    console.log("Session ID:", document.querySelector("[name=debug_session_id]").value);
+    
+    // Validate payment method
+    if (!document.getElementById("payment_method").value) {
+        e.preventDefault();
+        alert("Please select a payment method before placing your order.");
+        return false;
+    }
+    
+    // Validate selected items
+    const selectedItems = JSON.parse(document.getElementById("selected_items").value);
+    if (!selectedItems || selectedItems.length === 0) {
+        e.preventDefault();
+        alert("No items selected for checkout. Please go back to cart and select items.");
+        return false;
+    }
+    
+    console.log("Form validation passed, submitting...");
+    return true;
+});
+</script>

@@ -214,4 +214,23 @@ class SearchController extends Controller
 
         return response()->json(['trending' => $trending]);
     }
+
+    /**
+     * Get popular recommendations
+     */
+    public function popular(): JsonResponse
+    {
+        $popular = [
+            ['text' => 'Best Sellers', 'icon' => 'ri-trophy-line', 'category' => 'best-sellers'],
+            ['text' => 'New Arrivals', 'icon' => 'ri-star-smile-line', 'category' => 'new-arrivals'],
+            ['text' => 'Electronics', 'icon' => 'ri-smartphone-line', 'category' => 'electronics'],
+            ['text' => 'Fashion', 'icon' => 'ri-shirt-line', 'category' => 'fashion'],
+            ['text' => 'Home & Living', 'icon' => 'ri-home-line', 'category' => 'home'],
+            ['text' => 'Beauty & Health', 'icon' => 'ri-heart-line', 'category' => 'beauty'],
+            ['text' => 'Sports & Outdoor', 'icon' => 'ri-football-line', 'category' => 'sports'],
+            ['text' => 'Toys & Games', 'icon' => 'ri-gamepad-line', 'category' => 'toys']
+        ];
+
+        return response()->json(['popular' => $popular]);
+    }
 }

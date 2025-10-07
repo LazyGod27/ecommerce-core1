@@ -141,28 +141,11 @@
 @endsection
 
 @section('scripts')
+<script src="{{ asset('js/cart-auth.js') }}"></script>
 <script>
-    function addToCart(productName, price, image) {
-        const csrf = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        const form = document.getElementById('add-to-cart-form');
-        const syntheticId = Date.now();
-        form.setAttribute('action', `${'{{ url('/') }}'}/cart/add/${syntheticId}`);
-        form.innerHTML = `
-            <input type="hidden" name="_token" value="${csrf}">
-            <input type="hidden" name="product_name" value="${productName}">
-            <input type="hidden" name="product_price" value="${price}">
-            <input type="hidden" name="product_image" value="${image}">
-            <input type="hidden" name="quantity" value="1">
-        `;
-        form.submit();
-    }
+    // addToCart function is now loaded from cart-auth.js
 
-    function buyNow(productName, price, image) {
-        addToCart(productName, price, image);
-        setTimeout(() => {
-            window.location.href = '{{ route("checkout") }}';
-        }, 500);
-    }
+    // buyNow function is now loaded from cart-auth.js
 
     function viewProduct(productName, price, image, description) {
         // Create and show product detail modal

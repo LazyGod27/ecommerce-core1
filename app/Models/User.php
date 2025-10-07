@@ -89,6 +89,31 @@ class User extends Authenticatable
         return $this->hasMany(Address::class);
     }
 
+    public function seller(): HasOne
+    {
+        return $this->hasOne(Seller::class);
+    }
+
+    public function admin(): HasOne
+    {
+        return $this->hasOne(Admin::class);
+    }
+
+    public function isSeller(): bool
+    {
+        return $this->seller !== null;
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->admin !== null;
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->admin && $this->admin->is_super_admin;
+    }
+
     /**
      * Get the user's full address
      */

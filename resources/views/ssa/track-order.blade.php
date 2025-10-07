@@ -1,13 +1,51 @@
-@extends('ssa.categories.layout')
+@extends('layouts.frontend')
 
 @section('title', 'Track Order - iMarket PH')
 
 @section('content')
 <style>
+    :root {
+        --primary-color: #3b82f6;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+    }
+
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        animation: gradientShift 15s ease infinite;
+    }
+    
+    @keyframes gradientShift {
+        0% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        25% { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        50% { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        75% { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        100% { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+    }
+
+    .main-container {
+        padding-top: 100px;
+        min-height: 100vh;
+        background: transparent;
+    }
+
     .container {
         display: flex;
         gap: 2rem;
-        max-width: 1200px;
+        max-width: 1400px;
         margin: 2rem auto;
         padding: 0 1rem;
     }
@@ -15,9 +53,11 @@
     .left-panel {
         flex: 2;
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 2rem;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
     }
     
     .right-panel {
@@ -105,28 +145,49 @@
         position: relative;
         display: flex;
         justify-content: space-between;
-        margin-bottom: 2rem;
-        padding: 1rem 0;
+        margin-bottom: 3rem;
+        padding: 2rem 0;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        animation: slideInUp 0.8s ease-out;
+    }
+    
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .progress-line {
         position: absolute;
         top: 50%;
-        left: 0;
-        right: 0;
-        height: 2px;
-        background: #e5e7eb;
+        left: 5%;
+        right: 5%;
+        height: 4px;
+        background: linear-gradient(90deg, #e2e8f0 0%, #cbd5e1 100%);
         z-index: 1;
+        border-radius: 2px;
     }
     
     .progress-bar-fill {
         position: absolute;
         top: 50%;
-        left: 0;
-        height: 2px;
-        background: #3b82f6;
+        left: 5%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color) 0%, var(--success-color) 100%);
         z-index: 2;
-        transition: width 0.3s ease;
+        transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 2px;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
     }
     
     .progress-step {
@@ -136,42 +197,96 @@
         position: relative;
         z-index: 3;
         cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem;
+        border-radius: 12px;
+        animation: fadeInScale 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .progress-step:nth-child(1) { animation-delay: 0.1s; }
+    .progress-step:nth-child(2) { animation-delay: 0.2s; }
+    .progress-step:nth-child(3) { animation-delay: 0.3s; }
+    .progress-step:nth-child(4) { animation-delay: 0.4s; }
+    .progress-step:nth-child(5) { animation-delay: 0.5s; }
+    
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.8) translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
+    }
+    
+    .progress-step:hover {
+        background: rgba(59, 130, 246, 0.08);
+        transform: translateY(-4px) scale(1.05);
+        box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
     }
     
     .progress-circle {
-        width: 20px;
-        height: 20px;
+        width: 32px;
+        height: 32px;
         border-radius: 50%;
-        background: #e5e7eb;
-        border: 2px solid #e5e7eb;
-        transition: all 0.3s ease;
+        background: var(--gray-200);
+        border: 3px solid var(--gray-200);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--gray-500);
     }
     
     .progress-step.active .progress-circle {
-        background: #3b82f6;
-        border-color: #3b82f6;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        animation: pulse 2s infinite;
     }
     
     .progress-step.completed .progress-circle {
-        background: #10b981;
-        border-color: #10b981;
+        background: var(--success-color);
+        border-color: var(--success-color);
+        color: white;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    .progress-step.completed .progress-circle::before {
+        content: '✓';
+        font-size: 16px;
+        font-weight: bold;
     }
     
     .progress-text {
-        margin-top: 0.5rem;
-        font-size: 0.75rem;
-        color: #6b7280;
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        color: var(--gray-500);
         text-align: center;
+        font-weight: 500;
+        transition: all 0.3s ease;
     }
     
     .progress-step.active .progress-text {
-        color: #3b82f6;
+        color: var(--primary-color);
         font-weight: 600;
+        transform: scale(1.05);
     }
     
     .progress-step.completed .progress-text {
-        color: #10b981;
+        color: var(--success-color);
         font-weight: 600;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
+        50% { box-shadow: 0 4px 20px rgba(59, 130, 246, 0.6); }
+        100% { box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4); }
     }
     
     .product-list-section h2 {
@@ -183,35 +298,142 @@
     
     .product-card {
         display: flex;
-        gap: 1rem;
-        padding: 1rem;
-        border: 1px solid #e5e7eb;
-        border-radius: 8px;
-        margin-bottom: 1rem;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        border: 1px solid var(--gray-200);
+        border-radius: 16px;
+        margin-bottom: 1.5rem;
         background: white;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        animation: slideInLeft 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .product-card:nth-child(1) { animation-delay: 0.1s; }
+    .product-card:nth-child(2) { animation-delay: 0.2s; }
+    .product-card:nth-child(3) { animation-delay: 0.3s; }
+    .product-card:nth-child(4) { animation-delay: 0.4s; }
+    
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(-30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+    
+    .product-card:hover {
+        transform: translateY(-6px) scale(1.02);
+        box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        border-color: var(--primary-color);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     }
     
     .product-image {
-        width: 80px;
-        height: 80px;
+        width: 100px;
+        height: 100px;
         object-fit: cover;
-        border-radius: 6px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
     
     .product-details {
         flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
     }
     
     .product-name {
-        font-size: 1rem;
+        font-size: 1.125rem;
         font-weight: 600;
-        color: #333;
+        color: var(--gray-800);
         margin: 0 0 0.5rem 0;
+        line-height: 1.4;
     }
     
     .product-price {
-        color: #ef4444;
-        font-size: 1.125rem;
+        color: var(--danger-color);
+        font-size: 1.25rem;
+        font-weight: 700;
+    }
+
+    .tracking-timeline {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .timeline-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--gray-100);
+        position: relative;
+    }
+
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 20px;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: var(--gray-200);
+    }
+
+    .timeline-item:last-child::before {
+        display: none;
+    }
+
+    .timeline-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 18px;
+        font-weight: 600;
+        flex-shrink: 0;
+        z-index: 2;
+        position: relative;
+    }
+
+    .timeline-content {
+        flex: 1;
+    }
+
+    .timeline-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-800);
+        margin-bottom: 0.25rem;
+    }
+
+    .timeline-description {
+        font-size: 0.875rem;
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+    }
+
+    .timeline-time {
+        font-size: 0.75rem;
+        color: var(--gray-500);
+        font-weight: 500;
     }
     
     .hidden {
@@ -228,9 +450,36 @@
     
     .info-section {
         background: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        padding: 1.5rem;
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        padding: 2rem;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideInRight 0.8s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .info-section:nth-child(1) { animation-delay: 0.2s; }
+    .info-section:nth-child(2) { animation-delay: 0.4s; }
+    .info-section:nth-child(3) { animation-delay: 0.6s; }
+    .info-section:nth-child(4) { animation-delay: 0.8s; }
+    
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .info-section:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     }
     
     .info-section h2 {
@@ -285,11 +534,39 @@
     .suggested-product-card {
         text-decoration: none;
         color: inherit;
-        transition: transform 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-radius: 12px;
+        padding: 1rem;
+        background: white;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        animation: fadeInUp 0.6s ease-out;
+        animation-fill-mode: both;
+    }
+    
+    .suggested-product-card:nth-child(1) { animation-delay: 0.1s; }
+    .suggested-product-card:nth-child(2) { animation-delay: 0.2s; }
+    .suggested-product-card:nth-child(3) { animation-delay: 0.3s; }
+    .suggested-product-card:nth-child(4) { animation-delay: 0.4s; }
+    .suggested-product-card:nth-child(5) { animation-delay: 0.5s; }
+    .suggested-product-card:nth-child(6) { animation-delay: 0.6s; }
+    .suggested-product-card:nth-child(7) { animation-delay: 0.7s; }
+    .suggested-product-card:nth-child(8) { animation-delay: 0.8s; }
+    
+    @keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     
     .suggested-product-card:hover {
-        transform: translateY(-2px);
+        transform: translateY(-6px) scale(1.05);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     }
     
     .suggested-product-card img {
@@ -306,21 +583,42 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.6);
         display: none;
         justify-content: center;
         align-items: center;
         z-index: 1000;
+        backdrop-filter: blur(5px);
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
     }
     
     .modal-content {
         background: white;
-        border-radius: 12px;
+        border-radius: 20px;
         padding: 2rem;
         max-width: 500px;
         width: 90%;
         max-height: 90vh;
         overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        transform-origin: center;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: scale(0.8) translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+        }
     }
     
     .modal-header {
@@ -392,6 +690,64 @@
     
     .modal-body button:hover {
         opacity: 0.9;
+    }
+    
+    /* Loading Spinner */
+    .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(59, 130, 246, 0.3);
+        border-radius: 50%;
+        border-top-color: #3b82f6;
+        animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    
+    /* Enhanced Status Badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        animation: pulse 2s infinite;
+    }
+    
+    .status-badge.pending {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        color: #92400e;
+        border: 1px solid #f59e0b;
+    }
+    
+    .status-badge.processing {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        color: #1e40af;
+        border: 1px solid #3b82f6;
+    }
+    
+    .status-badge.shipped {
+        background: linear-gradient(135deg, #e9d5ff 0%, #ddd6fe 100%);
+        color: #6b21a8;
+        border: 1px solid #8b5cf6;
+    }
+    
+    .status-badge.delivered {
+        background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        color: #065f46;
+        border: 1px solid #10b981;
+    }
+    
+    .status-badge.cancelled {
+        background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+        color: #991b1b;
+        border: 1px solid #ef4444;
     }
     
     @media (max-width: 768px) {
@@ -471,9 +827,60 @@
             </div>
         </div>
         
+        <!-- Tracking Timeline Section -->
+        @if($order && $order->tracking)
+        <div class="tracking-timeline">
+            <h2 class="font-semibold text-lg mb-6 flex items-center">
+                <i class="ri-truck-line mr-2 text-blue-600"></i>
+                Tracking Timeline
+            </h2>
+            <div class="timeline-item">
+                <div class="timeline-icon">📦</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Order Placed</div>
+                    <div class="timeline-description">Your order has been received and is being processed</div>
+                    <div class="timeline-time">{{ $order->created_at->format('M d, Y \a\t g:i A') }}</div>
+                </div>
+            </div>
+            @if($order->status === 'processing' || $order->status === 'shipped' || $order->status === 'delivered' || $order->status === 'completed')
+            <div class="timeline-item">
+                <div class="timeline-icon">⚙️</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Processing</div>
+                    <div class="timeline-description">Your order is being prepared for shipment</div>
+                    <div class="timeline-time">{{ $order->created_at->addHours(2)->format('M d, Y \a\t g:i A') }}</div>
+                </div>
+            </div>
+            @endif
+            @if($order->status === 'shipped' || $order->status === 'delivered' || $order->status === 'completed')
+            <div class="timeline-item">
+                <div class="timeline-icon">🚚</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Shipped</div>
+                    <div class="timeline-description">Your order is on its way</div>
+                    <div class="timeline-time">{{ $order->created_at->addDays(1)->format('M d, Y \a\t g:i A') }}</div>
+                </div>
+            </div>
+            @endif
+            @if($order->status === 'delivered' || $order->status === 'completed')
+            <div class="timeline-item">
+                <div class="timeline-icon">✅</div>
+                <div class="timeline-content">
+                    <div class="timeline-title">Delivered</div>
+                    <div class="timeline-description">Your order has been delivered successfully</div>
+                    <div class="timeline-time">{{ $order->delivered_at ? $order->delivered_at->format('M d, Y \a\t g:i A') : $order->created_at->addDays(3)->format('M d, Y \a\t g:i A') }}</div>
+                </div>
+            </div>
+            @endif
+        </div>
+        @endif
+
         <!-- Dynamic Product List Section -->
         <div class="product-list-section">
-            <h2 class="font-semibold text-lg mb-4">Items</h2>
+            <h2 class="font-semibold text-lg mb-4 flex items-center">
+                <i class="ri-shopping-bag-line mr-2 text-green-600"></i>
+                Order Items
+            </h2>
             <div id="product-list">
                 <!-- Product cards will be dynamically inserted here -->
             </div>
@@ -487,12 +894,24 @@
     <div class="right-panel">
         <!-- Delivery Address Section -->
         <div class="info-section">
-            <h2 class="font-semibold text-lg mb-4">Delivery Address</h2>
-            <div class="bg-gray-100 p-4 rounded-lg">
+            <h2 class="font-semibold text-lg mb-4 flex items-center">
+                <i class="ri-map-pin-line mr-2 text-red-600"></i>
+                Delivery Address
+            </h2>
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-200">
                 @if($order && $order->shipping_address)
-                    <p class="text-sm text-gray-700">{{ $order->shipping_address }}</p>
+                    <p class="text-sm text-gray-700 font-medium">{{ $order->shipping_address }}</p>
                     @if($order->contact_number)
-                        <p class="text-sm text-gray-600 mt-2">Contact: {{ $order->contact_number }}</p>
+                        <p class="text-sm text-gray-600 mt-2 flex items-center">
+                            <i class="ri-phone-line mr-1"></i>
+                            {{ $order->contact_number }}
+                        </p>
+                    @endif
+                    @if($order->email)
+                        <p class="text-sm text-gray-600 mt-1 flex items-center">
+                            <i class="ri-mail-line mr-1"></i>
+                            {{ $order->email }}
+                        </p>
                     @endif
                 @else
                     <p class="text-sm text-gray-600">No address found</p>
@@ -500,13 +919,40 @@
             </div>
         </div>
 
+        <!-- Delivery Estimate Section -->
+        @if($order && $order->tracking)
+        <div class="info-section">
+            <h2 class="font-semibold text-lg mb-4 flex items-center">
+                <i class="ri-time-line mr-2 text-orange-600"></i>
+                Delivery Estimate
+            </h2>
+            <div class="bg-gradient-to-br from-orange-50 to-yellow-50 p-4 rounded-xl border border-orange-200">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-gray-700">Expected Delivery</span>
+                    <span class="text-sm font-bold text-orange-600">
+                        {{ $order->tracking->estimated_delivery ? $order->tracking->estimated_delivery->format('M d, Y') : 'TBD' }}
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-600">Tracking Number</span>
+                    <span class="text-sm font-mono bg-white px-2 py-1 rounded border">
+                        {{ $order->tracking->tracking_number }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        @endif
+
         <!-- Order Summary Section -->
         <div class="info-section">
-            <h2 class="font-semibold text-lg mb-4">Order Summary</h2>
-            <div class="space-y-2 text-sm">
-                <div class="flex justify-between">
-                    <span>Order Total</span>
-                    <span class="font-semibold">
+            <h2 class="font-semibold text-lg mb-4 flex items-center">
+                <i class="ri-receipt-line mr-2 text-green-600"></i>
+                Order Summary
+            </h2>
+            <div class="space-y-3 text-sm">
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Order Total</span>
+                    <span class="font-semibold text-gray-800">
                         @if($order)
                             ₱{{ number_format($order->subtotal ?? 0, 2) }}
                         @else
@@ -514,9 +960,9 @@
                         @endif
                     </span>
                 </div>
-                <div class="flex justify-between">
-                    <span>Shipping Fee</span>
-                    <span class="font-semibold">
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Shipping Fee</span>
+                    <span class="font-semibold text-gray-800">
                         @if($order)
                             ₱{{ number_format($order->shipping_cost ?? 0, 2) }}
                         @else
@@ -524,9 +970,15 @@
                         @endif
                     </span>
                 </div>
-                <div class="flex justify-between font-bold text-base mt-4">
-                    <span>Total Payment</span>
-                    <span class="text-orange-500">
+                @if($order && $order->tax)
+                <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Tax (12% VAT)</span>
+                    <span class="font-semibold text-gray-800">₱{{ number_format($order->tax, 2) }}</span>
+                </div>
+                @endif
+                <div class="flex justify-between items-center py-3 bg-gradient-to-r from-green-50 to-blue-50 rounded-lg px-3 mt-4">
+                    <span class="font-bold text-gray-800">Total Payment</span>
+                    <span class="font-bold text-xl text-green-600">
                         @if($order)
                             ₱{{ number_format($order->total ?? 0, 2) }}
                         @else
@@ -535,20 +987,24 @@
                     </span>
                 </div>
                 @if($order)
-                    <div class="flex justify-between text-sm mt-2">
-                        <span>Order Status</span>
-                        <span class="font-semibold text-blue-600">{{ ucfirst($order->status ?? 'Pending') }}</span>
-                    </div>
-                    <div class="flex justify-between text-sm">
-                        <span>Order Date</span>
-                        <span class="font-semibold">{{ $order->created_at->format('M d, Y') }}</span>
-                    </div>
-                    @if($order->delivered_at)
-                        <div class="flex justify-between text-sm">
-                            <span>Delivered Date</span>
-                            <span class="font-semibold">{{ $order->delivered_at->format('M d, Y') }}</span>
+                    <div class="mt-4 space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Order Status</span>
+                            <span class="status-badge {{ $order->status ?? 'pending' }}">
+                                {{ ucfirst($order->status ?? 'Pending') }}
+                            </span>
                         </div>
-                    @endif
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Order Date</span>
+                            <span class="font-semibold text-gray-800">{{ $order->created_at->format('M d, Y') }}</span>
+                        </div>
+                        @if($order->delivered_at)
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-600">Delivered Date</span>
+                                <span class="font-semibold text-gray-800">{{ $order->delivered_at->format('M d, Y') }}</span>
+                            </div>
+                        @endif
+                    </div>
                 @endif
             </div>
         </div>

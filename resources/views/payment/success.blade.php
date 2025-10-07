@@ -98,6 +98,14 @@
                     <p class="font-semibold">{{ $order->payment_method }}</p>
                 </div>
                 <div>
+                    <p class="text-gray-600">Contact Number:</p>
+                    <p class="font-semibold">{{ $order->contact_number ?? $order->user->phone ?? 'Not provided' }}</p>
+                </div>
+                <div>
+                    <p class="text-gray-600">Email:</p>
+                    <p class="font-semibold">{{ $order->email ?? $order->user->email ?? 'Not provided' }}</p>
+                </div>
+                <div>
                     <p class="text-gray-600">Total Amount:</p>
                     <p class="font-semibold text-green-600">₱{{ number_format($order->total, 2) }}</p>
                 </div>

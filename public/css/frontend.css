@@ -76,7 +76,9 @@ a:hover {
 }
 
 .logo img {
-    height: 30px; 
+    max-height: 80px !important; 
+    height: auto !important;
+    width: auto !important;
     margin-top: 5px; 
     border: 1px solid transparent;
     padding: 5px;

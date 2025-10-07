@@ -86,7 +86,7 @@
                     <button id="modal-add-to-cart" class="bg-blue-600 text-white font-semibold p-3 rounded-md hover:bg-blue-700 transition-colors duration-300">
                         Add to Cart
                     </button>
-                    <a href="{{ route('cart') }}" id="modal-proceed-to-checkout" class="block text-center bg-blue-400 text-white font-semibold p-3 rounded-md hover:bg-blue-500 transition-colors duration-300">
+                    <a href="#" onclick="goToCart()" id="modal-proceed-to-checkout" class="block text-center bg-blue-400 text-white font-semibold p-3 rounded-md hover:bg-blue-500 transition-colors duration-300">
                         Proceed to Checkout
                     </a>
                 </div>

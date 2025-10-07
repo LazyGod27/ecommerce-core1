@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
 *{
     margin: 0;
     padding: 0;
@@ -58,6 +61,55 @@ header {
   display: block;
   margin-top:6px;
   margin-left: -30px;
+}
+
+/* Standardize all iMarket logos across the site */
+.logo img,
+header .logo img,
+.header .logo img,
+.footer-logo img,
+.logo a img,
+header .logo a img,
+.header .logo a img {
+  max-height: 80px !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+}
+
+/* Ensure footer logo maintains proper size */
+.footer-logo img {
+  max-height: 80px !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  filter: invert(1) !important;
+}
+
+/* Global override to ensure all iMarket logos are the same size */
+img[alt*="IMARKET"],
+img[alt*="iMarket"],
+img[alt*="logo"],
+img[src*="logo.png"],
+img[alt="IMARKET PH Logo"] {
+  max-height: 80px !important;
+  width: auto !important;
+  height: auto !important;
+}
+
+/* Override any Tailwind or other framework styles for logos */
+.logo img,
+header .logo img,
+.header .logo img,
+.logo a img,
+header .logo a img,
+.header .logo a img {
+  max-height: 80px !important;
+  width: auto !important;
+  height: auto !important;
+  display: block !important;
+  margin-top: 6px !important;
+  margin-left: -30px !important;
 }
 
 
@@ -1543,7 +1595,6 @@ span{
             background-color: #0E1552;
         }
         /* para naman ito a tracking */
-              @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
         
         :root {
             --bg1-color: #ffffff;
@@ -1808,7 +1859,6 @@ span{
             cursor: pointer;
         }
         /* para sa customer service */
-               @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
         
         :root {
             --bg-color: #f7f9fb;

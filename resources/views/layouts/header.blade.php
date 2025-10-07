@@ -57,7 +57,7 @@
                 Returns
                 <div class="text-xs text-gray-400">& Orders</div>
             </a>
-            <a href="{{ route('cart') }}" class="flex items-center text-sm font-bold relative">
+            <a href="#" onclick="goToCart()" class="flex items-center text-sm font-bold relative">
                 <i class="fas fa-shopping-cart text-xl mr-2"></i> Cart
                 @auth
                     @php

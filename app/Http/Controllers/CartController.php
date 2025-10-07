@@ -20,8 +20,10 @@ class CartController extends Controller
     {
         $cart = session('cart', []);
         
-        
-        $subtotal = collect($cart)->sum('price');
+        // Calculate subtotal properly (price * quantity for each item)
+        $subtotal = collect($cart)->sum(function($item) {
+            return $item['price'] * $item['quantity'];
+        });
         $shippingCost = $this->calculateShippingCost($subtotal);
         $tax = $this->calculateTax($subtotal);
         $total = $subtotal + $shippingCost + $tax;
@@ -97,6 +99,10 @@ class CartController extends Controller
         
         session(['cart' => $cart]);
         
+        // Check if user wants to go directly to checkout
+        if ($request->has('redirect_to_checkout')) {
+            return redirect()->route('cart')->with('success', 'Product added to cart!')->with('checkout', true);
+        }
         
         return redirect()->route('cart')->with('success', 'Product added to cart!');
     }
@@ -193,18 +199,29 @@ class CartController extends Controller
 
     public function checkout(Request $request)
     {
+        // Enhanced debugging for checkout
+        Log::info('=== CHECKOUT PAGE DEBUG START ===');
+        Log::info('Session ID: ' . session()->getId());
+        Log::info('User ID: ' . (Auth::id() ?? 'null'));
+        Log::info('Request data: ' . json_encode($request->all()));
+        
         $cart = session('cart', []);
+        Log::info('Cart from session: ' . json_encode($cart));
+        Log::info('Cart count: ' . count($cart));
         
         if (empty($cart)) {
+            Log::error('Cart is empty in checkout method');
             return redirect()->route('cart')->with('error', 'Your cart is empty!');
         }
         
         // Get selected items from request or session storage
         $selectedItems = $request->get('selected_items', []);
+        Log::info('Selected items from request: ' . json_encode($selectedItems));
         
         // If no selected items provided, use all cart items (fallback)
         if (empty($selectedItems)) {
             $selectedItems = array_keys($cart);
+            Log::info('Using all cart items as selected: ' . json_encode($selectedItems));
         }
         
         // Filter cart to only include selected items
@@ -212,7 +229,11 @@ class CartController extends Controller
             return in_array($key, $selectedItems);
         }, ARRAY_FILTER_USE_KEY);
         
+        Log::info('Selected cart after filtering: ' . json_encode($selectedCart));
+        Log::info('Selected cart count: ' . count($selectedCart));
+        
         if (empty($selectedCart)) {
+            Log::error('No items selected for checkout in checkout method');
             return redirect()->route('cart')->with('error', 'No items selected for checkout!');
         }
         
@@ -232,12 +253,144 @@ class CartController extends Controller
         return view('checkout', compact('selectedCart', 'subtotal', 'shippingCost', 'tax', 'total', 'userPhone', 'userEmail', 'userAddress', 'user'));
     }
 
+    public function directCheckout(Request $request)
+    {
+        Log::info('=== DIRECT CHECKOUT DEBUG START ===');
+        Log::info('Request data: ' . json_encode($request->all()));
+        
+        $request->validate([
+            'product_name' => 'required|string|max:255',
+            'product_price' => 'required|numeric|min:0',
+            'product_image' => 'required|string',
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        // Create a temporary cart item for direct checkout
+        $productId = 'direct_' . time();
+        $directCartItem = [
+            'rowId' => $productId,
+            'id' => $productId,
+            'name' => $request->product_name,
+            'price' => $request->product_price * $request->quantity,
+            'quantity' => $request->quantity,
+            'image' => $request->product_image,
+            'stock' => 999, // Set high stock for direct checkout
+            'is_direct_checkout' => true // Flag to identify direct checkout items
+        ];
+
+        // Store the direct checkout item in session
+        $cart = session('cart', []);
+        $cart[$productId] = $directCartItem;
+        session(['cart' => $cart]);
+        
+        Log::info('Direct checkout item stored in session: ' . json_encode($directCartItem));
+        Log::info('Updated cart: ' . json_encode($cart));
+
+        // Create selected cart for checkout view
+        $selectedCart = [$productId => $directCartItem];
+
+        $subtotal = $request->product_price * $request->quantity;
+        $shippingCost = $this->calculateShippingCost($subtotal);
+        $tax = $this->calculateTax($subtotal);
+        $total = $subtotal + $shippingCost + $tax;
+        
+        // Get user profile information for auto-filling
+        $user = Auth::user();
+        $userPhone = $user ? $user->phone : '';
+        $userEmail = $user ? $user->email : '';
+        $userAddress = $user ? ($user->address_line1 . ', ' . $user->city . ', ' . $user->state . ' ' . $user->postal_code) : '';
+        
+        Log::info('=== DIRECT CHECKOUT DEBUG END ===');
+        
+        return view('checkout', compact('selectedCart', 'subtotal', 'shippingCost', 'tax', 'total', 'userPhone', 'userEmail', 'userAddress', 'user'));
+    }
+
     public function processCheckout(Request $request)
     {
-        Log::info('Checkout process started', [
-            'user_id' => Auth::id(),
-            'request_data' => $request->all()
-        ]);
+        // Enhanced debugging and validation
+        Log::info('=== ENHANCED CHECKOUT DEBUG START ===');
+        Log::info('Session ID: ' . session()->getId());
+        Log::info('User ID: ' . (Auth::id() ?? 'null'));
+        Log::info('Request URL: ' . $request->fullUrl());
+        Log::info('Request method: ' . $request->method());
+        Log::info('Request data: ' . json_encode($request->all()));
+        
+        // Get cart from session with fallback
+        $cart = session('cart', []);
+        Log::info('Cart from session: ' . json_encode($cart));
+        Log::info('Cart count: ' . count($cart));
+        
+        // Enhanced cart validation
+        if (empty($cart)) {
+            Log::error('Cart is empty in processCheckout');
+            
+            // Try to get cart from alternative sources
+            $cartFromRequest = $request->get('cart', []);
+            if (!empty($cartFromRequest)) {
+                Log::info('Found cart in request data: ' . json_encode($cartFromRequest));
+                $cart = $cartFromRequest;
+            } else {
+                return redirect()->route('cart')->with('error', 'Your cart is empty! Please add items to your cart before checkout.');
+            }
+        }
+        
+        // Get selected items with enhanced handling
+        $selectedItems = $request->get('selected_items', []);
+        Log::info('Raw selected items: ' . json_encode($selectedItems));
+        
+        // Handle different formats of selected items
+        if (is_string($selectedItems)) {
+            $selectedItems = json_decode($selectedItems, true) ?? [];
+            Log::info('Selected items after JSON decode: ' . json_encode($selectedItems));
+        }
+        
+        // If selected_items is not an array, try to convert it
+        if (!is_array($selectedItems)) {
+            $selectedItems = [];
+        }
+        
+        // If no selected items provided, use all cart items
+        if (empty($selectedItems)) {
+            $selectedItems = array_keys($cart);
+            Log::info('Using all cart items as selected: ' . json_encode($selectedItems));
+        }
+        
+        // Filter cart to only include selected items
+        $selectedCart = array_filter($cart, function($key) use ($selectedItems) {
+            return in_array($key, $selectedItems);
+        }, ARRAY_FILTER_USE_KEY);
+        
+        Log::info('Selected cart after filtering: ' . json_encode($selectedCart));
+        Log::info('Selected cart count: ' . count($selectedCart));
+        
+        // Special handling for direct checkout items
+        $hasDirectCheckoutItems = false;
+        foreach ($selectedCart as $item) {
+            if (isset($item['is_direct_checkout']) && $item['is_direct_checkout']) {
+                $hasDirectCheckoutItems = true;
+                break;
+            }
+        }
+        
+        if (empty($selectedCart)) {
+            Log::error('No items selected for checkout');
+            return redirect()->route('cart')->with('error', 'No items selected for checkout! Please select items and try again.');
+        }
+        
+        // If we have direct checkout items, we don't need to validate stock
+        if (!$hasDirectCheckoutItems) {
+            // Validate stock availability for regular cart items only
+            foreach ($selectedCart as $item) {
+                if (isset($item['id']) && is_numeric($item['id'])) {
+                    $product = Product::find($item['id']);
+                    if ($product) {
+                        if ($product->stock < $item['quantity']) {
+                            return redirect()->route('cart')->with('error', "Insufficient stock for {$product->name}!");
+                        }
+                    }
+                }
+            }
+        }
 
         try {
             $request->validate([
@@ -257,57 +410,6 @@ class CartController extends Controller
             return redirect()->route('checkout')->withErrors($e->errors())->withInput();
         }
 
-        $cart = session('cart', []);
-        
-        if (empty($cart)) {
-            return redirect()->route('cart')->with('error', 'Your cart is empty!');
-        }
-
-        // Get selected items from the checkout form
-        $selectedItems = $request->get('selected_items', []);
-        
-        Log::info('Selected items from request', [
-            'raw_selected_items' => $selectedItems,
-            'type' => gettype($selectedItems)
-        ]);
-        
-        // If selected_items is a JSON string, decode it
-        if (is_string($selectedItems)) {
-            $selectedItems = json_decode($selectedItems, true) ?? [];
-        }
-        
-        Log::info('Selected items after processing', [
-            'selected_items' => $selectedItems,
-            'cart_keys' => array_keys($cart)
-        ]);
-        
-        // If no selected items provided, use all cart items (fallback)
-        if (empty($selectedItems)) {
-            $selectedItems = array_keys($cart);
-        }
-        
-        // Filter cart to only include selected items
-        $selectedCart = array_filter($cart, function($key) use ($selectedItems) {
-            return in_array($key, $selectedItems);
-        }, ARRAY_FILTER_USE_KEY);
-
-        if (empty($selectedCart)) {
-            return redirect()->route('cart')->with('error', 'No items selected for checkout!');
-        }
-
-        // Validate stock availability for selected items only
-        foreach ($selectedCart as $item) {
-            if (isset($item['id'])) {
-                $product = Product::find($item['id']);
-                if ($product) {
-                    // Real product from database - check stock
-                    if ($product->stock < $item['quantity']) {
-                        return redirect()->route('cart')->with('error', "Insufficient stock for {$product->name}!");
-                    }
-                }
-            }
-            // Demo products (not in database) are assumed to have sufficient stock
-        }
 
         try {
             DB::beginTransaction();
@@ -326,8 +428,8 @@ class CartController extends Controller
                 'order_number' => 'ORD-' . strtoupper(Str::random(8)),
                 'status' => 'pending',
                 'shipping_address' => $request->shipping_address,
-                'contact_number' => $request->contact_number,
-                'email' => $request->email,
+                'contact_number' => $request->shipping_phone,
+                'email' => $request->shipping_email,
                 'payment_method' => $request->payment_method,
                 'payment_status' => 'pending',
                 'subtotal' => $subtotal,
@@ -339,27 +441,42 @@ class CartController extends Controller
 
             // Create order items
             foreach ($selectedCart as $key => $item) {
-                $product = isset($item['id']) ? Product::find($item['id']) : null;
-
-                if (!$product) {
-                    // Skip items that don't map to a real product record
-                    Log::warning('Skipping cart item without valid product during checkout', [
-                        'cart_key' => $key,
-                        'item' => $item,
+                // Handle direct checkout items differently
+                if (isset($item['is_direct_checkout']) && $item['is_direct_checkout']) {
+                    // For direct checkout items, create order item without product_id
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => null, // No real product for direct checkout
+                        'product_name' => $item['name'], // Store product name directly
+                        'quantity' => $item['quantity'],
+                        'price' => $item['quantity'] > 0 ? ($item['price'] / $item['quantity']) : 0,
                     ]);
-                    continue;
+                    
+                    Log::info('Created order item for direct checkout: ' . $item['name']);
+                } else {
+                    // Handle regular cart items
+                    $product = isset($item['id']) ? Product::find($item['id']) : null;
+
+                    if (!$product) {
+                        // Skip items that don't map to a real product record
+                        Log::warning('Skipping cart item without valid product during checkout', [
+                            'cart_key' => $key,
+                            'item' => $item,
+                        ]);
+                        continue;
+                    }
+
+                    OrderItem::create([
+                        'order_id' => $order->id,
+                        'product_id' => $product->id,
+                        'quantity' => $item['quantity'],
+                        // Store unit price in the order_items.price column
+                        'price' => $item['quantity'] > 0 ? ($item['price'] / $item['quantity']) : 0,
+                    ]);
+
+                    // Update product stock
+                    $product->decrement('stock', $item['quantity']);
                 }
-
-                OrderItem::create([
-                    'order_id' => $order->id,
-                    'product_id' => $product->id,
-                    'quantity' => $item['quantity'],
-                    // Store unit price in the order_items.price column
-                    'price' => $item['quantity'] > 0 ? ($item['price'] / $item['quantity']) : 0,
-                ]);
-
-                // Update product stock
-                $product->decrement('stock', $item['quantity']);
             }
 
             // Create tracking record (schema uses 'history' JSON column)

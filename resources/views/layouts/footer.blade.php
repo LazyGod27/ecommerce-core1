@@ -33,7 +33,7 @@
     </div>
     <div class="footer-bottom flex flex-wrap justify-center items-center p-5 gap-5 text-xs text-light-gray-blue">
         <div class="footer-logo">
-            <img src="{{ asset('images/logo.png') }}" alt="iMarket Logo" class="h-8 filter invert">
+            <img src="{{ asset('images/logo.png') }}" alt="iMarket Logo" class="filter invert">
         </div>
         <div class="footer-lang flex items-center gap-1 border border-light-gray-blue p-2 rounded-md cursor-pointer hover:border-blue-light hover:text-blue-light">
             <i class="fas fa-globe"></i> English <i class="fas fa-caret-down"></i>

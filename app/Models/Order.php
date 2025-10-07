@@ -25,6 +25,13 @@ class Order extends Model
         'notes',
         'paid_at',
         'delivered_at',
+        'delivery_confirmation_deadline',
+        'delivery_status',
+        'customer_response_at',
+        'return_reason',
+        'return_status',
+        'return_requested_at',
+        'return_processed_at',
         'refunded_at',
         'refund_reason'
     ];
@@ -36,6 +43,10 @@ class Order extends Model
         'total' => 'decimal:2',
         'paid_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'delivery_confirmation_deadline' => 'datetime',
+        'customer_response_at' => 'datetime',
+        'return_requested_at' => 'datetime',
+        'return_processed_at' => 'datetime',
         'refunded_at' => 'datetime'
     ];
 
@@ -178,5 +189,132 @@ class Order extends Model
             'refunded' => 'bg-gray-100 text-gray-800',
             default => 'bg-gray-100 text-gray-800'
         };
+    }
+
+    /**
+     * Mark order as delivered and set confirmation deadline
+     */
+    public function markAsDelivered(): void
+    {
+        $this->update([
+            'status' => 'delivered',
+            'delivered_at' => now(),
+            'delivery_status' => 'delivered',
+            'delivery_confirmation_deadline' => now()->addDays(7)
+        ]);
+    }
+
+    /**
+     * Customer confirms item received
+     */
+    public function confirmReceived(): void
+    {
+        $this->update([
+            'delivery_status' => 'confirmed_received',
+            'customer_response_at' => now(),
+            'status' => 'completed'
+        ]);
+    }
+
+    /**
+     * Customer requests return/refund
+     */
+    public function requestReturn(string $reason): void
+    {
+        $this->update([
+            'delivery_status' => 'return_requested',
+            'return_status' => 'requested',
+            'return_reason' => $reason,
+            'return_requested_at' => now(),
+            'customer_response_at' => now()
+        ]);
+    }
+
+    /**
+     * Auto-confirm order after deadline
+     */
+    public function autoConfirm(): void
+    {
+        $this->update([
+            'delivery_status' => 'auto_confirmed',
+            'status' => 'completed',
+            'customer_response_at' => now()
+        ]);
+    }
+
+    /**
+     * Check if order is waiting for customer response
+     */
+    public function isWaitingForCustomerResponse(): bool
+    {
+        return $this->delivery_status === 'delivered' && 
+               $this->delivery_confirmation_deadline && 
+               $this->delivery_confirmation_deadline->isFuture();
+    }
+
+    /**
+     * Check if order deadline has passed
+     */
+    public function hasDeadlinePassed(): bool
+    {
+        return $this->delivery_confirmation_deadline && 
+               $this->delivery_confirmation_deadline->isPast() &&
+               $this->delivery_status === 'delivered';
+    }
+
+    /**
+     * Get delivery status badge class
+     */
+    public function getDeliveryStatusBadgeClass(): string
+    {
+        return match($this->delivery_status) {
+            'pending' => 'bg-gray-100 text-gray-800',
+            'delivered' => 'bg-blue-100 text-blue-800',
+            'confirmed_received' => 'bg-green-100 text-green-800',
+            'return_requested' => 'bg-yellow-100 text-yellow-800',
+            'auto_confirmed' => 'bg-purple-100 text-purple-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
+    }
+
+    /**
+     * Get return status badge class
+     */
+    public function getReturnStatusBadgeClass(): string
+    {
+        return match($this->return_status) {
+            'none' => 'bg-gray-100 text-gray-800',
+            'requested' => 'bg-yellow-100 text-yellow-800',
+            'approved' => 'bg-blue-100 text-blue-800',
+            'rejected' => 'bg-red-100 text-red-800',
+            'completed' => 'bg-green-100 text-green-800',
+            default => 'bg-gray-100 text-gray-800'
+        };
+    }
+
+    /**
+     * Scope for orders waiting for customer response
+     */
+    public function scopeWaitingForResponse($query)
+    {
+        return $query->where('delivery_status', 'delivered')
+                    ->where('delivery_confirmation_deadline', '>', now());
+    }
+
+    /**
+     * Scope for orders with passed deadline
+     */
+    public function scopeDeadlinePassed($query)
+    {
+        return $query->where('delivery_status', 'delivered')
+                    ->where('delivery_confirmation_deadline', '<', now());
+    }
+
+    /**
+     * Scope for orders with return requests
+     */
+    public function scopeWithReturnRequests($query)
+    {
+        return $query->where('return_status', '!=', 'none');
     }
 }
