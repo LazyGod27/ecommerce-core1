@@ -789,7 +789,7 @@
                 @if($order)
                     Tracking Order #{{ $order->id }}
                 @else
-                    Your Orders
+                    Order Tracking
                 @endif
             </h1>
             <div class="flex items-center gap-2">
@@ -827,6 +827,19 @@
             </div>
         </div>
         
+        @if(!$order)
+        <div class="no-order-message">
+            <div class="text-center py-12">
+                <i class="ri-error-warning-line text-6xl text-gray-400 mb-4"></i>
+                <h2 class="text-xl font-semibold text-gray-700 mb-2">No Order Found</h2>
+                <p class="text-gray-500 mb-6">The order you're looking for doesn't exist or you don't have permission to view it.</p>
+                <a href="{{ route('profile.orders') }}" class="btn btn-primary">
+                    <i class="ri-arrow-left-line mr-2"></i>
+                    Back to Orders
+                </a>
+            </div>
+        </div>
+        @else
         <!-- Tracking Timeline Section -->
         @if($order && $order->tracking)
         <div class="tracking-timeline">
@@ -1089,6 +1102,7 @@
         </div>
     </div>
 </div>
+@endif
 @endsection
 
 @section('scripts')

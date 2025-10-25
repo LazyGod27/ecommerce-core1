@@ -534,3 +534,18 @@ This integration guide provides everything the Core Transaction 2 team needs to 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

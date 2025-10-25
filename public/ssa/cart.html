@@ -12,6 +12,31 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <title>User</title>
     <style>
+        /* Force logo size consistency - same as index page */
+        .logo img,
+        header .logo img,
+        img[alt="IMARKET PH Logo"],
+        img[src*="logo.png"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
+        
+        /* Maximum specificity override */
+        html body header .logo img,
+        html body .logo img,
+        html body img[alt="IMARKET PH Logo"],
+        html body img[src*="logo.png"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
         
         .dropdown-menu {
             display: none;
@@ -298,5 +323,6 @@
             }
         });
     </script>
+    <script src="logo-enforcer.js"></script>
 </body>
 </html>

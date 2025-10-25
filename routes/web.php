@@ -80,12 +80,41 @@ Route::middleware('auth')->group(function () {
         $orderId = request('order');
         $order = null;
         
-        if ($orderId) {
-            $order = \App\Models\Order::with(['items.product', 'tracking'])
-                ->where('id', $orderId)
-                ->where('user_id', auth()->id())
-                ->first();
+        // Debug information
+        \Log::info('Track Order Request', [
+            'order_id' => $orderId,
+            'user_id' => auth()->id(),
+            'user_name' => auth()->user() ? auth()->user()->name : 'Not authenticated'
+        ]);
+        
+        if (!$orderId) {
+            \Log::warning('Track Order: No order ID provided');
+            return redirect()->route('profile.orders')->with('error', 'No order specified.');
         }
+        
+        if (!auth()->check()) {
+            \Log::warning('Track Order: User not authenticated');
+            return redirect()->route('login')->with('error', 'Please log in to track your orders.');
+        }
+        
+        $order = \App\Models\Order::with(['items.product', 'tracking'])
+            ->where('id', $orderId)
+            ->where('user_id', auth()->id())
+            ->first();
+            
+        if (!$order) {
+            \Log::warning('Track Order: Order not found', [
+                'order_id' => $orderId,
+                'user_id' => auth()->id()
+            ]);
+            return redirect()->route('profile.orders')->with('error', 'Order not found or you do not have permission to view this order.');
+        }
+        
+        \Log::info('Track Order: Success', [
+            'order_id' => $order->id,
+            'order_status' => $order->status,
+            'user_id' => auth()->id()
+        ]);
         
         return view('ssa.track-order', compact('order'));
     })->name('track-order');

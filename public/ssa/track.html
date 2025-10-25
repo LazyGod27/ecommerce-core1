@@ -20,7 +20,32 @@
     <title>User</title>
 </head>
 <body>
-    <style>         
+    <style>
+        /* Force logo size consistency - same as index page */
+        .logo img,
+        header .logo img,
+        img[alt="IMARKET PH Logo"],
+        img[src*="logo.png"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
+        
+        /* Maximum specificity override */
+        html body header .logo img,
+        html body .logo img,
+        html body img[alt="IMARKET PH Logo"],
+        html body img[src*="logo.png"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }         
     body {
             font-family: 'Poppins', sans-serif;
             background-color: var(--bg-color);
@@ -418,5 +443,6 @@
     }
 });
         </script>
+        <script src="logo-enforcer.js"></script>
 </body>
 </html>

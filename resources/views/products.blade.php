@@ -23,6 +23,56 @@
         color: initial !important;
     }
     
+    /* Force logo size consistency on products page */
+    .logo img,
+    header .logo img,
+    .logo a img,
+    header .logo a img,
+    img[alt="IMARKET PH Logo"],
+    img[src*="logo.png"] {
+        max-height: 80px !important;
+        height: auto !important;
+        width: auto !important;
+        display: block !important;
+        margin-top: 6px !important;
+        margin-left: -30px !important;
+    }
+    
+    /* Maximum specificity override for products page */
+    html body header .logo a img,
+    html body .logo img,
+    html body header .logo img,
+    html body .logo a img,
+    html body header .logo a img,
+    html body img[alt="IMARKET PH Logo"],
+    html body img[src*="logo.png"] {
+        max-height: 80px !important;
+        height: auto !important;
+        width: auto !important;
+        display: block !important;
+        margin-top: 6px !important;
+        margin-left: -30px !important;
+    }
+    
+    /* Override any Tailwind classes that might affect logo */
+    .logo .h-8,
+    .logo .h-10,
+    .logo .h-12,
+    .logo .h-16,
+    .logo .h-20,
+    .logo .h-24,
+    .logo .h-32,
+    header .logo .h-8,
+    header .logo .h-10,
+    header .logo .h-12,
+    header .logo .h-16,
+    header .logo .h-20,
+    header .logo .h-24,
+    header .logo .h-32 {
+        max-height: 80px !important;
+        height: auto !important;
+    }
+    
     .hero {
         position: relative;
         height: 60vh;
@@ -872,6 +922,24 @@
                 }, 300);
             });
         });
+        
+        // Force logo size consistency on products page
+        function enforceProductsPageLogoSize() {
+            const logos = document.querySelectorAll('.logo img, header .logo img, img[alt="IMARKET PH Logo"], img[src*="logo.png"]');
+            logos.forEach(function(logo) {
+                logo.style.setProperty('max-height', '80px', 'important');
+                logo.style.setProperty('height', 'auto', 'important');
+                logo.style.setProperty('width', 'auto', 'important');
+                logo.style.setProperty('display', 'block', 'important');
+                logo.style.setProperty('margin-top', '6px', 'important');
+                logo.style.setProperty('margin-left', '-30px', 'important');
+            });
+        }
+        
+        // Apply logo size enforcement
+        enforceProductsPageLogoSize();
+        setTimeout(enforceProductsPageLogoSize, 100);
+        setTimeout(enforceProductsPageLogoSize, 500);
     });
 </script>
 @endsection

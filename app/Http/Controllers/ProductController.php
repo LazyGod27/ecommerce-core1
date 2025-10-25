@@ -38,21 +38,31 @@ class ProductController extends Controller
 
     public function category($category)
     {
-        // Map category slugs to actual category names
+        // Map category slugs to actual category names in database
         $categoryMap = [
-            'gaming' => 'Gaming Products',
-            'accessories' => 'Accessories',
-            'clothing' => 'Clothing & Fashion',
-            'beauty' => 'Beauty & Skincare',
-            'jeans' => 'Jeans Collection',
-            'make-up' => 'Makeup & Cosmetics'
+            'gaming' => 'gaming',
+            'electronics' => 'electronics',
+            'fashion' => 'fashion',
+            'beauty' => 'beauty',
+            'sports' => 'sports',
+            'toys' => 'toys',
+            'home' => 'home',
+            'groceries' => 'groceries',
+            'jeans' => 'jeans',
+            'make-up' => 'make-up',
+            'accessories' => 'accessories',
+            'best-sellers' => 'best',
+            'new-arrivals' => 'new'
         ];
         
-        $categoryName = $categoryMap[$category] ?? ucfirst($category);
+        $actualCategory = $categoryMap[$category] ?? $category;
+        $categoryName = ucfirst(str_replace('-', ' ', $category));
         
-        // For now, we'll use the dynamic JavaScript generation
-        // In a real application, you'd filter products by category from the database
-        $products = collect(); // Empty collection since we're using JS generation
+        // Filter products by category from database
+        $products = Product::where('category', $actualCategory)
+            ->with(['reviews'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(12);
         
         return view('products.category', compact('products', 'categoryName', 'category'));
     }

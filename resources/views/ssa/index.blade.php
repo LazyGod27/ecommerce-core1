@@ -13,7 +13,853 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <title>iMarket PH</title>
     <style>
-        .image-scan-fab{position:fixed;bottom:20px;left:20px;width:50px;height:50px;border-radius:50%;background-color:#007bff;color:#fff;border:none;display:flex;justify-content:center;align-items:center;font-size:1.5rem;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:999;transition:transform .3s ease}.image-scan-fab:hover{transform:scale(1.1)}.voice-toggle-btn{position:fixed;bottom:20px;right:20px;width:180px;height:50px;border-radius:50px;background-color:#007bff;color:#000;border:none;display:flex;justify-content:center;align-items:center;font-size:.9rem;font-weight:600;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.15);z-index:1000;transition:transform .3s ease}.voice-toggle-btn:hover{transform:scale(1.05)}.voice-chat-container{position:fixed;bottom:-100%;right:20px;width:350px;height:450px;background-color:#fff;border-radius:12px;box-shadow:0 5px 20px rgba(0,0,0,.2);display:flex;flex-direction:column;z-index:1001;transition:bottom .5s cubic-bezier(.68,-.55,.27,1.55)}.voice-chat-container.open{bottom:90px}.voice-chat-header{display:flex;justify-content:space-between;align-items:center;padding:15px 20px;background-color:var(--primary-color);color:#00008a;border-top-left-radius:12px;border-top-right-radius:12px;font-weight:600;font-size:1.1rem}.voice-chat-close-btn{background:none;border:none;color:#ffffff;font-size:1.5rem;cursor:pointer;line-height:1}.voice-chat-body{flex-grow:1;padding:20px;overflow-y:auto;background-color:#4f549c;display:flex;flex-direction:column;gap:10px}.voice-message{padding:10px 15px;border-radius:15px;max-width:80%;word-wrap:break-word}.voice-bot-message{background-color:#e0e0e0;align-self:flex-start}.voice-user-message{background-color:var(--primary-color);color:#fff;align-self:flex-end}.voice-chat-input-area{display:flex;justify-content:center;align-items:center;padding:15px;border-top:1px solid #000}#voice-mic-btn{background-color:rgb(125,125,241);color:#000;border:none;border-radius:50%;width:50px;height:50px;font-size:1.5rem;cursor:pointer;transition:background-color .3s ease,transform .3s ease}#voice-mic-btn.listening{background-color:#dc3545;animation:pulse 1s infinite}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}
+        /* Enhanced Modern Animations and Styles */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(44, 60, 140, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(44, 60, 140, 0.6); }
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+        
+        /* Enhanced Hero Section */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            height: auto;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 0 80px 0;
+        }
+
+        /* Main content container */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+            padding: 40px 20px;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* "WELCOME TO" */
+        .hero-welcome {
+            margin-bottom: 15px;
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .hero-welcome h2 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 16px;
+            border-radius: 8px;
+            backdrop-filter: blur(10px);
+            display: inline-block;
+        }
+
+        /* "IMARKET PH" main title */
+        .hero-content h1 {
+            color: #ffffff;
+            font-size: 4rem;
+            font-weight: 900;
+            margin: 10px auto 10px auto;
+            text-shadow: 3px 3px 12px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 0, 0, 0.7);
+            animation: fadeInUp 0.8s ease-out 0.6s both;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: block;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Hero tagline */
+        .hero-tagline {
+            margin: 15px 0 20px 0;
+            animation: fadeInUp 0.8s ease-out 0.8s both;
+        }
+
+        .hero-tagline p {
+            color: #ffffff;
+            font-size: 1.2rem;
+            font-weight: 500;
+            text-align: center;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            margin: 0;
+        }
+
+        
+        .hero-btn {
+            animation: float 3s ease-in-out infinite;
+            transition: all 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .hero-content h1 {
+                font-size: 3rem;
+                padding: 15px 25px;
+            }
+
+            .hero-welcome h2 {
+                font-size: 1.2rem;
+                padding: 6px 12px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                padding: 40px 0 60px 0;
+            }
+
+            .hero-content h1 {
+                font-size: 2.3rem;
+                padding: 12px 20px;
+            }
+
+            .hero-welcome h2 {
+                font-size: 1rem;
+            }
+
+            .hero-tagline p {
+                font-size: 1rem;
+                padding: 10px 16px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-content h1 {
+                font-size: 1.8rem;
+            }
+
+            .hero-welcome h2 {
+                font-size: 0.9rem;
+            }
+
+            .hero-tagline p {
+                font-size: 0.9rem;
+                padding: 8px 12px;
+            }
+        }
+        
+        .hero-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Enhanced Product Cards */
+        .product-card {
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .product-card:hover::before {
+            left: 100%;
+        }
+        
+        .product-card:nth-child(1) { animation-delay: 0.1s; }
+        .product-card:nth-child(2) { animation-delay: 0.2s; }
+        .product-card:nth-child(3) { animation-delay: 0.3s; }
+        .product-card:nth-child(4) { animation-delay: 0.4s; }
+        .product-card:nth-child(5) { animation-delay: 0.5s; }
+        .product-card:nth-child(6) { animation-delay: 0.6s; }
+        .product-card:nth-child(7) { animation-delay: 0.7s; }
+        .product-card:nth-child(8) { animation-delay: 0.8s; }
+        .product-card:nth-child(9) { animation-delay: 0.9s; }
+        .product-card:nth-child(10) { animation-delay: 1.0s; }
+        
+        .product-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .product-img {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .product-img img {
+            transition: transform 0.4s ease;
+        }
+        
+        .product-card:hover .product-img img {
+            transform: scale(1.1);
+        }
+        
+        .discount {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Enhanced Section Headers */
+        .middle-text {
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        .middle-text h2 {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .middle-text h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+        
+        .middle-text:hover h2::after {
+            width: 100%;
+        }
+        
+        /* Enhanced Buttons */
+        .btn {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Enhanced Voice and Image Scan FABs */
+        .image-scan-fab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .image-scan-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .voice-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 60px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            animation: float 3s ease-in-out infinite 1s;
+        }
+        
+        .voice-toggle-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.3);
+        }
+        
+        .voice-chat-container {
+            position: fixed;
+            bottom: -100%;
+            right: 20px;
+            width: 380px;
+            height: 500px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 1001;
+            transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .voice-chat-container.open {
+            bottom: 100px;
+        }
+        
+        .voice-chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .voice-chat-close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+        
+        .voice-chat-close-btn:hover {
+            transform: scale(1.2);
+        }
+        
+        .voice-chat-body {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .voice-message {
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        .voice-bot-message {
+            background: linear-gradient(135deg, #e2e8f0 0%, #cbd5e1 100%);
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .voice-user-message {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .voice-chat-input-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+        }
+        
+        #voice-mic-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #voice-mic-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #voice-mic-btn.listening {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            animation: pulse 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Hero Background Images */
+        .hero-slides {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .hero-slides img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .hero-slides img.active {
+            opacity: 1;
+        }
+        
+        
+        
+        
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+            margin: 20px 0;
+            justify-content: center;
+            animation: fadeInUp 0.8s ease-out 1.1s both;
+            flex-direction: row;
+        }
+        
+        .stat-item {
+            text-align: center;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .stat-number {
+            display: block;
+            font-size: 2.5rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 5px;
+            color: #ffffff;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #ffffff;
+            font-weight: 600;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+        }
+        
+        .shop-now-container {
+            margin: 20px 0;
+            animation: fadeInUp 0.8s ease-out 1.2s both;
+        }
+        
+        .hero-actions {
+            margin: 20px 0 0 0;
+            animation: fadeInUp 0.8s ease-out 1.3s both;
+        }
+        
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 16px 24px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin: 0 10px;
+        }
+        
+        .hero-btn.primary {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.5), 0 0 30px rgba(255, 107, 107, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+        }
+        
+        .hero-btn.secondary {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+        
+        .hero-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .hero-btn.primary:hover {
+            box-shadow: 0 12px 35px rgba(255, 107, 107, 0.4);
+        }
+        
+        .hero-scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            color: #2c3c8c;
+            font-size: 0.9rem;
+            animation: fadeInUp 0.8s ease-out 1.4s both;
+        }
+        
+        .scroll-arrow {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(44, 60, 140, 0.5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 2s ease-in-out infinite;
+        }
+        
+        .scroll-arrow i {
+            font-size: 1.2rem;
+        }
+        
+        /* Enhanced Hero Dots */
+        .hero-dots {
+            position: absolute;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 12px;
+            z-index: 2;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(44, 60, 140, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .dot.active {
+            background: #2c3c8c;
+            transform: scale(1.2);
+            box-shadow: 0 0 20px rgba(44, 60, 140, 0.5);
+        }
+        
+        .dot:hover {
+            background: rgba(44, 60, 140, 0.7);
+            transform: scale(1.1);
+        }
+        
+        /* Features Section Styles */
+        .features-section {
+            padding: 80px 0;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .features-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23e2e8f0" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 40px 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1a202c;
+            margin-bottom: 15px;
+        }
+        
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.6;
+            font-size: 1rem;
+        }
+        
+        /* Container for features */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+            
+            /* Mobile Hero Adjustments */
+            .hero-welcome h2 {
+                font-size: 1.2rem;
+            }
+            
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+                max-width: 100%;
+                padding: 12px 20px;
+            }
+            
+            .hero {
+                padding: 60px 0 100px 0;
+            }
+            
+            .hero-content {
+                padding: 20px 10px;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                gap: 15px;
+                max-width: 100%;
+                padding: 0 10px;
+                margin: 15px auto 0 auto;
+            }
+            
+            .hero-btn {
+                width: 100%;
+                max-width: 280px;
+                justify-content: center;
+                flex: none;
+            }
+            
+            .shop-now-container {
+                margin: 15px auto;
+                max-width: 280px;
+            }
+            
+            .hero-stats {
+                flex-direction: row;
+                gap: 20px;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .hero-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
         
         /* User Dropdown Styles */
         .user-dropdown {
@@ -198,9 +1044,39 @@
             <img class="slide" src="{{ asset('ssa/school.webp') }}" alt="Slide 5">
         </div>
         <div class="hero-content">
+            <div class="hero-welcome">
+                <h2>Welcome to</h2>
+            </div>
             <h1>IMARKET PH</h1>
-            <p>Discover amazing deals and best-selling products.</p>
-            <a href="{{ route('products') }}" class="hero-btn">Shop Now</a>
+            <div class="hero-tagline">
+                <p>Your Ultimate Shopping Destination in the Philippines</p>
+            </div>
+            <div class="hero-stats">
+                <div class="stat-item">
+                    <span class="stat-number">50K+</span>
+                    <span class="stat-label">Products</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">24/7</span>
+                    <span class="stat-label">Support</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">99%</span>
+                    <span class="stat-label">Satisfaction</span>
+                </div>
+            </div>
+            <div class="shop-now-container">
+                <a href="{{ route('products') }}" class="hero-btn primary">
+                    <i class="ri-shopping-bag-line"></i>
+                    Shop Now
+                </a>
+            </div>
+            <div class="hero-actions">
+                <a href="{{ route('categories.best') }}" class="hero-btn secondary">
+                    <i class="ri-fire-line"></i>
+                    Best Sellers
+                </a>
+            </div>
         </div>
         <div class="hero-dots">
             <span class="dot active" data-index="0"></span>
@@ -208,6 +1084,12 @@
             <span class="dot" data-index="2"></span>
             <span class="dot" data-index="3"></span>
             <span class="dot" data-index="4"></span>
+        </div>
+        <div class="hero-scroll-indicator">
+            <div class="scroll-arrow">
+                <i class="ri-arrow-down-line"></i>
+            </div>
+            <span>Scroll to explore</span>
         </div>
     </section>
 
@@ -369,6 +1251,60 @@
         </div>
     </section>
 
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="middle-text">
+                <h2>Why Choose <span>iMarket PH</span></h2>
+                <p>Experience the best online shopping with our premium features</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ri-truck-line"></i>
+                    </div>
+                    <h3>Fast Delivery</h3>
+                    <p>Get your orders delivered within 24-48 hours across the Philippines with our reliable shipping partners.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ri-shield-check-line"></i>
+                    </div>
+                    <h3>Secure Payments</h3>
+                    <p>Shop with confidence using our secure payment gateway supporting all major payment methods.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ri-customer-service-2-line"></i>
+                    </div>
+                    <h3>24/7 Support</h3>
+                    <p>Our dedicated customer service team is available round the clock to assist you with any queries.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ri-refresh-line"></i>
+                    </div>
+                    <h3>Easy Returns</h3>
+                    <p>Not satisfied? Return your items within 30 days with our hassle-free return policy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ri-price-tag-3-line"></i>
+                    </div>
+                    <h3>Best Prices</h3>
+                    <p>Find the best deals and competitive prices on thousands of products from trusted sellers.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="ri-award-line"></i>
+                    </div>
+                    <h3>Quality Guarantee</h3>
+                    <p>All products are verified for quality and authenticity before being listed on our platform.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="product">
         <div class="middle-text">
             <h2>New <span>Arrival</span></h2>
@@ -451,6 +1387,7 @@
             </div>
         </div>
     </section>
+
 
     <div class="voice-chat-container" id="voice-chat-container">
         <div class="voice-chat-header">
@@ -716,44 +1653,6 @@
             border-color: #e74c3c;
         }
         
-        /* Search Bar Styles */
-        .search-bar {
-            position: relative;
-            display: flex;
-            align-items: center;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            flex: 1;
-            max-width: 600px;
-            margin: 0 20px;
-        }
-        
-        .search-bar input {
-            flex: 1;
-            border: none;
-            outline: none;
-            padding: 12px 16px;
-            font-size: 16px;
-            background: transparent;
-        }
-        
-        .search-btn {
-            background: #2c3c8c;
-            color: white;
-            border: none;
-            padding: 12px 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .search-btn:hover {
-            background: #1e40af;
-        }
         
         .search-btn i {
             font-size: 18px;
@@ -948,11 +1847,59 @@
         window.onload=()=>{startHeroSlider&&startHeroSlider()};
         document.addEventListener('DOMContentLoaded',()=>{
             // Modal functionality removed - using dedicated HTML pages instead
+            
+            
+            // Smooth scroll for hero scroll indicator
+            const scrollIndicator = document.querySelector('.hero-scroll-indicator');
+            if (scrollIndicator) {
+                scrollIndicator.addEventListener('click', function() {
+                    const featuresSection = document.querySelector('.features-section');
+                    if (featuresSection) {
+                        featuresSection.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            }
+            
+            // Intersection Observer for animations
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            }, observerOptions);
+            
+            // Observe elements for scroll animations
+            document.querySelectorAll('.feature-card, .product-card, .middle-text').forEach(el => {
+                observer.observe(el);
+            });
+            
+            // Hero slides rotation
+            const slides = document.querySelectorAll('.hero-slides .slide');
+            let currentSlide = 0;
+            
+            function rotateSlides() {
+                slides.forEach(slide => slide.classList.remove('active'));
+                currentSlide = (currentSlide + 1) % slides.length;
+                slides[currentSlide].classList.add('active');
+            }
+            
+            // Rotate slides every 5 seconds
+            setInterval(rotateSlides, 5000);
         });
         
     </script>
     <script src="https://unpkg.com/scrollreveal"></script>
     <script src="{{ asset('ssa/script.js') }}"></script>
+    <script src="{{ asset('js/logo-consistency.js') }}?v={{ time() }}"></script>
 </body>
 </html>
 

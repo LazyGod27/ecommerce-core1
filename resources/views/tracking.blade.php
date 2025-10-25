@@ -27,6 +27,7 @@
         border-radius: 12px;
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         padding: 30px;
+        min-height: 600px;
     }
     
     .right-panel {
@@ -36,6 +37,71 @@
         box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         padding: 30px;
         height: fit-content;
+        position: sticky;
+        top: 120px;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .container {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .right-panel {
+            position: static;
+            order: -1;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .container {
+            padding: 15px;
+            gap: 10px;
+        }
+        
+        .left-panel, .right-panel {
+            padding: 20px;
+        }
+        
+        .header {
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-start;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .left-panel, .right-panel {
+            padding: 15px;
+        }
+        
+        .progress-container {
+            margin: 20px 0;
+            padding: 15px 0;
+        }
+        
+        .progress-step {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .progress-text {
+            font-size: 0.8rem;
+        }
+        
+        .progress-circle {
+            width: 35px;
+            height: 35px;
+        }
     }
     
     .header {
@@ -59,6 +125,26 @@
         font-weight: 500;
     }
     
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    @media (max-width: 768px) {
+        .header-actions {
+            flex-direction: column;
+            gap: 8px;
+            align-items: flex-end;
+        }
+        
+        .cancel-btn {
+            font-size: 0.8rem;
+            padding: 6px 12px;
+        }
+    }
+    
     .cancel-btn {
         background: #dc2626;
         color: white;
@@ -78,6 +164,9 @@
         position: relative;
         margin: 30px 0;
         padding: 20px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .progress-line {
@@ -178,6 +267,19 @@
         transition: all 0.3s ease;
     }
     
+    @media (max-width: 768px) {
+        .product-card {
+            flex-direction: column;
+            text-align: center;
+            gap: 10px;
+        }
+        
+        .product-image {
+            width: 100px;
+            height: 100px;
+        }
+    }
+    
     .product-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -232,6 +334,20 @@
         gap: 15px;
     }
     
+    @media (max-width: 768px) {
+        .suggested-products-grid {
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 10px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .suggested-products-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+    }
+    
     .suggested-product-card {
         text-align: center;
         padding: 15px;
@@ -261,6 +377,23 @@
         color: var(--text-color);
     }
     
+    .empty-state {
+        padding: 2rem;
+    }
+    
+    .loading-spinner {
+        padding: 2rem;
+    }
+    
+    .animate-spin {
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    
     .modal-overlay {
         position: fixed;
         top: 0;
@@ -282,6 +415,22 @@
         width: 90%;
         max-height: 80vh;
         overflow-y: auto;
+    }
+    
+    @media (max-width: 768px) {
+        .modal-content {
+            padding: 20px;
+            width: 95%;
+            margin: 10px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 15px;
+            width: 98%;
+            margin: 5px;
+        }
     }
     
     .modal-header {
@@ -358,12 +507,12 @@
     <!-- Left Panel for Status and Products -->
     <div class="left-panel">
         <div class="header">
-            <a href="#" class="text-gray-500 hover:text-gray-800">
+            <a href="{{ route('products') }}" class="text-gray-500 hover:text-gray-800">
                 <i class="ri-arrow-left-line"></i>
             </a>
             <h1>Your Orders</h1>
-            <div style="display: flex; align-items: center; gap: 10px;">
-                <a href="#" class="text-blue-500 hover:underline text-sm font-medium">View All ></a>
+            <div class="header-actions">
+                <a href="{{ route('tracking') }}" class="text-blue-500 hover:underline text-sm font-medium">View All ></a>
                 <button class="cancel-btn" id="cancel-order-btn">Cancel Order</button>
             </div>
         </div>
@@ -402,7 +551,17 @@
                 <!-- Product cards will be dynamically inserted here -->
             </div>
             <div id="no-products-message" class="hidden text-center text-gray-500 mt-8">
-                <p>No products found in this category.</p>
+                <div class="empty-state">
+                    <i class="ri-shopping-bag-line" style="font-size: 3rem; color: #d1d5db; margin-bottom: 1rem;"></i>
+                    <p>No products found in this category.</p>
+                    <a href="{{ route('products') }}" class="text-blue-500 hover:underline mt-2 inline-block">Browse Products</a>
+                </div>
+            </div>
+            <div id="loading-state" class="hidden text-center text-gray-500 mt-8">
+                <div class="loading-spinner">
+                    <i class="ri-loader-4-line animate-spin" style="font-size: 2rem; color: var(--main-color);"></i>
+                    <p class="mt-2">Loading products...</p>
+                </div>
             </div>
         </div>
     </div>

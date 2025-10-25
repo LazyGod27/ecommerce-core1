@@ -19,7 +19,7 @@ class TrackingController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
             
-        return view('tracking', compact('orders'));
+        return view('tracking', compact('orders', 'user'));
     }
 
     public function show($orderId)

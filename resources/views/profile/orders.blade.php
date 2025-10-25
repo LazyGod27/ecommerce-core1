@@ -364,6 +364,33 @@
             </div>
 
             <div class="orders-content">
+                @if(session('error'))
+                    <div class="alert alert-danger mb-4" style="background: #fee; border: 1px solid #fcc; color: #c33; padding: 15px; border-radius: 8px;">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        {{ session('error') }}
+                    </div>
+                @endif
+                
+                @if(session('success'))
+                    <div class="alert alert-success mb-4" style="background: #efe; border: 1px solid #cfc; color: #3c3; padding: 15px; border-radius: 8px;">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        {{ session('success') }}
+                    </div>
+                @endif
+                
+                @if(config('app.debug'))
+                    <div class="debug-info mb-4" style="background: #f0f0f0; border: 1px solid #ccc; padding: 10px; border-radius: 5px; font-size: 12px;">
+                        <strong>Debug Info:</strong><br>
+                        User ID: {{ auth()->id() }}<br>
+                        User Name: {{ auth()->user()->name ?? 'Not logged in' }}<br>
+                        Orders Count: {{ $orders->count() }}<br>
+                        @if($orders->count() > 0)
+                            First Order ID: {{ $orders->first()->id }}<br>
+                            First Order Status: {{ $orders->first()->status }}<br>
+                        @endif
+                    </div>
+                @endif
+                
                 @if($orders->count() > 0)
                     @foreach($orders as $order)
                         <div class="order-item">

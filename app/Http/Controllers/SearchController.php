@@ -221,14 +221,17 @@ class SearchController extends Controller
     public function popular(): JsonResponse
     {
         $popular = [
-            ['text' => 'Best Sellers', 'icon' => 'ri-trophy-line', 'category' => 'best-sellers'],
-            ['text' => 'New Arrivals', 'icon' => 'ri-star-smile-line', 'category' => 'new-arrivals'],
+            ['text' => 'Gaming', 'icon' => 'ri-gamepad-line', 'category' => 'gaming'],
             ['text' => 'Electronics', 'icon' => 'ri-smartphone-line', 'category' => 'electronics'],
             ['text' => 'Fashion', 'icon' => 'ri-shirt-line', 'category' => 'fashion'],
-            ['text' => 'Home & Living', 'icon' => 'ri-home-line', 'category' => 'home'],
             ['text' => 'Beauty & Health', 'icon' => 'ri-heart-line', 'category' => 'beauty'],
             ['text' => 'Sports & Outdoor', 'icon' => 'ri-football-line', 'category' => 'sports'],
-            ['text' => 'Toys & Games', 'icon' => 'ri-gamepad-line', 'category' => 'toys']
+            ['text' => 'Toys & Games', 'icon' => 'ri-gamepad-line', 'category' => 'toys'],
+            ['text' => 'Home & Living', 'icon' => 'ri-home-line', 'category' => 'home'],
+            ['text' => 'Groceries', 'icon' => 'ri-shopping-basket-line', 'category' => 'groceries'],
+            ['text' => 'Jeans', 'icon' => 'ri-pants-line', 'category' => 'jeans'],
+            ['text' => 'Makeup', 'icon' => 'ri-makeup-line', 'category' => 'make-up'],
+            ['text' => 'Accessories', 'icon' => 'ri-watch-line', 'category' => 'accessories']
         ];
 
         return response()->json(['popular' => $popular]);

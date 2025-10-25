@@ -67,8 +67,68 @@
     </div>
 
     <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-        <!-- Products will be generated dynamically via JavaScript -->
+        @forelse($products as $product)
+            @php
+                $discount = $product->original_price ? round((($product->original_price - $product->price) / $product->original_price) * 100) : 0;
+                $soldCount = $product->review_count ? $product->review_count * 10 : rand(50, 2000);
+            @endphp
+            <div class="product-card bg-white rounded-lg shadow-md overflow-hidden relative transition-transform duration-300 hover:scale-105 cursor-pointer"
+                 onclick="handleProductClick(event, { 
+                     id: '{{ $product->id }}', 
+                     name: '{{ $product->name }}', 
+                     price: {{ $product->price }}, 
+                     image: '{{ $product->image }}' 
+                 })">
+                <img src="{{ $product->image }}" alt="{{ $product->name }}" class="w-full h-auto" onerror="this.src='{{ asset('ssa/logo.png') }}'">
+                
+                @if($discount > 0)
+                    <span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">-{{ $discount }}%</span>
+                @endif
+                
+                <div class="p-3">
+                    <h3 class="font-semibold text-gray-800 text-sm mb-1 truncate">{{ $product->name }}</h3>
+                    
+                    <div class="flex items-center text-xs text-gray-600 mb-2">
+                        <i class="fas fa-star text-yellow-400 mr-1"></i>
+                        <span class="mr-2">{{ $product->average_rating ?? '4.5' }}</span>
+                        <span>({{ $soldCount }} sold)</span>
+                    </div>
+                    
+                    <div class="flex items-baseline justify-between text-base mb-2">
+                        <span class="font-bold text-blue-600">₱{{ number_format($product->price, 2) }}</span>
+                        @if($product->original_price && $product->original_price > $product->price)
+                            <span class="text-xs text-gray-500 line-through">₱{{ number_format($product->original_price, 2) }}</span>
+                        @endif
+                    </div>
+                    
+                    <!-- Add to Cart Button -->
+                    <div class="mt-3">
+                        <form action="{{ route('cart.add', $product) }}" method="POST" style="display: inline-block;">
+                            @csrf
+                            <input type="hidden" name="quantity" value="1">
+                            <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-blue-700 transition-colors duration-300 text-sm">
+                                <i class="fas fa-shopping-cart mr-1"></i> Add to Cart
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-span-full text-center py-12">
+                <h3 class="text-xl font-semibold text-gray-600 mb-4">No products found in this category</h3>
+                <p class="text-gray-500 mb-6">We're working on adding more products to this category.</p>
+                <a href="{{ route('products') }}" class="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                    Browse All Products
+                </a>
+            </div>
+        @endforelse
     </div>
+
+    @if($products->hasPages())
+        <div class="mt-8 flex justify-center">
+            {{ $products->links() }}
+        </div>
+    @endif
 </div>
 
 <!-- Product Modal -->
@@ -150,6 +210,14 @@
         }, 3000); 
     };
 
+    const handleProductClick = (event, product) => {
+        // Don't open modal if clicking on the Add to Cart button or form
+        if (event.target.closest('form') || event.target.closest('button')) {
+            return;
+        }
+        openProductModal(product);
+    };
+
     const openProductModal = (product) => {
         modalProductName.textContent = product.name;
         modalProductPrice.textContent = `₱${product.price.toFixed(2)}`;
@@ -214,56 +282,7 @@
         form.submit();
     };
 
-    // Generate products based on category
-    const category = '{{ $category }}';
-    const productNames = categoryProducts[category] || ['Product'];
-    
-    for (let i = 1; i <= 20; i++) {
-        const randomColor = colors[0];
-        const isFlashSale = getRandom(0, 1) === 1;
-        const hasExtra = getRandom(0, 1) === 1;
-        const hasFreeShipping = getRandom(0, 1) === 1;
-        const hasCOD = getRandom(0, 1) === 1;
-        const productName = productNames[getRandom(0, productNames.length - 1)] + ` ${i}`;
-
-        const originalPrice = getRandom(500, 2000);
-        const discountPercentage = isFlashSale ? getRandom(20, 80) : 0;
-        const salePrice = isFlashSale ? (originalPrice - (originalPrice * discountPercentage / 100)).toFixed(2) : originalPrice.toFixed(2);
-        
-        const rating = (getRandom(30, 50) / 10).toFixed(1);
-        const soldCount = `${getRandom(10, 500)} sold`;
-        
-        const productHtml = `
-            <div class="product-card bg-white rounded-lg shadow-md overflow-hidden relative transition-transform duration-300 hover:scale-105 cursor-pointer"
-                 onclick="openProductModal({ id: '${i}', name: '${productName}', price: ${salePrice}, image: 'https://placehold.co/400x400/${randomColor.bg}/${randomColor.text}?text=${encodeURIComponent(productName)}' })">
-                <img src="https://placehold.co/400x400/${randomColor.bg}/${randomColor.text}?text=${encodeURIComponent(productName)}" alt="Product Image" class="w-full h-auto">
-                
-                ${hasExtra ? `<span class="absolute top-2 left-2 bg-blue-400 text-white text-xs font-semibold px-2 py-1 rounded-full">XTRA</span>` : ''}
-                ${isFlashSale ? `<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-full">-${discountPercentage}%</span>` : ''}
-                
-                <div class="p-3">
-                    <h3 class="font-semibold text-gray-800 text-sm mb-1 truncate">${productName}</h3>
-                    
-                    <div class="flex items-center text-xs text-gray-600 mb-2">
-                        <i class="fas fa-star text-yellow-400 mr-1"></i>
-                        <span class="mr-2">${rating}</span>
-                        <span>(${soldCount})</span>
-                    </div>
-
-                    <div class="flex items-center text-xs text-gray-600 space-x-1 mb-2">
-                        ${hasFreeShipping ? `<span class="bg-gray-200 text-gray-700 px-1 py-0.5 rounded-full">Free Shipping</span>` : ''}
-                        ${hasCOD ? `<span class="bg-gray-200 text-gray-700 px-1 py-0.5 rounded-full">COD</span>` : ''}
-                    </div>
-                    
-                    <div class="flex items-baseline justify-between text-base mb-2">
-                        <span class="font-bold text-blue-600">₱${salePrice}</span>
-                        ${isFlashSale ? `<span class="text-xs text-gray-500 line-through">₱${originalPrice.toFixed(2)}</span>` : ''}
-                    </div>
-                </div>
-            </div>
-        `;
-        productGrid.innerHTML += productHtml;
-    }
+    // Products are now loaded from the database via Blade template
 
     modalAddToCartButton.addEventListener('click', (event) => {
         const product = {

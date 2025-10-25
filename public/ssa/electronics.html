@@ -12,6 +12,32 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
     <title>User</title>
     <style>
+        /* Force logo size consistency - same as index page */
+        .logo img,
+        header .logo img,
+        img[alt="IMARKET PH Logo"],
+        img[src*="logo.png"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
+        
+        /* Maximum specificity override */
+        html body header .logo img,
+        html body .logo img,
+        html body img[alt="IMARKET PH Logo"],
+        html body img[src*="logo.png"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
+        
   .image-scan-fab {
         position: fixed;
         bottom: 20px;
@@ -1265,9 +1291,28 @@
                 alert('Please select a size and color before checking out.');
             }
         });
+        
+        // Force logo size consistency - same as index page
+        function enforceLogoSize() {
+            const logos = document.querySelectorAll('.logo img, header .logo img, img[alt="IMARKET PH Logo"], img[src*="logo.png"]');
+            logos.forEach(function(logo) {
+                logo.style.setProperty('max-height', '80px', 'important');
+                logo.style.setProperty('height', 'auto', 'important');
+                logo.style.setProperty('width', 'auto', 'important');
+                logo.style.setProperty('display', 'block', 'important');
+                logo.style.setProperty('margin-top', '6px', 'important');
+                logo.style.setProperty('margin-left', '-30px', 'important');
+            });
+        }
+        
+        // Apply logo size enforcement
+        enforceLogoSize();
+        setTimeout(enforceLogoSize, 100);
+        setTimeout(enforceLogoSize, 500);
     });
 </script>
   <script src="https://unpkg.com/scrollreveal"></script>
   <script src="script.js"></script>
+  <script src="logo-enforcer.js"></script>
 </body>
 </html>

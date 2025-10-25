@@ -70,7 +70,17 @@ header .logo img,
 .footer-logo img,
 .logo a img,
 header .logo a img,
-.header .logo a img {
+.header .logo a img,
+/* Additional selectors for different page layouts */
+img[alt*="IMARKET"],
+img[alt*="iMarket"],
+img[alt*="logo"],
+img[src*="logo.png"],
+img[alt="IMARKET PH Logo"],
+/* Tailwind and other framework overrides */
+.logo img[src*="logo"],
+header img[src*="logo"],
+.header img[src*="logo"] {
   max-height: 80px !important;
   width: auto !important;
   height: auto !important;
@@ -91,7 +101,15 @@ img[alt*="IMARKET"],
 img[alt*="iMarket"],
 img[alt*="logo"],
 img[src*="logo.png"],
-img[alt="IMARKET PH Logo"] {
+img[alt="IMARKET PH Logo"],
+/* Additional comprehensive selectors */
+img[src*="ssa/logo.png"],
+img[src*="/ssa/logo.png"],
+img[src*="public/ssa/logo.png"],
+/* Tailwind CSS overrides */
+.w-\[.*\] img[src*="logo"],
+.h-\[.*\] img[src*="logo"],
+.max-w-\[.*\] img[src*="logo"] {
   max-height: 80px !important;
   width: auto !important;
   height: auto !important;
@@ -2152,4 +2170,63 @@ span{
             }
         }
         /* for voice command */
+        
+        /* FINAL LOGO SIZE OVERRIDE - Highest Priority */
+        /* This section ensures ALL iMarket logos are exactly 80px max-height */
+        img[src*="logo.png"],
+        img[alt*="IMARKET"],
+        img[alt*="iMarket"],
+        img[alt*="logo"],
+        .logo img,
+        header .logo img,
+        .header .logo img,
+        .logo a img,
+        header .logo a img,
+        .header .logo a img,
+        /* Override any Tailwind classes */
+        .w-16 img[src*="logo"],
+        .h-16 img[src*="logo"],
+        .w-20 img[src*="logo"],
+        .h-20 img[src*="logo"],
+        .w-24 img[src*="logo"],
+        .h-24 img[src*="logo"],
+        .w-32 img[src*="logo"],
+        .h-32 img[src*="logo"],
+        /* Override any inline styles or other CSS */
+        img[style*="height"][src*="logo"],
+        img[style*="width"][src*="logo"] {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
+        
+        /* ULTIMATE OVERRIDE - Even more specific selectors */
+        html body header div.logo img,
+        html body div.logo img,
+        html body header div.logo a img,
+        html body div.logo a img,
+        html body header .logo img,
+        html body .logo img,
+        html body header .logo a img,
+        html body .logo a img {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+            margin-top: 6px !important;
+            margin-left: -30px !important;
+        }
+        
+        /* JavaScript-based logo size enforcement */
+        /* This will be applied via JavaScript to ensure consistency */
+        .logo-size-enforced {
+            max-height: 80px !important;
+            height: auto !important;
+            width: auto !important;
+            display: block !important;
+        }
+        
         

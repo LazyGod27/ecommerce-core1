@@ -16,7 +16,86 @@ class ProductSeeder extends Seeder
         
         // Create comprehensive products for all categories
         $products = [
-            // GAMING CATEGORY
+            // GAMING CATEGORY - Additional Gaming Mice
+            [
+                'name' => 'Gaming Mouse RGB Pro',
+                'description' => 'Professional gaming mouse with 25K DPI sensor, programmable buttons, RGB lighting, and ultra-fast response time.',
+                'price' => 69.99,
+                'category' => 'gaming',
+                'image' => 'ssa/mouse.jpg',
+                'stock' => 60,
+                'average_rating' => 4.7,
+                'review_count' => 41
+            ],
+            [
+                'name' => 'Wireless Gaming Mouse',
+                'description' => 'High-performance wireless gaming mouse with 20K DPI sensor, long battery life, and ergonomic design.',
+                'price' => 89.99,
+                'original_price' => 119.99,
+                'category' => 'gaming',
+                'image' => 'https://placehold.co/400x400/2c3c8c/ffffff?text=Wireless+Gaming+Mouse',
+                'stock' => 45,
+                'average_rating' => 4.6,
+                'review_count' => 38
+            ],
+            [
+                'name' => 'Gaming Mouse with RGB',
+                'description' => 'Precision gaming mouse with customizable RGB lighting, adjustable DPI, and comfortable grip.',
+                'price' => 49.99,
+                'original_price' => 69.99,
+                'category' => 'gaming',
+                'image' => 'https://placehold.co/400x400/3498db/ffffff?text=RGB+Gaming+Mouse',
+                'stock' => 70,
+                'average_rating' => 4.5,
+                'review_count' => 52
+            ],
+
+            // GAMING CATEGORY - Additional Gaming Keyboards
+            [
+                'name' => 'Gaming Keyboard RGB',
+                'description' => 'RGB mechanical gaming keyboard with Cherry MX switches, customizable lighting, and durable construction for gaming.',
+                'price' => 129.99,
+                'category' => 'gaming',
+                'image' => 'ssa/keyboard.jpg',
+                'stock' => 45,
+                'average_rating' => 4.6,
+                'review_count' => 38
+            ],
+            [
+                'name' => 'Mechanical Gaming Keyboard',
+                'description' => 'Professional mechanical gaming keyboard with tactile switches, macro keys, and RGB backlighting.',
+                'price' => 149.99,
+                'original_price' => 199.99,
+                'category' => 'gaming',
+                'image' => 'https://placehold.co/400x400/e74c3c/ffffff?text=Mechanical+Keyboard',
+                'stock' => 35,
+                'average_rating' => 4.8,
+                'review_count' => 67
+            ],
+            [
+                'name' => 'Wireless Gaming Keyboard',
+                'description' => 'Wireless mechanical gaming keyboard with low-latency connection, RGB lighting, and long battery life.',
+                'price' => 179.99,
+                'original_price' => 229.99,
+                'category' => 'gaming',
+                'image' => 'https://placehold.co/400x400/9b59b6/ffffff?text=Wireless+Keyboard',
+                'stock' => 25,
+                'average_rating' => 4.7,
+                'review_count' => 43
+            ],
+            [
+                'name' => 'Compact Gaming Keyboard',
+                'description' => 'Tenkeyless gaming keyboard with mechanical switches, RGB lighting, and space-saving design.',
+                'price' => 99.99,
+                'original_price' => 129.99,
+                'category' => 'gaming',
+                'image' => 'https://placehold.co/400x400/27ae60/ffffff?text=Compact+Keyboard',
+                'stock' => 55,
+                'average_rating' => 4.4,
+                'review_count' => 29
+            ],
+
+            // GAMING CATEGORY - Other Gaming Products
             [
                 'name' => 'Gaming Laptop - RTX 4070',
                 'description' => 'High-performance gaming laptop with NVIDIA RTX 4070 graphics, 16GB RAM, 1TB SSD, and 15.6" 144Hz display. Perfect for gaming and content creation.',
