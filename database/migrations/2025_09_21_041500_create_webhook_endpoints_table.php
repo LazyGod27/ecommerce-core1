@@ -24,7 +24,7 @@ return new class extends Migration
             $table->json('headers')->nullable();
             $table->timestamps();
 
-            $table->index(['is_active', 'events']);
+            $table->index('is_active');
         });
     }
 

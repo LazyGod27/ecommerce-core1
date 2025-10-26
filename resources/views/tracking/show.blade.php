@@ -256,14 +256,25 @@
             @foreach($order->items as $item)
             <div class="flex items-center justify-between border-b border-gray-200 pb-4">
                 <div class="flex items-center space-x-4">
-                    <img src="{{ asset('storage/' . $item->product->image) }}" 
-                         alt="{{ $item->product->name }}" 
-                         class="w-16 h-16 rounded-md object-cover">
-                    <div>
-                        <h3 class="font-semibold text-gray-800">{{ $item->product->name }}</h3>
-                        <p class="text-sm text-gray-600">Quantity: {{ $item->quantity }}</p>
-                        <p class="text-sm text-gray-600">Unit Price: ₱{{ number_format($item->price, 2) }}</p>
-                    </div>
+                    @if($item->product)
+                        <img src="{{ asset('storage/' . $item->product->image) }}" 
+                             alt="{{ $item->product->name }}" 
+                             class="w-16 h-16 rounded-md object-cover">
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ $item->product->name }}</h3>
+                            <p class="text-sm text-gray-600">Quantity: {{ $item->quantity }}</p>
+                            <p class="text-sm text-gray-600">Unit Price: ₱{{ number_format($item->price, 2) }}</p>
+                        </div>
+                    @else
+                        <div class="w-16 h-16 bg-gray-200 rounded-md flex items-center justify-center">
+                            <span class="text-gray-400 text-xs">No Image</span>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-800">{{ $item->product_name ?? 'Product Unavailable' }}</h3>
+                            <p class="text-sm text-gray-600">Quantity: {{ $item->quantity }}</p>
+                            <p class="text-sm text-gray-600">Unit Price: ₱{{ number_format($item->price, 2) }}</p>
+                        </div>
+                    @endif
                 </div>
                 <div class="text-right">
                     <p class="font-semibold text-gray-800">₱{{ number_format($item->total, 2) }}</p>
